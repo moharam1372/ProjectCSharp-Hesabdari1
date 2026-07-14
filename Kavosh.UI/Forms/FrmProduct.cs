@@ -19,10 +19,12 @@ namespace Kavosh.UI.Forms
     {
         private ClsFont _clsFont = new(false);
         private ClsFont _clsFontBold = new(true);
+        private readonly ProductService _productService;
         private Guid _selectedProductId = Guid.Empty; // خالی یعنی رکورد جدید
-        public FrmProduct()
+        public FrmProduct(ProductService productService)   // 👈 دریافت از DI
         {
             InitializeComponent();
+            _productService = productService;               // 👈 مقداردهی فیلد
             Shown += FrmMain_Shown;
         }
 
@@ -128,8 +130,10 @@ namespace Kavosh.UI.Forms
                     Id = _selectedProductId,
                     ProductCode = layInput.GetValue<long>("کد محصول"),
                     Title = layInput.GetValue<string>("نام محصول"),
-                    ProductGroupId = layInput.GetValue<Guid>("گروه محصول"),
-                    ProductUnitId = layInput.GetValue<Guid>("سنجش"),
+                    //ProductGroupId = layInput.GetValue<Guid>("گروه محصول"),
+                    ProductGroupId = Guid.Parse("e0fbeaa9-bbbe-44f5-af24-c69ce2d1136d"),
+                    ProductUnitId = Guid.Parse("c560bc27-a69d-45c3-9fd2-4b3b17acb5ba"),
+                    //ProductUnitId = layInput.GetValue<Guid>("سنجش"),
                     InitialInventory = layInput.GetValue<float>("موجودی اولیه"),
                     SellPrice = layInput.GetValue<long>("قیمت فروش"),
                 };
