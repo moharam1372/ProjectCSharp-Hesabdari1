@@ -14,6 +14,11 @@ namespace Kavosh.DataAccess
 
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Person> Persons { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<ProductUnit> ProductUnits { get; set; }
+        public DbSet<ProductGroup> ProductGroups { get; set; }
+
+
         // TODO: به ازای هر یک از ۱۵ جدول، یک DbSet مشابه اینجا اضافه کنید
         // public DbSet<Order> Orders { get; set; }
         // public DbSet<Product> Products { get; set; }

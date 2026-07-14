@@ -57,6 +57,7 @@ namespace Kavosh.UI
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
             services.AddScoped<ICustomerRepository, CustomerRepository>();
+            services.AddScoped<PersonService>();
             //services.AddScoped<ICustomerRepository, CustomerRepository>();
 
             // Services
