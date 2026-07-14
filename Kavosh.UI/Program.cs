@@ -4,6 +4,7 @@ using Kavosh.DataAccess;
 using Kavosh.DataAccess.Repositories;
 using Kavosh.Domain.Interfaces;
 using Kavosh.Services;
+using Kavosh.UI.Forms;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -57,14 +58,20 @@ namespace Kavosh.UI
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
             services.AddScoped<ICustomerRepository, CustomerRepository>();
-            services.AddScoped<PersonService>();
+            services.AddScoped<IProductRepository, ProductRepository>();
+
+            //services.AddScoped<ProductUnitService>();
+            //services.AddScoped<ProductGroupService>();
             //services.AddScoped<ICustomerRepository, CustomerRepository>();
 
             // Services
             services.AddScoped<CustomerService>();
+            services.AddScoped<PersonService>();
+            services.AddScoped<ProductService>();
 
             // Forms
             services.AddTransient<FrmMain>();
+            services.AddTransient<FrmProduct>();                           // 👈 جدید
             //services.AddTransient<CustomerForm>();
         }
         private static void InitializeDatabase()

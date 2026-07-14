@@ -1,3 +1,4 @@
+using Kavosh.DataAccess.Repositories;
 using Kavosh.Domain.Entities;
 using Kavosh.Domain.Interfaces;
 using Kavosh.Services.DTOs;
@@ -11,6 +12,36 @@ namespace Kavosh.Services
         public CustomerService(IRepository<Customer> repository)
         {
             _repository = repository;
+        }
+
+        public async Task<Guid> SaveCustomerAsync(CustomerDto dto)
+        {
+            var (entity, isNew) = await _repository.GetOrNew(dto.Id);
+
+            Validate(dto);
+
+            entity.FullName = dto.FullName;
+            entity.PhoneNumber = dto.PhoneNumber;
+            entity.Email = dto.Email;
+
+            if (isNew)
+            {
+                entity.CreatedDate = DateTime.Now;
+                entity.CreatedBy = Environment.UserName;
+            }
+            else
+            {
+                entity.ModifiedDate = DateTime.Now;
+                entity.ModifiedBy = Environment.UserName;
+            }
+
+            if (isNew)
+                await _repository.Add(entity);
+            else
+                await _repository.Update(entity);
+
+            await _repository.SaveChangesAsync();
+            return entity.Id;
         }
 
         // ============= خواندن =============

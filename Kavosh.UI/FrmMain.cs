@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Kavosh.UI.Forms;
+using Microsoft.Extensions.DependencyInjection;
 using MyCom.Class;
 
 namespace Kavosh.UI
@@ -38,7 +39,10 @@ namespace Kavosh.UI
       
         private void barBtnProduct_ItemClick(object sender, ItemClickEventArgs e)
         {
-            new FrmProduct().OverShowWait<FrmProduct>(this);
+            //new FrmProduct().OverShowWait<FrmProduct>(this);
+
+            var frm = Program.ServiceProvider.GetRequiredService<FrmProduct>();
+            frm.OverShowWait<FrmProduct>(this);
         }
 
      

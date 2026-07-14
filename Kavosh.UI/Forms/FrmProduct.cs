@@ -1,5 +1,9 @@
-﻿using DevExpress.XtraEditors;
+﻿using DevExpress.Utils.Html.Internal;
+using DevExpress.XtraEditors;
+using Kavosh.Services;
+using Kavosh.Services.DTOs;
 using MyCom.Class;
+using MyCom.Object;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,7 +12,6 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using MyCom.Object;
 
 namespace Kavosh.UI.Forms
 {
@@ -16,7 +19,7 @@ namespace Kavosh.UI.Forms
     {
         private ClsFont _clsFont = new(false);
         private ClsFont _clsFontBold = new(true);
-
+        private Guid _selectedProductId = Guid.Empty; // خالی یعنی رکورد جدید
         public FrmProduct()
         {
             InitializeComponent();
@@ -33,7 +36,7 @@ namespace Kavosh.UI.Forms
         public async Task SetStyle()
         {
             _clsFontBold.ChangeFont(dgvProduct);
-         await   dgvProduct.SetStyle();
+            await dgvProduct.SetStyle();
         }
 
 
@@ -116,7 +119,34 @@ namespace Kavosh.UI.Forms
 
         }
 
-        private void LayInput_BtnSaveClick(object sender, EventArgs e)
+        private async void LayInput_BtnSaveClick(object sender, EventArgs e)
+        {
+            try
+            {
+                var dto = new ProductDto
+                {
+                    Id = _selectedProductId,
+                    ProductCode = layInput.GetValue<long>("کد محصول"),
+                    Title = layInput.GetValue<string>("نام محصول"),
+                    ProductGroupId = layInput.GetValue<Guid>("گروه محصول"),
+                    ProductUnitId = layInput.GetValue<Guid>("سنجش"),
+                    InitialInventory = layInput.GetValue<float>("موجودی اولیه"),
+                    SellPrice = layInput.GetValue<long>("قیمت فروش"),
+                };
+
+                var savedId = await _productService.SaveProductAsync(dto);
+                _selectedProductId = savedId;
+
+                await SetFieldDgvProduct(); // رفرش گرید
+                XtraMessageBox.Show("ذخیره شد.", "موفق", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                XtraMessageBox.Show(ex.Message, "خطا", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void FrmProduct_Load(object sender, EventArgs e)
         {
 
         }

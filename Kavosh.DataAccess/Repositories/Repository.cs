@@ -57,7 +57,9 @@ namespace Kavosh.DataAccess.Repositories
         // ============= متدهای Add =============
         public async Task Add(T entity)
         {
-            entity.Id = Guid.NewGuid();
+            if (entity.Id == Guid.Empty)
+                entity.Id = Guid.NewGuid();
+
             entity.CreatedAt = DateTime.UtcNow;
             entity.IsDeleted = false;
             await _dbSet.AddAsync(entity);
@@ -73,12 +75,38 @@ namespace Kavosh.DataAccess.Repositories
             }
             await _dbSet.AddRangeAsync(entities);
         }
-
+        // فیلدهایی که فقط موقع «ایجاد» رکورد باید ست بشن و هیچ‌وقت با Update بازنویسی نشن
+        private static readonly string[] _preserveOnUpdateFields =
+        {
+            nameof(BaseEntity.CreatedAt),   // همیشه روی همه‌ی Entity ها هست
+            nameof(BaseEntity.IsDeleted),   // نباید با Update وضعیت حذف تغییر کنه
+            "CreatedBy",                    // فقط اگه Entity این پراپرتی رو داشته باشه
+            "CreatedDate"                   // فقط اگه Entity این پراپرتی رو داشته باشه
+        };
+        // مقدار فعلی فیلدهای «ایجاد» رو از رکورد موجود روی شیء ورودی کپی می‌کنه
+        // تا SetValues اونا رو با مقدار خالی بازنویسی نکنه
+        private static void PreserveCreationFields(T existing, T incoming)
+        {
+            var type = typeof(T);
+            foreach (var fieldName in _preserveOnUpdateFields)
+            {
+                var prop = type.GetProperty(fieldName);
+                if (prop != null && prop.CanWrite)
+                {
+                    prop.SetValue(incoming, prop.GetValue(existing));
+                }
+            }
+        }
         public async Task AddOrUpdate(T entity)
         {
-            var existing = await _dbSet.FindAsync(entity.Id);
+            var existing = entity.Id != Guid.Empty
+                ? await _dbSet.FindAsync(entity.Id)
+                : null;
+
             if (existing != null)
             {
+                PreserveCreationFields(existing, entity);
+
                 _context.Entry(existing).CurrentValues.SetValues(entity);
                 existing.UpdatedAt = DateTime.UtcNow;
             }

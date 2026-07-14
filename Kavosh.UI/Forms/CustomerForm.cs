@@ -30,13 +30,13 @@ namespace YourApp.UI.Forms
 
         private void gridView1_FocusedRowChanged(object sender, DevExpress.XtraGrid.Views.Base.FocusedRowChangedEventArgs e)
         {
-            if (gridView1.GetFocusedRow() is CustomerDto dto)
-            {
-                _selectedCustomerId = dto.Id;
-                txtFullName.Text = dto.FullName;
-                txtPhone.Text = dto.PhoneNumber;
-                txtEmail.Text = dto.Email;
-            }
+            //if (gridView1.GetFocusedRow() is CustomerDto dto)
+            //{
+            //    _selectedCustomerId = dto.Id;
+            //    txtFullName.Text = dto.FullName;
+            //    txtPhone.Text = dto.PhoneNumber;
+            //    txtEmail.Text = dto.Email;
+            //}
         }
 
         private void btnNew_Click(object sender, EventArgs e)
