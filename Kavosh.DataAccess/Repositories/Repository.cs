@@ -1,0 +1,188 @@
+using Kavosh.Domain;
+using Kavosh.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+
+namespace Kavosh.DataAccess.Repositories
+{
+
+    public class Repository<T> : IRepository<T> where T : BaseEntity, new()
+    {
+        protected readonly AppDbContext _context;
+        protected readonly DbSet<T> _dbSet;
+
+        public Repository(AppDbContext context)
+        {
+            _context = context;
+            _dbSet = _context.Set<T>();
+        }
+
+        // ============= متدهای Any =============
+        public async Task<bool> Any()
+        {
+            return await _dbSet.AnyAsync();
+        }
+
+        public async Task<bool> Any(Guid id)
+        {
+            return await _dbSet.AnyAsync(a => a.Id == id);
+        }
+
+        public async Task<bool> Any(Expression<Func<T, bool>> expression)
+        {
+            return await _dbSet.AnyAsync(expression);
+        }
+
+        // ============= متدهای Get =============
+        public async Task<T> GetById(Guid id)
+        {
+            return await _dbSet.FindAsync(id);
+        }
+
+        public async Task<IEnumerable<T>> GetAll()
+        {
+            return await _dbSet.Where(w => !w.IsDeleted).ToListAsync();
+        }
+
+        public async Task<IEnumerable<T>> Find(Expression<Func<T, bool>> expression)
+        {
+            return await _dbSet.Where(expression).ToListAsync();
+        }
+
+        public async Task<T> First(Expression<Func<T, bool>> expression)
+        {
+            return await _dbSet.FirstOrDefaultAsync(expression);
+        }
+
+        // ============= متدهای Add =============
+        public async Task Add(T entity)
+        {
+            entity.Id = Guid.NewGuid();
+            entity.CreatedAt = DateTime.UtcNow;
+            entity.IsDeleted = false;
+            await _dbSet.AddAsync(entity);
+        }
+
+        public async Task AddRange(IEnumerable<T> entities)
+        {
+            foreach (var entity in entities)
+            {
+                entity.Id = Guid.NewGuid();
+                entity.CreatedAt = DateTime.UtcNow;
+                entity.IsDeleted = false;
+            }
+            await _dbSet.AddRangeAsync(entities);
+        }
+
+        public async Task AddOrUpdate(T entity)
+        {
+            var existing = await _dbSet.FindAsync(entity.Id);
+            if (existing != null)
+            {
+                _context.Entry(existing).CurrentValues.SetValues(entity);
+                existing.UpdatedAt = DateTime.UtcNow;
+            }
+            else
+            {
+                entity.Id = Guid.NewGuid();
+                entity.CreatedAt = DateTime.UtcNow;
+                entity.IsDeleted = false;
+                await _dbSet.AddAsync(entity);
+            }
+        }
+
+        // ============= متدهای Update =============
+        public async Task Update(T entity)
+        {
+            entity.UpdatedAt = DateTime.UtcNow;
+            _dbSet.Update(entity);
+            await Task.CompletedTask;
+        }
+
+        public async Task UpdateRange(List<T> entities)
+        {
+            foreach (var entity in entities)
+            {
+                entity.UpdatedAt = DateTime.UtcNow;
+            }
+            _dbSet.UpdateRange(entities);
+            await Task.CompletedTask;
+        }
+
+        // ============= متدهای Remove (Soft Delete) =============
+        public async Task Remove(T entity)
+        {
+            entity.IsDeleted = true;
+            _dbSet.Update(entity);
+            await Task.CompletedTask;
+        }
+
+        public async Task RemoveRange(IEnumerable<T> entities)
+        {
+            foreach (var entity in entities)
+            {
+                entity.IsDeleted = true;
+            }
+            _dbSet.UpdateRange(entities);
+            await Task.CompletedTask;
+        }
+
+        // ============= متدهای GetOrNew =============
+        public async Task<(T item, bool gNew)> GetOrNew(Guid id)
+        {
+            var item = await _dbSet.FindAsync(id);
+            if (item != null)
+                return (item, false);
+
+            var newItem = new T
+            {
+                Id = Guid.NewGuid(),
+                CreatedAt = DateTime.UtcNow,
+                IsDeleted = false
+            };
+            return (newItem, true);
+        }
+
+        public async Task<(T item, bool gNew)> GetOrNew(Expression<Func<T, bool>> expression)
+        {
+            var item = await _dbSet.FirstOrDefaultAsync(expression);
+            if (item != null)
+                return (item, false);
+
+            var newItem = new T
+            {
+                Id = Guid.NewGuid(),
+                CreatedAt = DateTime.UtcNow,
+                IsDeleted = false
+            };
+            return (newItem, true);
+        }
+
+        // ============= متدهای OrderBy =============
+        public async Task<IEnumerable<T>> OrderBy(Expression<Func<T, object>> expression)
+        {
+            return await _dbSet.OrderBy(expression).ToListAsync();
+        }
+
+        public async Task<IEnumerable<T>> OrderByDesc(Expression<Func<T, object>> expression)
+        {
+            return await _dbSet.OrderByDescending(expression).ToListAsync();
+        }
+
+        // ============= SaveChanges =============
+        public async Task<int> SaveChangesAsync()
+        {
+            // به‌روزرسانی خودکار UpdatedAt
+            var entries = _context.ChangeTracker
+                .Entries<BaseEntity>()
+                .Where(e => e.State == EntityState.Modified);
+
+            foreach (var entry in entries)
+            {
+                entry.Entity.UpdatedAt = DateTime.UtcNow;
+            }
+
+            return await _context.SaveChangesAsync();
+        }
+    }
+}
