@@ -59,7 +59,9 @@ namespace Kavosh.UI
 
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
-
+            services.AddScoped<IProductGroupRepository, ProductGroupRepository>();
+            services.AddScoped<IProductUnitRepository, ProductUnitRepository>();
+         
             //services.AddScoped<ProductUnitService>();
             //services.AddScoped<ProductGroupService>();
             //services.AddScoped<ICustomerRepository, CustomerRepository>();
@@ -68,6 +70,9 @@ namespace Kavosh.UI
             services.AddScoped<CustomerService>();
             services.AddScoped<PersonService>();
             services.AddScoped<ProductService>();
+            services.AddScoped<ProductGroupService>();
+            services.AddScoped<ProductUnitService>();
+
 
             // Forms
             services.AddTransient<FrmMain>();

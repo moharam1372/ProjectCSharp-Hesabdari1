@@ -20,6 +20,8 @@ namespace Kavosh.UI.Forms
         private ClsFont _clsFont = new(false);
         private ClsFont _clsFontBold = new(true);
         private readonly ProductService _productService;
+        private readonly ProductGroupService _productGroupService;
+
         private Guid _selectedProductId = Guid.Empty; // خالی یعنی رکورد جدید
         public FrmProduct(ProductService productService)   // 👈 دریافت از DI
         {
@@ -46,7 +48,7 @@ namespace Kavosh.UI.Forms
 
         public async Task SetFieldDgvProduct()
         {
-            splitContainerControl1.Panel1.WaitDownPage(() =>
+            splitContainerControl1.Panel1.WaitDownPage(async () =>
             {
                 if (dgvProduct.ColumnCount() == 0)
                 {
@@ -68,8 +70,9 @@ namespace Kavosh.UI.Forms
 
                     #region Relation
 
-
-
+                    var getProductGroup = (await _productGroupService.GetAllAsync());
+                    var cmbProductGroup = dgvProduct.AddGridToGrid(getProductGroup, "گروه کالا", "Id", "Title");
+                    cmbProductGroup.HiddenColumn("Id");
                     #endregion
 
                     #region Event
@@ -78,7 +81,19 @@ namespace Kavosh.UI.Forms
 
                     #endregion
                 }
+
+            
             });
+            //#region Load Data
+
+            //var getData = await _productService.GetAllProductsAsync();
+
+            //foreach (var i in getData)
+            //{
+            //    _dtProduct.Rows.Add(i.Id, "", "", "", i.ProductCode, i.ProductGroupId, i.Title, i.InitialInventory, i.InputStock, i.OutputStock, (i.InputStock + i.InitialInventory) - i.OutputStock);
+            //}
+            //dgvProduct.SetFieldSizeColumn();
+            //#endregion
         }
 
         public async Task SetFieldLayInput()
@@ -123,6 +138,7 @@ namespace Kavosh.UI.Forms
 
         private async void LayInput_BtnSaveClick(object sender, EventArgs e)
         {
+            layInput._disableAfterSave = true;
             try
             {
                 var dto = new ProductDto
@@ -131,8 +147,8 @@ namespace Kavosh.UI.Forms
                     ProductCode = layInput.GetValue<long>("کد محصول"),
                     Title = layInput.GetValue<string>("نام محصول"),
                     //ProductGroupId = layInput.GetValue<Guid>("گروه محصول"),
-                    ProductGroupId = Guid.Parse("e0fbeaa9-bbbe-44f5-af24-c69ce2d1136d"),
-                    ProductUnitId = Guid.Parse("c560bc27-a69d-45c3-9fd2-4b3b17acb5ba"),
+                    ProductUnitId = Guid.Parse("e0fbeaa9-bbbe-44f5-af24-c69ce2d1136d"),
+                    ProductGroupId = Guid.Parse("c560bc27-a69d-45c3-9fd2-4b3b17acb5ba"),
                     //ProductUnitId = layInput.GetValue<Guid>("سنجش"),
                     InitialInventory = layInput.GetValue<float>("موجودی اولیه"),
                     SellPrice = layInput.GetValue<long>("قیمت فروش"),
@@ -142,11 +158,13 @@ namespace Kavosh.UI.Forms
                 _selectedProductId = savedId;
 
                 await SetFieldDgvProduct(); // رفرش گرید
-                XtraMessageBox.Show("ذخیره شد.", "موفق", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ClassMessageBox.ShowMSG("اطلاعات ذخیره شد.", Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
+                layInput._disableAfterSave = false;
             }
             catch (Exception ex)
             {
-                XtraMessageBox.Show(ex.Message, "خطا", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                var message = ex.InnerException?.Message ?? ex.Message;
+                ClassMessageBox.ShowMSG(message, Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
             }
         }
 

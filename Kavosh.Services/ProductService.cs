@@ -27,11 +27,23 @@ namespace Kavosh.Services
         }
 
         // ============= ذخیره (افزودن + ویرایش با یک متد) =============
+        // متد عمومی که خودتون هم می‌تونید صداش بزنید (مثلاً برای نمایش پیش‌فرض توی فرم قبل از ذخیره)
+        public async Task<long> GetNextProductCodeAsync()
+        {
+            var maxCode = await _repository.GetMaxCodeAsync();
+            return maxCode + 1;
+        }
+
         public async Task<Guid> SaveProductAsync(ProductDto dto)
         {
             var (entity, isNew) = await _repository.GetOrNew(dto.Id);
 
+            // اگه کاربر کد وارد نکرده باشه (۰ یا کمتر)، خودکار تولید میشه
+            if (dto.ProductCode <= 0)
+                dto.ProductCode = await GetNextProductCodeAsync();
+
             await ValidateAsync(dto, isNew);
+
 
             entity.ProductCode = dto.ProductCode;
             entity.ProductGroupId = dto.ProductGroupId;

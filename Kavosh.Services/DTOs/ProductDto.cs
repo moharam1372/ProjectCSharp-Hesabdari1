@@ -15,6 +15,9 @@ namespace Kavosh.Services.DTOs
         public Guid ProductUnitId { get; set; }
         public string ProductUnitTitle { get; set; }
 
+        /// <summary>
+        /// موجودی اولیه محصول در انبار، که در زمان ایجاد محصول مشخص می‌شود و بعداً با تراکنش‌های انبار تغییر می‌کند.
+        /// </summary>
         public float InitialInventory { get; set; }
         public long UnitPrice { get; set; }
         public long SellPrice { get; set; }

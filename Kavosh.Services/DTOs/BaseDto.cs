@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Kavosh.Services.DTOs
 {
-    internal class BaseDto
-    {
-    }
+    //internal class BaseDto
+    //{
+    //}
 }

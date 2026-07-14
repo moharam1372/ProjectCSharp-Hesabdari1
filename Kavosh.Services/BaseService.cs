@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Kavosh.Services
 {
-    internal class BaseService
-    {
-    }
+    //internal class BaseService
+    //{
+    //}
 }

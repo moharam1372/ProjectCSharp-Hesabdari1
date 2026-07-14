@@ -166,7 +166,7 @@ namespace MyCom.Class
             Frm_MSG Frm_MSG = new Frm_MSG(Message, Title, Icon);
             Frm_MSG.ShowDialog();
         }
-        public static string Msg_Name => "کافه کلوپ کاوش";
+        public static string Msg_Name => "گروه برنامه نویسی کاوش";
         #region ترکیب اعداد ، حروف انگلیسی و فارسی
 
         /// <summary>
