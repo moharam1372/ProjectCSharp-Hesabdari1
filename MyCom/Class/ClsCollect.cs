@@ -2960,6 +2960,62 @@ namespace MyCom.Class
             };
             return Ctrl;
         }
+        public static TextEdit ModelCodeMelli(string name, string nullText, bool enabled = true)
+        {
+            var font = _font.ChangeFont();
+            var Ctrl = new TextEdit
+            {
+                Name = name,
+                Font = font,
+                Enabled = enabled,
+                RightToLeft = RightToLeft.Yes,
+                Properties =
+                {
+                    AllowMouseWheel = false,
+                    NullText = nullText,
+
+                    Appearance =
+                    {
+                        BackColor = Color.White,
+                        TextOptions =
+                        {
+                            HAlignment = HorzAlignment.Center, VAlignment = VertAlignment.Center
+                        }
+                    },
+                    //AppearanceFocused = {BackColor = Color.FromArgb(255, 241, 242, 154),},
+                    AppearanceFocused = {BackColor = Color.FromArgb(255, 242, 242, 217)},
+                    AppearanceDisabled =
+                    {
+                        BackColor = Color.FromArgb(201, 209, 210), ForeColor = Color.FromArgb(77, 66, 108)
+                    },
+                    //LookAndFeel = {UseDefaultLookAndFeel = false, SkinName = "Foggy"},
+                    LookAndFeel = {UseDefaultLookAndFeel = false, SkinName = "WXI"},
+                    MaxLength = 10
+                }
+            };
+
+            Ctrl.CustomDisplayText += (s, e) =>
+            {
+                Ctrl.Properties.Appearance.ForeColor = e.Value == null
+                    ? Color.FromArgb(183, 183, 183)
+                    : Color.FromArgb(16, 1, 1);
+            };
+            Ctrl.TextChanged += (s, e) =>
+            {
+                Ctrl.Properties.Appearance.ForeColor = Color.FromArgb(16, 1, 1);
+            };
+            Ctrl.Leave += (s, e) =>
+            {
+                var getValid = IsValidNationalCode(Ctrl.Text);
+                if (!getValid && Ctrl.Text.Length > 0)
+                {
+                    Ctrl.Focus();
+                    Ctrl.SelectAll();
+                    ClassMessageBox.ShowMSG("کد ملی صحیح نیست!", "", ClassMessageBox.enumIcon.هشدار);
+                }
+            };
+            return Ctrl;
+        }
         public static TextEdit ModelTextEditPassword(string name, int minLength, int maxLength, string nullText, bool enabled = true, bool dblShowPass = false, float fontSize = 13f)
         {
 
@@ -6106,7 +6162,21 @@ namespace MyCom.Class
 
         [DllImport("user32.dll")]
         private static extern IntPtr GetForegroundWindow();
+        public static bool IsValidNationalCode(this string code)
+        {
+            if (string.IsNullOrWhiteSpace(code) || code.Length != 10 || !code.All(char.IsDigit))
+                return false;
 
+            var check = int.Parse(code[9].ToString());
+            var sum = 0;
+
+            for (int i = 0; i < 9; i++)
+                sum += int.Parse(code[i].ToString()) * (10 - i);
+
+            var remainder = sum % 11;
+
+            return (remainder < 2 && check == remainder) || (remainder >= 2 && check == 11 - remainder);
+        }
         public static Process GetActiveProcessFileName()
         {
             IntPtr hwnd = GetForegroundWindow();

@@ -72,11 +72,13 @@ namespace Kavosh.UI
             services.AddScoped<ProductService>();
             services.AddScoped<ProductGroupService>();
             services.AddScoped<ProductUnitService>();
-
+            services.AddScoped<PersonService>();
+         
 
             // Forms
             services.AddTransient<FrmMain>();
-            services.AddTransient<FrmProduct>();                           // 👈 جدید
+            services.AddTransient<FrmProduct>();
+            services.AddTransient<FrmPerson>();// 👈 جدید
             //services.AddTransient<CustomerForm>();
         }
         private static void InitializeDatabase()

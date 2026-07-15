@@ -26,54 +26,25 @@ namespace Kavosh.Services
             return entity is null ? null : ToDto(entity);
         }
 
-        public async Task<bool> ExistsAsync(Guid id)
+        // ============= ذخیره (افزودن + ویرایش با یک متد) =============
+        public async Task<Guid> SavePersonAsync(PersonDto dto)
         {
-            return await _repository.Any(id);
-        }
+            var (entity, isNew) = await _repository.GetOrNew(dto.Id);
 
-        public async Task<PersonDto> GetByCodeMelliAsync(string codeMelli)
-        {
-            var entity = await _repository.First(p => p.CodeMelli == codeMelli);
-            return entity is null ? null : ToDto(entity);
-        }
-
-        // ============= افزودن =============
-        public async Task<Guid> AddPersonAsync(PersonDto dto)
-        {
-            await ValidateAsync(dto, isNew: true);
-
-            var entity = new Person
-            {
-                FullName = dto.FullName,
-                Mobile = dto.Mobile,
-                CodeMelli = dto.CodeMelli,
-                Address = dto.Address
-            };
-
-            // Id و CreatedAt/IsDeleted داخل Repository.Add ست میشن
-            await _repository.Add(entity);
-            await _repository.SaveChangesAsync();
-
-            return entity.Id;
-        }
-
-        // ============= ویرایش =============
-        public async Task UpdatePersonAsync(PersonDto dto)
-        {
-            await ValidateAsync(dto, isNew: false);
-
-            var entity = await _repository.GetById(dto.Id);
-            if (entity is null)
-                throw new InvalidOperationException("شخص یافت نشد");
+            await ValidateAsync(dto, isNew);
 
             entity.FullName = dto.FullName;
             entity.Mobile = dto.Mobile;
             entity.CodeMelli = dto.CodeMelli;
             entity.Address = dto.Address;
 
-            // UpdatedAt خودکار داخل SaveChangesAsync ست میشه
-            await _repository.Update(entity);
+            if (isNew)
+                await _repository.Add(entity);
+            else
+                await _repository.Update(entity);
+
             await _repository.SaveChangesAsync();
+            return entity.Id;
         }
 
         // ============= حذف (Soft Delete) =============
@@ -98,7 +69,6 @@ namespace Kavosh.Services
                 if (dto.CodeMelli.Length != 10 || !dto.CodeMelli.All(char.IsDigit))
                     throw new ArgumentException("کد ملی باید ۱۰ رقم باشد");
 
-                // جلوگیری از تکراری‌بودن کد ملی
                 var existing = await _repository.First(p => p.CodeMelli == dto.CodeMelli);
                 var isDuplicate = existing is not null && (isNew || existing.Id != dto.Id);
 

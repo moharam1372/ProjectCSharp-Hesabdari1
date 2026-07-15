@@ -47,7 +47,8 @@ namespace Kavosh.UI
 
         private void barPerson_ItemClick(object sender, ItemClickEventArgs e)
         {
-
+            var frm = Program.ServiceProvider.GetRequiredService<FrmPerson>();
+            frm.OverShowWait<FrmPerson>(this);
         }
     }
 }
