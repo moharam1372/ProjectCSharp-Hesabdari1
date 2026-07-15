@@ -164,21 +164,37 @@ namespace Kavosh.DataAccess.Repositories
         }
 
         // ============= متدهای GetOrNew =============
+        //public async Task<(T item, bool gNew)> GetOrNew(Guid id)
+        //{
+        //    var item = await _dbSet.FindAsync(id);
+        //    if (item != null)
+        //        return (item, false);
+
+        //    var newItem = new T
+        //    {
+        //        Id = Guid.NewGuid(),
+        //        CreatedAt = DateTime.UtcNow,
+        //        IsDeleted = false
+        //    };
+        //    return (newItem, true);
+        //}
         public async Task<(T item, bool gNew)> GetOrNew(Guid id)
         {
-            var item = await _dbSet.FindAsync(id);
+            var item = id != Guid.Empty
+                ? await _dbSet.FindAsync(id)
+                : null;
+
             if (item != null)
                 return (item, false);
 
             var newItem = new T
             {
-                Id = Guid.NewGuid(),
+                Id = id != Guid.Empty ? id : Guid.NewGuid(),   // 👈 اگه id فرستاده شده، همونو حفظ کن
                 CreatedAt = DateTime.UtcNow,
                 IsDeleted = false
             };
             return (newItem, true);
         }
-
         public async Task<(T item, bool gNew)> GetOrNew(Expression<Func<T, bool>> expression)
         {
             var item = await _dbSet.FirstOrDefaultAsync(expression);

@@ -71,7 +71,7 @@ namespace MyCom.Form_Portable
                     new() {Name = "نام",Type = typeof(string)},
                 ], true, false, false);
                 dgvPortable.ActiveScrollGrid();
-                //dgvPortable.HiddenColumn("Id");
+                dgvPortable.HiddenColumn("Id");
                 dgvPortable.MaxMinWidth("حذف", 45, 45);
                 dgvPortable.MaxMinWidth("نام", 240, 240);
                 dgvPortable.AddAllowNewRowAndType(DefaultBoolean.True, NewItemRowPosition.Top);
