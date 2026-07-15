@@ -20,7 +20,7 @@ namespace Kavosh.UI
         public FrmMain()
         {
             InitializeComponent();
-        
+
         }
 
         public async Task SetStyle()
@@ -36,7 +36,7 @@ namespace Kavosh.UI
             await SetStyle();
         }
 
-      
+
         private void barBtnProduct_ItemClick(object sender, ItemClickEventArgs e)
         {
             //new FrmProduct().OverShowWait<FrmProduct>(this);
@@ -45,6 +45,9 @@ namespace Kavosh.UI
             frm.OverShowWait<FrmProduct>(this);
         }
 
-     
+        private void barPerson_ItemClick(object sender, ItemClickEventArgs e)
+        {
+
+        }
     }
 }

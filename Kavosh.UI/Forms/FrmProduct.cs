@@ -14,6 +14,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using DevExpress.XtraLayout.Utils;
 using Kavosh.Domain.Entities;
 using static MyCom.Form_Portable.FrmPortable;
 
@@ -112,14 +113,16 @@ namespace Kavosh.UI.Forms
 
                     dgvProduct.AddEventRowCellClick<Guid>(async void (value) =>
                     {
-
                         await GetForEdit(value);
 
                     }, "Id", "ویرایش");
 
                     dgvProduct.AddEventRowCellClick<Guid>(value =>
                     {
-
+                        dgvProduct.DeleteRow(true, async () =>
+                        {
+                            await _productService.DeleteProductAsync(value);
+                        });
                     }, "Id", "حذف");
 
                     #endregion
@@ -234,7 +237,7 @@ namespace Kavosh.UI.Forms
                 var txtPriceSell = ClsCollect.ModelTextEditPrice("قیمت فروش", 50, "");
 
                 layInput.SetFieldColumnDataLayout(true, 1, [
-                    new() { Grp = 1, Ctrl = txtId, },
+                    new() { Grp = 1, Ctrl = txtId, Visibility = LayoutVisibility.Never},
                     new() { Grp = 1, Ctrl = txtCode, },
                     new() { Grp = 1, Ctrl = cmbGroup, SizeType = SizeConstraintsType.Custom, AutoHeight = 38 },
                     new() { Grp = 1, Ctrl = txtName, },

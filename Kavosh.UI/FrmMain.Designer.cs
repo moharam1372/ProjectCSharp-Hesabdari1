@@ -49,7 +49,7 @@
             ribbon.MaxItemId = 7;
             ribbon.Name = "ribbon";
             ribbon.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] { ribbonPage1 });
-            ribbon.Size = new Size(1175, 170);
+            ribbon.Size = new Size(1175, 201);
             ribbon.StatusBar = ribbonStatusBar;
             // 
             // barBtnProduct
@@ -66,6 +66,7 @@
             barPerson.Caption = "مدیریت مشتریان";
             barPerson.Id = 2;
             barPerson.Name = "barPerson";
+            barPerson.ItemClick += barPerson_ItemClick;
             // 
             // barFactor
             // 
@@ -113,10 +114,10 @@
             // 
             // ribbonStatusBar
             // 
-            ribbonStatusBar.Location = new Point(0, 591);
+            ribbonStatusBar.Location = new Point(0, 585);
             ribbonStatusBar.Name = "ribbonStatusBar";
             ribbonStatusBar.Ribbon = ribbon;
-            ribbonStatusBar.Size = new Size(1175, 31);
+            ribbonStatusBar.Size = new Size(1175, 37);
             // 
             // FrmMain
             // 
