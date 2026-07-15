@@ -840,6 +840,11 @@ namespace MyCom.Object
                 {
                     var getValue2 = Guid.Parse(getValue.ToString());
                     return (T)Convert.ChangeType(getValue2, typeof(T));
+                } 
+                if (getType == typeof(long).FullName || getType == typeof(int).FullName || getType == typeof(short).FullName)
+                {
+                    var getValue2 = Convert.ToDecimal(getValue.ToString());
+                    return (T)Convert.ChangeType(getValue2, typeof(T));
                 }
                 // End
                 return (T)Convert.ChangeType(getValue, typeof(T));

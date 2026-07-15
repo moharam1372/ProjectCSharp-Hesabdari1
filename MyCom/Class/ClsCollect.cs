@@ -2354,6 +2354,7 @@ namespace MyCom.Class
 
         public static GridLookUpEdit ModelGridToDataLayout<EF>(string name, List<EF> dtData, string valueMember, string displayMember, string nullText, TextEditStyles styles = TextEditStyles.Standard, float sizeFont = 13f) where EF : class
         {
+           
             GridLookUpEdit gridComboEdit = new GridLookUpEdit
             {
                 Name = name,
@@ -2375,6 +2376,8 @@ namespace MyCom.Class
                     AppearanceFocused = {BackColor = Color.FromArgb(255, 242, 242, 217)},
                 },
             };
+
+       
 
             gridComboEdit.EditValueChanged += (s1, e1) =>
             {
@@ -2399,6 +2402,7 @@ namespace MyCom.Class
             _fontBold.ChangeFont(gridComboEdit, sizeFont);
             GridView gridView = (GridView)gridComboEdit.Properties.PopupView;
 
+            gridView.OptionsView.ShowColumnHeaders = false; // بررسی شود - نمایش نام ستون ها
             gridView.OptionsFind.AllowFindPanel = true;
             gridView.OptionsFind.FindMode = FindMode.Always;
             gridView.OptionsFind.AlwaysVisible = true;
@@ -2424,30 +2428,37 @@ namespace MyCom.Class
                     ? Color.FromArgb(183, 183, 183)
                     : Color.FromArgb(16, 1, 1);
             };
+
+         
             // gridView.View.RowStyle += test_View_RowStyle;
             // ColumnView getData = gridComboEdit.Properties.PopupView;
 
+       
+
             return gridComboEdit;
         }
-        public static GroupControl ModelGridToDataLayout2<EF>(string name, List<EF> dtData, string valueMember, string displayMember, string nullText, TextEditStyles styles = TextEditStyles.Standard, float sizeFont = 13f)
+        public static GroupControl ModelGridToDataLayoutBtn<EF>(string name, List<EF> dtData, string valueMember, string displayMember, string nullText,Action action=null, TextEditStyles styles = TextEditStyles.Standard, float sizeFont = 13f)
         {
             GridLookUpEdit gridComboEdit = new GridLookUpEdit
             {
                 Name = name,
                 Dock = DockStyle.Fill,
+                RightToLeft = RightToLeft.Yes,
                 Properties =
                 {
                     NullText = nullText,
                     ValueMember = valueMember,
                     DisplayMember = displayMember,
                     DataSource = dtData,
-                    LookAndFeel = {UseDefaultLookAndFeel = false, SkinName = "Office 2013 Dark Gray"},
+                    //LookAndFeel = {UseDefaultLookAndFeel = false, SkinName = "Office 2013 Dark Gray"},
+                    LookAndFeel = {UseDefaultLookAndFeel = false, SkinName = "WXI"},
                     Appearance =
                     {
                         BackColor = Color.White,
                         TextOptions = {HAlignment = HorzAlignment.Center, VAlignment = VertAlignment.Center}
                     },
                     AppearanceFocused = {BackColor = Color.FromArgb(255, 241, 242, 154),},
+                    //AppearanceFocused = {BackColor = Color.FromArgb(255, 242, 242, 217)},
                 },
             };
 
@@ -2498,17 +2509,47 @@ namespace MyCom.Class
                 gridComboEdit.SelectAll();
             };
 
-            // gridView.View.RowStyle += test_View_RowStyle;
-            // ColumnView getData = gridComboEdit.Properties.PopupView;
-            // LayoutControlGroup
 
-            //  LayoutControlGroup groupControl = new LayoutControlGroup
             GroupControl groupControl = new GroupControl
-            { Name = gridComboEdit.Name, Dock = DockStyle.None, ShowCaption = false, BorderStyle = BorderStyles.NoBorder };
+            {
+                Name = gridComboEdit.Name, 
+                Dock = DockStyle.None, 
+                ShowCaption = false,
+                BorderStyle = BorderStyles.NoBorder
+            };
             // {Name = "GridPnl_" + gridComboEdit.Name, Dock = DockStyle.Fill,ShowCaption = false,BorderStyle = BorderStyles.NoBorder};
+     
+
+            #region Button
+
+            if (action != null)
+            {
+                var font = _fontBold.ChangeFont();
+
+                SimpleButton btnFastToday = new SimpleButton
+                {
+                    Visible = true,
+                    Text = @"+",
+                    Dock = DockStyle.Left,
+                    Height = groupControl.Height - 2,
+                    Font = font,
+                    Width = 50
+                };
+                btnFastToday.LookAndFeel.UseDefaultLookAndFeel = false;
+                btnFastToday.LookAndFeel.SkinName = "Glass Oceans";
+                btnFastToday.Click += (s1, e1) => { action(); };
+                //groupControl.Controls.Add(gridComboEdit);
+                groupControl.Controls.Add(btnFastToday);
+                //gridComboEdit.BringToFront();
+            }
             groupControl.Controls.Add(gridComboEdit);
-            groupControl.Height = 0;
-            groupControl.Dock = DockStyle.Fill;
+            gridComboEdit.BringToFront();
+            //gridComboEdit.Click -= dateCalen_Click;
+            //gridComboEdit.Click += dateCalen_Click;
+
+            #endregion
+
+
             //  groupControl.BringToFront();
             return groupControl;
         }
@@ -2823,7 +2864,7 @@ namespace MyCom.Class
 
             return Ctrl;
         }
-        public static TextEdit ModelTextEditNumber(string name, int maxLength, string nullText, bool enabled = true, float fontSize = 13f, bool useMaskAsDisplayFormat = false, string n = "N0")
+        public static TextEdit ModelTextEditNumber(string name, int maxLength, string nullText, bool enabled = true, float fontSize = 13f, bool jodakonnade = false, string n = "N0")
         {
             var font = _font.ChangeFont(fontSize);
             var Ctrl = new TextEdit
@@ -2835,12 +2876,24 @@ namespace MyCom.Class
                 Properties =
                 {
                     NullText = nullText,
-                    Mask =
-                    {
-                        MaskType = MaskType.Numeric,
-                        EditMask = n,
-                        UseMaskAsDisplayFormat = useMaskAsDisplayFormat
-                    },
+
+                  //  Mask =
+                  //  {
+
+                        //// اگر وقدار ورودی false
+                        //MaskType = MaskType.RegEx,        // ← تغییر به RegEx
+                        //EditMask = @"\d*",                // ← فقط اعداد 0-9
+                        //UseMaskAsDisplayFormat = false,
+                        //SaveLiteral = false,
+                        //ShowPlaceHolders = false
+
+                        //// اگر وقدار ورودی true
+                        //MaskType = MaskType.Numeric,
+                        //EditMask = n,
+                        //UseMaskAsDisplayFormat = useMaskAsDisplayFormat,
+                        //SaveLiteral = true,
+                        //ShowPlaceHolders = false
+                   // },
                     Appearance =
                     {
                         BackColor = Color.White,
@@ -2860,6 +2913,41 @@ namespace MyCom.Class
                     MaxLength = maxLength
                 }
             };
+            if (jodakonnade)
+            {
+                // با جداکننده (مثلاً 1,000,000)
+                Ctrl.Properties.Mask.MaskType = MaskType.Numeric;
+                Ctrl.Properties.Mask.EditMask = n;
+                Ctrl.Properties.Mask.UseMaskAsDisplayFormat = false;
+                //Ctrl.Properties.Mask.SaveLiteral = true;
+                //Ctrl.Properties.Mask.ShowPlaceHolders = false;
+            }
+            else
+            {
+                // حالت بدون جداکننده با تعداد اعشار دلخواه
+                if (n.ToLower() == "n0")
+                {
+                    // فقط اعداد صحیح (بدون اعشار)
+                    Ctrl.Properties.Mask.MaskType = MaskType.RegEx;
+                    Ctrl.Properties.Mask.EditMask = @"\d*";
+                }
+                else
+                {
+                    int getN = Convert.ToInt32(n.Substring(1, 1));
+                    // با اعشار (مثلاً 1234.56)
+                    Ctrl.Properties.Mask.MaskType = MaskType.RegEx;
+                    // الگوی Regex برای اعداد با اعشار
+                    //Ctrl.Properties.Mask.EditMask = $@"\d*\.?\d{{0,{getN}}}";
+
+                    Ctrl.Properties.Mask.EditMask = $@"\d*{"."}?\d{{0,{getN}}}";
+                }
+
+                Ctrl.Properties.Mask.UseMaskAsDisplayFormat = false;
+                Ctrl.Properties.Mask.SaveLiteral = false;
+                Ctrl.Properties.Mask.ShowPlaceHolders = false;
+            }
+
+
             Ctrl.CustomDisplayText += (s, e) =>
             {
                 Ctrl.Properties.Appearance.ForeColor = e.Value == null
@@ -4893,7 +4981,17 @@ namespace MyCom.Class
 
             layout.baseLayout.EndUpdate();
         }
-        public static GridLookUpEdit ConvertGroupToGrid(this GroupControl ctrl) => ctrl.Controls[0] as GridLookUpEdit;
+        public static GridLookUpEdit ConvertGroupToGrid(this GroupControl ctrl)
+        {
+            try
+            {
+                return ctrl.Controls[0] as GridLookUpEdit;
+            }
+            catch (Exception e)
+            {
+                return ctrl.Controls[1] as GridLookUpEdit;
+            }
+        }
 
         //public static GridLookUpEdit ConvertGroupToGrid(this GroupControl ctrl)
         //{

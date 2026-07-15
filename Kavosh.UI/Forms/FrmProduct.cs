@@ -1,8 +1,10 @@
 ﻿using DevExpress.Utils.Html.Internal;
 using DevExpress.XtraEditors;
+using DevExpress.XtraLayout;
 using Kavosh.Services;
 using Kavosh.Services.DTOs;
 using MyCom.Class;
+using MyCom.Form_Portable;
 using MyCom.Object;
 using System;
 using System.Collections.Generic;
@@ -12,6 +14,8 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Kavosh.Domain.Entities;
+using static MyCom.Form_Portable.FrmPortable;
 
 namespace Kavosh.UI.Forms
 {
@@ -36,9 +40,23 @@ namespace Kavosh.UI.Forms
 
         private async void FrmMain_Shown(object sender, EventArgs e)
         {
-            await SetStyle();
-            await SetFieldLayInput();
-            await SetFieldDgvProduct();
+
+            await Task.WhenAll(
+                SetStyle(),
+                SetFieldLayInput(),
+                SetFieldDgvProduct()
+            );
+
+            //try
+            //{
+            //    await SetStyle();
+            //    await SetFieldLayInput();
+            //    await SetFieldDgvProduct();
+            //}
+            //catch (Exception e1)
+            //{
+
+            //}
         }
 
         public async Task SetStyle()
@@ -51,9 +69,9 @@ namespace Kavosh.UI.Forms
         private DataTable _dtProduct;
 
 
-        public async Task SetFieldDgvProduct()
+        public Task SetFieldDgvProduct()
         {
-            splitContainerControl1.Panel1.WaitDownPage(async () =>
+            splitContainerControl1.Panel1.WaitDownPage(async void () =>
             {
                 if (dgvProduct.ColumnCount() == 0)
                 {
@@ -92,7 +110,7 @@ namespace Kavosh.UI.Forms
 
                     }, "Id", "کاردکس");
 
-                    dgvProduct.AddEventRowCellClick<Guid>(async value =>
+                    dgvProduct.AddEventRowCellClick<Guid>(async void (value) =>
                     {
 
                         await GetForEdit(value);
@@ -118,7 +136,7 @@ namespace Kavosh.UI.Forms
                 dgvProduct.SetFieldSizeColumn();
                 #endregion
             });
-
+            return Task.CompletedTask;
         }
 
         public async Task GetForEdit(Guid id)
@@ -133,14 +151,18 @@ namespace Kavosh.UI.Forms
                 layInput.SetValueType("کد محصول", getFirst.ProductCode);
                 layInput.SetValueType("گروه محصول", getFirst.ProductGroupId);
                 layInput.SetValueType("نام محصول", getFirst.Title);
-                layInput.SetValueType("نام محصول", getFirst.InitialInventory);
+                layInput.SetValueType("موجودی اولیه", getFirst.InitialInventory);
+                layInput.SetValueType("سنجش", getFirst.ProductUnitId);
+                layInput.SetValueType("قیمت واحد", getFirst.UnitPrice);
+                layInput.SetValueType("قیمت فروش", getFirst.SellPrice);
+                //layInput.SetValueType("", getFirst.InitialInventory);
+                //layInput.SetValueType("", getFirst.InitialInventory);
 
 
             });
         }
-        public async Task SetFieldLayInput()
+        public Task SetFieldLayInput()
         {
-
             splitContainerControl1.Panel2.WaitDownPage(async () =>
             {
                 layInput.RightToLeft = RightToLeft.Yes;
@@ -148,28 +170,77 @@ namespace Kavosh.UI.Forms
                 layInput.AddButtonOperation();
 
                 var txtId = ClsCollect.ModelTextEdit("Id", 50, "");
-                var txtCode = ClsCollect.ModelTextEditNumber("کد محصول", 50, "");
+                var txtCode = ClsCollect.ModelTextEditNumber("کد محصول", 50, "", true, 13, false,"N2");
+                //var txtCode = ClsCollect.ModelTextEditPrice("کد محصول", 50, "");
 
                 var getProductGroup = await _productGroupService.GetAllAsync();
-                var cmbGroup = ClsCollect.ModelGridToDataLayout("گروه محصول", getProductGroup, "Id", "Title", "");
-                cmbGroup.HiddenColumn("Id");
+                var cmbGroup = ClsCollect.ModelGridToDataLayoutBtn("گروه محصول", getProductGroup, "Id", "Title", "", async () =>
+                {
+                    var getData = (await _productGroupService.GetAllAsync())
+                        .Select(s => new ModelPortableData { Id = s.Id, Title = s.Title }).ToList();
+                        await new FrmPortable("گروه محصول",getData, new ModelAction
+                        {
+                            SaveData = async void (getData) =>
+                            {
+                                var get = getData;
+                                await _productGroupService.SaveAsync(new ProductGroupDto
+                                {
+                                    Id = get.Id,
+                                    Title = get.Title
+                                });
+                            },
+
+                            DeleteData = async void (id) =>
+                            {
+                                await _productGroupService.DeleteAsync(id);
+                            },
+                        }).ShowDialogAsync();
+                    });
+
+                cmbGroup.Controls.Add(new SimpleButton { Width = 50, Left = 0 });
+                cmbGroup.ConvertGroupToGrid().HiddenColumn("Id");
 
                 var txtName = ClsCollect.ModelTextEdit("نام محصول", 100, "");
 
-                var getProductUnit= await _productUnitService.GetAllAsync();
-                var cmbUnit = ClsCollect.ModelGridToDataLayout("سنجش", getProductUnit, "Id", "Title", "");
-                cmbUnit.HiddenColumn("Id");
+                var getProductUnit = await _productUnitService.GetAllAsync();
+                //var cmbUnit = ClsCollect.ModelGridToDataLayoutBtn("سنجش", getProductUnit, "Id", "Title", "");
+                var cmbUnit = ClsCollect.ModelGridToDataLayoutBtn("سنجش", getProductUnit, "Id", "Title", "", async () =>
+                {
+                    var getData = (await _productUnitService.GetAllAsync())
+                        .Select(s => new ModelPortableData { Id = s.Id, Title = s.Title }).ToList();
+                    await new FrmPortable("سنجش",getData, new ModelAction
+                    {
+                        SaveData = async void (getData) =>
+                        {
+                            var get = getData;
+                            var productUnitDto = new ProductUnitDto
+                            {
+                                Id = get.Id,
+                                Title = get.Title
+                            };
+                            await _productUnitService.SaveAsync(productUnitDto);
+                        },
+
+                        DeleteData = async void (id) =>
+                        {
+                            await _productUnitService.DeleteAsync(id);
+                        },
+                    }).ShowDialogAsync();
+                });
+                cmbUnit.ConvertGroupToGrid().HiddenColumn("Id");
 
                 var txtMojidi = ClsCollect.ModelTextEdit("موجودی اولیه", 50, "");
-                var txtPriceSell = ClsCollect.ModelTextEdit("قیمت فروش", 50, "");
+                var txtPriceUnit = ClsCollect.ModelTextEditPrice("قیمت واحد", 50, "");
+                var txtPriceSell = ClsCollect.ModelTextEditPrice("قیمت فروش", 50, "");
 
                 layInput.SetFieldColumnDataLayout(true, 1, [
                     new() { Grp = 1, Ctrl = txtId, },
                     new() { Grp = 1, Ctrl = txtCode, },
-                    new() { Grp = 1, Ctrl = cmbGroup, },
+                    new() { Grp = 1, Ctrl = cmbGroup, SizeType = SizeConstraintsType.Custom, AutoHeight = 38 },
                     new() { Grp = 1, Ctrl = txtName, },
-                    new() { Grp = 1, Ctrl = cmbUnit, },
+                    new() { Grp = 1, Ctrl = cmbUnit, SizeType = SizeConstraintsType.Custom, AutoHeight = 38  },
                     new() { Grp = 1, Ctrl = txtMojidi, },
+                    new() { Grp = 1, Ctrl = txtPriceUnit, },
                     new() { Grp = 1, Ctrl = txtPriceSell, },
 
                 ]);
@@ -177,6 +248,7 @@ namespace Kavosh.UI.Forms
                 layInput.BtnCancelClick += LayInput_BtnCancelClick;
                 layInput.BtnSaveClick += LayInput_BtnSaveClick;
             });
+            return Task.CompletedTask;
         }
 
         private void LayInput_BtnCancelClick(object sender, EventArgs e)
@@ -189,18 +261,17 @@ namespace Kavosh.UI.Forms
             layInput._disableAfterSave = true;
             try
             {
-                var dto = new ProductDto
-                {
-                    Id = _selectedProductId,
-                    ProductCode = layInput.GetValue<long>("کد محصول"),
-                    Title = layInput.GetValue<string>("نام محصول"),
-                    //ProductGroupId = layInput.GetValue<Guid>("گروه محصول"),
-                    ProductUnitId = Guid.Parse("e0fbeaa9-bbbe-44f5-af24-c69ce2d1136d"),
-                    ProductGroupId = Guid.Parse("c560bc27-a69d-45c3-9fd2-4b3b17acb5ba"),
-                    //ProductUnitId = layInput.GetValue<Guid>("سنجش"),
-                    InitialInventory = layInput.GetValue<float>("موجودی اولیه"),
-                    SellPrice = layInput.GetValue<long>("قیمت فروش"),
-                };
+                var dto = new ProductDto();
+                dto.Id = _selectedProductId;
+                dto.ProductCode = layInput.GetValue<long>("کد محصول");
+                dto.Title = layInput.GetValue<string>("نام محصول");
+                dto.ProductGroupId = layInput.GetValue<Guid>("گروه محصول");
+                dto.ProductUnitId = layInput.GetValue<Guid>("سنجش");
+                dto.InitialInventory = layInput.GetValue<float>("موجودی اولیه");
+                //dto.SellPrice = layInput.GetValue<decimal>("قیمت فروش").GetNum<long>();
+                dto.SellPrice = layInput.GetValue<long>("قیمت فروش");
+                dto.UnitPrice = layInput.GetValue<long>("قیمت واحد"); 
+                //dto.UnitPrice = layInput.GetValue<decimal>("قیمت واحد").GetNum<long>(); 
 
                 var savedId = await _productService.SaveProductAsync(dto);
                 _selectedProductId = savedId;

@@ -41,7 +41,15 @@ namespace Kavosh.DataAccess.Repositories
 
         public async Task<IEnumerable<T>> GetAll()
         {
-            return await _dbSet.Where(w => !w.IsDeleted).ToListAsync();
+            try
+            {
+                return await _dbSet.Where(w => !w.IsDeleted).ToListAsync();
+            }
+            catch (Exception e)
+            {
+                await Task.Delay(1000);
+                return await _dbSet.Where(w => !w.IsDeleted).ToListAsync();
+            }
         }
 
         public async Task<IEnumerable<T>> Find(Expression<Func<T, bool>> expression)
