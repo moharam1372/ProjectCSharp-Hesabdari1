@@ -10,7 +10,10 @@ namespace Kavosh.Domain.Entities
         /// </summary>
         public Guid PaymentTypeId { get; set; }
         public PaymentType PaymentType { get; set; }
-        
+
+        public Guid FactorHeaderId { get; set; }
+        public FactorHeader FactorHeader { get; set; }
+
         /// <summary>
         /// مبلغ پرداختی
         /// </summary>
