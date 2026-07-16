@@ -1,5 +1,4 @@
-﻿using static System.Runtime.InteropServices.JavaScript.JSType;
-
+﻿
 namespace Kavosh.Domain.Entities
 {
     public class HowToPay : BaseEntity
