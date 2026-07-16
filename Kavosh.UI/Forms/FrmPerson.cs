@@ -193,5 +193,10 @@ namespace Kavosh.UI.Forms
                 XtraMessageBox.Show(ex.Message, "خطا", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private void FrmPerson_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

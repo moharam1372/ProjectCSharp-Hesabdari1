@@ -36,31 +36,31 @@
             ((System.ComponentModel.ISupportInitialize)layInput).BeginInit();
             ((System.ComponentModel.ISupportInitialize)Root).BeginInit();
             SuspendLayout();
-            //
+            // 
             // splitContainerControl1
-            //
+            // 
             splitContainerControl1.Dock = DockStyle.Fill;
             splitContainerControl1.FixedPanel = DevExpress.XtraEditors.SplitFixedPanel.Panel2;
             splitContainerControl1.IsSplitterFixed = true;
             splitContainerControl1.Location = new Point(0, 0);
             splitContainerControl1.Name = "splitContainerControl1";
-            //
+            // 
             // splitContainerControl1.Panel1
-            //
+            // 
             splitContainerControl1.Panel1.Controls.Add(dgvPerson);
             splitContainerControl1.Panel1.Text = "Panel1";
-            //
+            // 
             // splitContainerControl1.Panel2
-            //
+            // 
             splitContainerControl1.Panel2.Controls.Add(layInput);
             splitContainerControl1.Panel2.Controls.Add(pnlFunction);
             splitContainerControl1.Panel2.Text = "Panel2";
             splitContainerControl1.Size = new Size(1135, 619);
             splitContainerControl1.SplitterPosition = 384;
             splitContainerControl1.TabIndex = 0;
-            //
+            // 
             // dgvPerson
-            //
+            // 
             dgvPerson.Dock = DockStyle.Fill;
             dgvPerson.Location = new Point(0, 0);
             dgvPerson.MainView = viewPerson;
@@ -69,21 +69,21 @@
             dgvPerson.Size = new Size(735, 619);
             dgvPerson.TabIndex = 0;
             dgvPerson.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { viewPerson });
-            //
+            // 
             // viewPerson
-            //
+            // 
             viewPerson.Bands.AddRange(new DevExpress.XtraGrid.Views.BandedGrid.GridBand[] { gridBand1 });
             viewPerson.GridControl = dgvPerson;
             viewPerson.Name = "viewPerson";
-            //
+            // 
             // gridBand1
-            //
+            // 
             gridBand1.Caption = "gridBand1";
             gridBand1.Name = "gridBand1";
             gridBand1.VisibleIndex = 0;
-            //
+            // 
             // layInput
-            //
+            // 
             layInput.Dock = DockStyle.Fill;
             layInput.Location = new Point(0, 33);
             layInput.Name = "layInput";
@@ -91,25 +91,25 @@
             layInput.Size = new Size(384, 586);
             layInput.TabIndex = 0;
             layInput.Text = "kavoshLayout1";
-            //
+            // 
             // Root
-            //
+            // 
             Root.EnableIndentsWithoutBorders = DevExpress.Utils.DefaultBoolean.True;
             Root.GroupBordersVisible = false;
             Root.Name = "Root";
             Root.Size = new Size(384, 586);
             Root.TextVisible = false;
-            //
+            // 
             // pnlFunction
-            //
+            // 
             pnlFunction.Dock = DockStyle.Top;
             pnlFunction.Location = new Point(0, 0);
             pnlFunction.Name = "pnlFunction";
             pnlFunction.Size = new Size(384, 33);
             pnlFunction.TabIndex = 2;
-            //
+            // 
             // FrmPerson
-            //
+            // 
             AutoScaleDimensions = new SizeF(6F, 13F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1135, 619);
@@ -117,6 +117,7 @@
             Name = "FrmPerson";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "مدیریت مشتریان";
+            Load += FrmPerson_Load;
             ((System.ComponentModel.ISupportInitialize)splitContainerControl1.Panel1).EndInit();
             splitContainerControl1.Panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)splitContainerControl1.Panel2).EndInit();
