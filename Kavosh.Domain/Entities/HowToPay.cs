@@ -10,6 +10,8 @@ namespace Kavosh.Domain.Entities
         /// مثال: نقدی، کارت-حساب، چک و حساب دفتری
         /// </summary>
         public Guid PaymentTypeId { get; set; }
+        public PaymentType PaymentType { get; set; }
+        
         /// <summary>
         /// مبلغ پرداختی
         /// </summary>
@@ -31,7 +33,8 @@ namespace Kavosh.Domain.Entities
         public bool Settlement { get; set; }
         public string Description { get; set; }
 
+        
+        public ICollection<DefinitiveAccount> DefinitiveAccounts { get; set; } = new List<DefinitiveAccount>();
 
-
-    }
+    }   
 }    

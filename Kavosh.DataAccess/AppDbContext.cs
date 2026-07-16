@@ -24,6 +24,7 @@ namespace Kavosh.DataAccess
         /// نحوه پرداخت
         /// </summary>
         public DbSet<HowToPay> HowToPays { get; set; }
+        public DbSet<PaymentType> PaymentTypes { get; set; }
 
 
         // TODO: به ازای هر یک از ۱۵ جدول، یک DbSet مشابه اینجا اضافه کنید

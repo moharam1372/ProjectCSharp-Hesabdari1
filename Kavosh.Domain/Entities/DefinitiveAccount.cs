@@ -15,11 +15,14 @@
         public virtual Person Person { get; set; }
         public DateTime DateCustom { get; set; }
         public long Price { get; set; }
-
+            
         /// <summary>
         /// بدهکار یا بستانکار
         /// </summary>
         public bool Debtor { get; set; }
         public string? Description { get; set; }
+
+        public Guid? HowToPayId { get; set; }
+        public virtual HowToPay HowToPay { get; set; }
     }
 }
