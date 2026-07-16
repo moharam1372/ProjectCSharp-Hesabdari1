@@ -45,26 +45,58 @@ namespace Kavosh.DataAccess
             }
         }
 
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //    modelBuilder.Entity<Product>(entity =>
+        //    {
+        //        entity.ToTable("Products");
+
+        //        entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
+
+        //        entity.HasOne(p => p.ProductGroup)
+        //            .WithMany(g => g.Products)
+        //            .HasForeignKey(p => p.ProductGroupId)
+        //            .OnDelete(DeleteBehavior.Cascade);   //  حذف زنجیره‌ای
+        //            //.OnDelete(DeleteBehavior.Restrict);   // جلوگیری از حذف زنجیره‌ای
+
+        //        entity.HasOne(p => p.ProductUnit)
+        //            .WithMany(u => u.Products)
+        //            .HasForeignKey(p => p.ProductUnitId)
+        //            .OnDelete(DeleteBehavior.Cascade);
+
+             
+        //    });
+
+        //    modelBuilder.Entity<ProductGroup>(entity =>
+        //    {
+        //        entity.ToTable("ProductGroups");
+        //        entity.Property(e => e.Title).IsRequired().HasMaxLength(150);
+        //    });
+
+        //    modelBuilder.Entity<ProductUnit>(entity =>
+        //    {
+        //        entity.ToTable("ProductUnits");
+        //        entity.Property(e => e.Title).IsRequired().HasMaxLength(50);
+        //    });
+
+        //    base.OnModelCreating(modelBuilder);
+        //}
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Product>(entity =>
             {
                 entity.ToTable("Products");
-
                 entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
 
                 entity.HasOne(p => p.ProductGroup)
                     .WithMany(g => g.Products)
                     .HasForeignKey(p => p.ProductGroupId)
-                    .OnDelete(DeleteBehavior.Cascade);   //  حذف زنجیره‌ای
-                    //.OnDelete(DeleteBehavior.Restrict);   // جلوگیری از حذف زنجیره‌ای
+                    .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasOne(p => p.ProductUnit)
                     .WithMany(u => u.Products)
                     .HasForeignKey(p => p.ProductUnitId)
                     .OnDelete(DeleteBehavior.Cascade);
-
-             
             });
 
             modelBuilder.Entity<ProductGroup>(entity =>
@@ -77,6 +109,34 @@ namespace Kavosh.DataAccess
             {
                 entity.ToTable("ProductUnits");
                 entity.Property(e => e.Title).IsRequired().HasMaxLength(50);
+            });
+
+            // ============= HowToPay =============
+            modelBuilder.Entity<HowToPay>(entity =>
+            {
+                entity.HasOne(h => h.FactorHeader)
+                    .WithMany(f => f.HowToPays)
+                    .HasForeignKey(h => h.FactorHeaderId)
+                    .OnDelete(DeleteBehavior.Cascade);   // حذف فاکتور => حذف روش‌های پرداختش
+
+                entity.HasOne(h => h.PaymentType)
+                    .WithMany(p => p.HowToPays)
+                    .HasForeignKey(h => h.PaymentTypeId)
+                    .OnDelete(DeleteBehavior.Restrict);  // حذف نوع پرداخت نباید تاریخچه رو پاک کنه
+            });
+
+            // ============= DefinitiveAccount =============
+            modelBuilder.Entity<DefinitiveAccount>(entity =>
+            {
+                entity.HasOne(d => d.Person)
+                    .WithMany(p => p.DefinitiveAccounts)
+                    .HasForeignKey(d => d.PersonId)
+                    .OnDelete(DeleteBehavior.Cascade);   // این مسیر Cascade باقی می‌مونه
+
+                entity.HasOne(d => d.HowToPay)
+                    .WithMany(h => h.DefinitiveAccounts)
+                    .HasForeignKey(d => d.HowToPayId)
+                    .OnDelete(DeleteBehavior.Restrict);  // 👈 کلید حل مشکل multiple cascade paths
             });
 
             base.OnModelCreating(modelBuilder);

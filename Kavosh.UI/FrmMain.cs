@@ -33,7 +33,7 @@ namespace Kavosh.UI
 
         private async void FrmMain_Load(object sender, EventArgs e)
         {
-             new FrmPersianCalendar().ShowDialog();
+           //  new FrmPersianCalendar().ShowDialog();
             await SetStyle();
         }
 

@@ -57,6 +57,8 @@
             barBtnProduct.AllowHtmlText = DevExpress.Utils.DefaultBoolean.True;
             barBtnProduct.Caption = "مدیریت محصولات";
             barBtnProduct.Id = 1;
+            barBtnProduct.ImageOptions.SvgImage = Properties.Resources.bo_product_group;
+            barBtnProduct.LargeWidth = 110;
             barBtnProduct.Name = "barBtnProduct";
             barBtnProduct.ItemClick += barBtnProduct_ItemClick;
             // 
@@ -65,6 +67,8 @@
             barPerson.AllowHtmlText = DevExpress.Utils.DefaultBoolean.True;
             barPerson.Caption = "مدیریت مشتریان";
             barPerson.Id = 2;
+            barPerson.ImageOptions.SvgImage = Properties.Resources.bo_employee;
+            barPerson.LargeWidth = 110;
             barPerson.Name = "barPerson";
             barPerson.ItemClick += barPerson_ItemClick;
             // 
@@ -73,6 +77,8 @@
             barFactor.AllowHtmlText = DevExpress.Utils.DefaultBoolean.True;
             barFactor.Caption = "فاکتورها";
             barFactor.Id = 3;
+            barFactor.ImageOptions.SvgImage = Properties.Resources.list;
+            barFactor.LargeWidth = 70;
             barFactor.Name = "barFactor";
             // 
             // barBtnAccounting
@@ -80,6 +86,8 @@
             barBtnAccounting.AllowHtmlText = DevExpress.Utils.DefaultBoolean.True;
             barBtnAccounting.Caption = "صورت حساب مستریان";
             barBtnAccounting.Id = 4;
+            barBtnAccounting.ImageOptions.SvgImage = Properties.Resources.customerprofilereport;
+            barBtnAccounting.LargeWidth = 140;
             barBtnAccounting.Name = "barBtnAccounting";
             // 
             // barBtnSetting
@@ -87,6 +95,8 @@
             barBtnSetting.AllowHtmlText = DevExpress.Utils.DefaultBoolean.True;
             barBtnSetting.Caption = "تنظیمات";
             barBtnSetting.Id = 5;
+            barBtnSetting.ImageOptions.SvgImage = Properties.Resources.viewsettings;
+            barBtnSetting.LargeWidth = 70;
             barBtnSetting.Name = "barBtnSetting";
             // 
             // barBtnPardakhtDaryaft
@@ -94,6 +104,8 @@
             barBtnPardakhtDaryaft.AllowHtmlText = DevExpress.Utils.DefaultBoolean.True;
             barBtnPardakhtDaryaft.Caption = "دریافت|پرداخت";
             barBtnPardakhtDaryaft.Id = 6;
+            barBtnPardakhtDaryaft.ImageOptions.SvgImage = Properties.Resources.accounting;
+            barBtnPardakhtDaryaft.LargeWidth = 95;
             barBtnPardakhtDaryaft.Name = "barBtnPardakhtDaryaft";
             // 
             // ribbonPage1
