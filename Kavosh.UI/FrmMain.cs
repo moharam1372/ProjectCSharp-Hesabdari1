@@ -1,4 +1,8 @@
 ﻿using DevExpress.XtraBars;
+using Kavosh.UI.Forms;
+using Microsoft.Extensions.DependencyInjection;
+using MyCom.Class;
+using MyCom.Form_Portable;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -7,9 +11,6 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using Kavosh.UI.Forms;
-using Microsoft.Extensions.DependencyInjection;
-using MyCom.Class;
 
 namespace Kavosh.UI
 {
@@ -32,7 +33,7 @@ namespace Kavosh.UI
 
         private async void FrmMain_Load(object sender, EventArgs e)
         {
-
+             new FrmPersianCalendar().ShowDialog();
             await SetStyle();
         }
 

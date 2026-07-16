@@ -19,5 +19,7 @@
         public long UnitPrice { get; set; }
         public long SellPrice { get; set; }
         public string Description { get; set; }
+
+        public ICollection<FactorDetail> FactorDetails { get; set; } = new List<FactorDetail>();
     }
-}
+}   

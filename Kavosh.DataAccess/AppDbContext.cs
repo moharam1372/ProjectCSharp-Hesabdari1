@@ -11,12 +11,19 @@ namespace Kavosh.DataAccess
         {
            
         }
-
+        //[Table(name: "DefinitiveAccount", Schema = "Account")]
         public DbSet<Customer> Customers { get; set; }
+        public DbSet<DefinitiveAccount> DefinitiveAccounts { get; set; }
         public DbSet<Person> Persons { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductUnit> ProductUnits { get; set; }
         public DbSet<ProductGroup> ProductGroups { get; set; }
+        public DbSet<FactorHeader> FactorHeaders { get; set; }
+        public DbSet<FactorDetail> FactorDetails { get; set; }
+        /// <summary>
+        /// نحوه پرداخت
+        /// </summary>
+        public DbSet<HowToPay> HowToPays { get; set; }
 
 
         // TODO: به ازای هر یک از ۱۵ جدول، یک DbSet مشابه اینجا اضافه کنید
@@ -42,6 +49,7 @@ namespace Kavosh.DataAccess
             modelBuilder.Entity<Product>(entity =>
             {
                 entity.ToTable("Products");
+
                 entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
 
                 entity.HasOne(p => p.ProductGroup)
@@ -54,6 +62,8 @@ namespace Kavosh.DataAccess
                     .WithMany(u => u.Products)
                     .HasForeignKey(p => p.ProductUnitId)
                     .OnDelete(DeleteBehavior.Cascade);
+
+             
             });
 
             modelBuilder.Entity<ProductGroup>(entity =>
