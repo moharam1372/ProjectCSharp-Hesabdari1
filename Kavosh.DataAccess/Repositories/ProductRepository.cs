@@ -11,6 +11,9 @@ namespace Kavosh.DataAccess.Repositories
         Task<Product> GetByIdWithDetailsAsync(Guid id);
         Task<Product> GetByCodeAsync(long code);
         Task<long> GetMaxCodeAsync();   // 👈 جدید
+        // IProductRepository.cs — اضافه به اینترفیس موجود
+        Task<(float Input, float Output)> GetStockMovementAsync(Guid productId);
+        Task<Dictionary<Guid, (float Input, float Output)>> GetStockMovementForAllAsync();
     }
 
     public class ProductRepository : Repository<Product>, IProductRepository
@@ -22,6 +25,38 @@ namespace Kavosh.DataAccess.Repositories
             // شامل رکوردهای Soft-Delete شده هم میشه تا کد تکراری تولید نشه
             return await _dbSet.MaxAsync(p => (long?)p.ProductCode) ?? 0;
         }
+
+        // ProductRepository.cs
+        public async Task<(float Input, float Output)> GetStockMovementAsync(Guid productId)
+        {
+            var details = await _context.Set<FactorDetail>()
+                .Include(d => d.FactorHeader)
+                .Where(d => d.ProductId == productId && !d.IsDeleted && !d.FactorHeader.IsDeleted)
+                .ToListAsync();
+
+            var input = details.Where(d => !d.FactorHeader.Type).Sum(d => d.Count);  // خرید = ورودی
+            var output = details.Where(d => d.FactorHeader.Type).Sum(d => d.Count); // فروش = خروجی
+
+            return (input, output);
+        }
+
+        public async Task<Dictionary<Guid, (float Input, float Output)>> GetStockMovementForAllAsync()
+        {
+            var details = await _context.Set<FactorDetail>()
+                .Include(d => d.FactorHeader)
+                .Where(d => !d.IsDeleted && !d.FactorHeader.IsDeleted)
+                .ToListAsync();
+
+            return details
+                .GroupBy(d => d.ProductId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => (
+                        Input: g.Where(d => !d.FactorHeader.Type).Sum(d => d.Count),
+                        Output: g.Where(d => d.FactorHeader.Type).Sum(d => d.Count)
+                    ));
+        }
+
         public async Task<List<Product>> GetAllWithDetailsAsync()
         {
             return await _dbSet

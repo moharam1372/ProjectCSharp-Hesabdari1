@@ -1043,9 +1043,12 @@ namespace MyCom.Object
 
         #region مدیریت فیلد گرید
 
-
-        public RepositoryItemGridLookUpEdit AddGridToGrid<EF>(List<EF> lEF,
-    string nameRelationColumn, string valueMember, string displayMember,
+        public class ModelGetValueTitle
+        {
+            public Guid Id { get; set; }
+            public object Title { get; set; }
+        }
+        public RepositoryItemGridLookUpEdit AddGridToGrid<EF>(List<EF> lEF, string nameRelationColumn, string valueMember, string displayMember, Action<ModelGetValueTitle> action = null,
     TextEditStyles _styles = TextEditStyles.Standard, string nullText = "", Image image = null)
         {
             //  dtTest.Clear();
@@ -1056,7 +1059,6 @@ namespace MyCom.Object
                 DisplayMember = displayMember,
                 NullText = nullText,
                 ContextImageOptions = { Image = image },
-
             };
 
             // var dtTest = litEFst;
@@ -1091,6 +1093,21 @@ namespace MyCom.Object
             gridComboEdit.BestFitMode = BestFitMode.BestFitResizePopup;
             gridComboEdit.View.RowStyle += EventRowStyle_RowStyle;
             //  gridComboEdit.View.CellValueChanged += View_CellValueChanged; 
+
+            if (action != null)
+            {
+                gridComboEdit.EditValueChanged += (s, e) =>
+                {
+                    var getValue = Guid.Parse(((GridLookUpEdit)s).EditValue.ToString());
+                    var getTitle = ((GridLookUpEdit)s).Text.ToString();
+                    action(new ModelGetValueTitle
+                    {
+                        Id = getValue,
+                        Title = getTitle
+                    });
+                };
+            }
+
 
             gridComboEdit.ProcessNewValue += (s, e) =>
             {
@@ -2279,7 +2296,7 @@ namespace MyCom.Object
             this.Invoke(() =>
             {
                 DGV_Viw = MainView as BandedGridView;
-  
+
                 #region BandPanel
 
                 DGV_Viw.Appearance.BandPanel.BackColor = Color.FromArgb(175, 226, 214);

@@ -54,7 +54,6 @@
             // 
             // barBtnProduct
             // 
-            barBtnProduct.AllowHtmlText = DevExpress.Utils.DefaultBoolean.True;
             barBtnProduct.Caption = "مدیریت محصولات";
             barBtnProduct.Id = 1;
             barBtnProduct.ImageOptions.SvgImage = Properties.Resources.bo_product_group;
@@ -80,6 +79,7 @@
             barFactor.ImageOptions.SvgImage = Properties.Resources.list;
             barFactor.LargeWidth = 70;
             barFactor.Name = "barFactor";
+            barFactor.ItemClick += barFactor_ItemClick;
             // 
             // barBtnAccounting
             // 
@@ -105,7 +105,7 @@
             barBtnPardakhtDaryaft.Caption = "دریافت|پرداخت";
             barBtnPardakhtDaryaft.Id = 6;
             barBtnPardakhtDaryaft.ImageOptions.SvgImage = Properties.Resources.accounting;
-            barBtnPardakhtDaryaft.LargeWidth = 95;
+            barBtnPardakhtDaryaft.LargeWidth = 100;
             barBtnPardakhtDaryaft.Name = "barBtnPardakhtDaryaft";
             // 
             // ribbonPage1

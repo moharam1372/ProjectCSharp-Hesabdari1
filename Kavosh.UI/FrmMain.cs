@@ -11,6 +11,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using DevExpress.XtraBars.Ribbon;
 
 namespace Kavosh.UI
 {
@@ -33,7 +34,7 @@ namespace Kavosh.UI
 
         private async void FrmMain_Load(object sender, EventArgs e)
         {
-           //  new FrmPersianCalendar().ShowDialog();
+            //ribbon.ShowPageHeadersMode = DevExpress.XtraBars.Ribbon.ShowPageHeadersMode.Hide;
             await SetStyle();
         }
 
@@ -50,6 +51,12 @@ namespace Kavosh.UI
         {
             var frm = Program.ServiceProvider.GetRequiredService<FrmPerson>();
             frm.OverShowWait<FrmPerson>(this);
+        }
+
+        private void barFactor_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var frm = Program.ServiceProvider.GetRequiredService<FrmFactor>();
+            frm.OverShowWait<FrmFactor>(this);
         }
     }
 }

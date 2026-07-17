@@ -61,10 +61,13 @@ namespace Kavosh.UI
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IProductGroupRepository, ProductGroupRepository>();
             services.AddScoped<IProductUnitRepository, ProductUnitRepository>();
-         
-            //services.AddScoped<ProductUnitService>();
-            //services.AddScoped<ProductGroupService>();
-            //services.AddScoped<ICustomerRepository, CustomerRepository>();
+            services.AddScoped<IFactorHeaderRepository, FactorHeaderRepository>();
+
+
+
+          
+          
+
 
             // Services
             services.AddScoped<CustomerService>();
@@ -73,12 +76,13 @@ namespace Kavosh.UI
             services.AddScoped<ProductGroupService>();
             services.AddScoped<ProductUnitService>();
             services.AddScoped<PersonService>();
-         
+            services.AddScoped<FactorHeaderService>();
 
             // Forms
             services.AddTransient<FrmMain>();
             services.AddTransient<FrmProduct>();
             services.AddTransient<FrmPerson>();// 👈 جدید
+            services.AddTransient<FrmFactor>();
             //services.AddTransient<CustomerForm>();
         }
         private static void InitializeDatabase()

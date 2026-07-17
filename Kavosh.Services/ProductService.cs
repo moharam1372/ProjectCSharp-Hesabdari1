@@ -114,5 +114,23 @@ namespace Kavosh.Services
             OutputStock = 0,
             CurrentStock = p.InitialInventory
         };
+        private static ProductDto ToDto(Product p, float input, float output) => new()
+        {
+            Id = p.Id,
+            ProductCode = p.ProductCode,
+            ProductGroupId = p.ProductGroupId,
+            ProductGroupTitle = p.ProductGroup?.Title,
+            Title = p.Title,
+            ProductUnitId = p.ProductUnitId,
+            ProductUnitTitle = p.ProductUnit?.Title,
+            InitialInventory = p.InitialInventory,
+            UnitPrice = p.UnitPrice,
+            SellPrice = p.SellPrice,
+            Description = p.Description,
+
+            InputStock = input,
+            OutputStock = output,
+            CurrentStock = p.InitialInventory + input - output
+        };
     }
 }

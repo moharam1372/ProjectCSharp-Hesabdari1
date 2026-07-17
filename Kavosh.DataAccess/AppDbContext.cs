@@ -44,43 +44,6 @@ namespace Kavosh.DataAccess
                 return new AppDbContext(optionsBuilder.Options);
             }
         }
-
-        //protected override void OnModelCreating(ModelBuilder modelBuilder)
-        //{
-        //    modelBuilder.Entity<Product>(entity =>
-        //    {
-        //        entity.ToTable("Products");
-
-        //        entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
-
-        //        entity.HasOne(p => p.ProductGroup)
-        //            .WithMany(g => g.Products)
-        //            .HasForeignKey(p => p.ProductGroupId)
-        //            .OnDelete(DeleteBehavior.Cascade);   //  حذف زنجیره‌ای
-        //            //.OnDelete(DeleteBehavior.Restrict);   // جلوگیری از حذف زنجیره‌ای
-
-        //        entity.HasOne(p => p.ProductUnit)
-        //            .WithMany(u => u.Products)
-        //            .HasForeignKey(p => p.ProductUnitId)
-        //            .OnDelete(DeleteBehavior.Cascade);
-
-             
-        //    });
-
-        //    modelBuilder.Entity<ProductGroup>(entity =>
-        //    {
-        //        entity.ToTable("ProductGroups");
-        //        entity.Property(e => e.Title).IsRequired().HasMaxLength(150);
-        //    });
-
-        //    modelBuilder.Entity<ProductUnit>(entity =>
-        //    {
-        //        entity.ToTable("ProductUnits");
-        //        entity.Property(e => e.Title).IsRequired().HasMaxLength(50);
-        //    });
-
-        //    base.OnModelCreating(modelBuilder);
-        //}
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Product>(entity =>
