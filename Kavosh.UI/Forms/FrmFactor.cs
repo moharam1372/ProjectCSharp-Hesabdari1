@@ -19,21 +19,23 @@ namespace Kavosh.UI.Forms
         private readonly FactorHeaderService _factorHeaderService;
         private readonly PersonService _personService;
         private readonly ProductService _productService;
+        private readonly PaymentTypeService _paymentTypeService;   // 👈 جدید
 
         private ClsFont _clsFont = new(false);
         private ClsFont _clsFontBold = new(true);
 
         private Guid _selectedFactorId = Guid.Empty;
         private DataTable _dtFactorDetail;
-
+        private DataTable _dtHowToPay;   // 👈 جدید
         public FrmFactor(FactorHeaderService factorHeaderService,
                           PersonService personService,
-                          ProductService productService)
+                          ProductService productService, PaymentTypeService paymentTypeService)
         {
             InitializeComponent();
             _factorHeaderService = factorHeaderService;
             _personService = personService;
             _productService = productService;
+            _paymentTypeService = paymentTypeService;
             Shown += FrmFactor_Shown;
         }
 
@@ -51,12 +53,15 @@ namespace Kavosh.UI.Forms
             await SetFieldLayInput();
             await SetFieldDgvFactorDetail();
             await PrepareNewFactor();
+            await SetFieldDgvHowToPay();   // 👈 جدید
         }
 
         public async Task SetStyle()
         {
             _clsFontBold.ChangeFont(dgvFactorDetail);
+            _clsFontBold.ChangeFont(dgvHowToPay);
             await dgvFactorDetail.SetStyle();
+            await dgvHowToPay.SetStyle();
         }
 
         // ============= هدر فاکتور (سمت راست) =============
@@ -105,7 +110,7 @@ namespace Kavosh.UI.Forms
             layInput.BtnNewClick += LayInput_BtnNewClick; ;
         }
 
-     
+
 
 
         // ============= خط‌های محصول (سمت چپ، قابل ویرایش) =============
@@ -185,14 +190,18 @@ namespace Kavosh.UI.Forms
         {
             _selectedFactorId = Guid.Empty;
             layInput.CallNew();
-            _dtFactorDetail.Rows.Clear();
+            if (_dtFactorDetail is { Columns.Count: > 0 })
+                _dtFactorDetail.Rows.Clear();
+
+            if (_dtHowToPay is { Columns.Count: > 0 })
+                _dtHowToPay.Rows.Clear();   // 👈 جدید
 
             var nextCode = await _factorHeaderService.GetNextCodeAsync();
             layInput.SetValueType("کد فاکتور", nextCode);
             layInput.SetValueType("تاریخ", DateTime.Now.DateTimePersian().Date);
         }
 
-        // ============= بارگذاری فاکتور موجود برای ویرایش =============
+        // ============= بارگذاری فاکتور موجود =============
         public async Task LoadFactorToForm(Guid id)
         {
             var dto = await _factorHeaderService.GetFactorByIdAsync(id);
@@ -215,9 +224,17 @@ namespace Kavosh.UI.Forms
                 _dtFactorDetail.Rows.Add(d.Id, "حذف", d.ProductId, d.Count, d.PriceUnit, d.LineTotal);
             }
             dgvFactorDetail.SetFieldSizeColumn();
+
+            // 👇 جدید
+            _dtHowToPay.Rows.Clear();
+            foreach (var p in dto.HowToPays)
+            {
+                _dtHowToPay.Rows.Add(p.Id, "حذف", p.PaymentTypeId, p.Price, p.CheckNumber, p.CheckDate, p.Settlement, p.Description);
+            }
+            dgvHowToPay.SetFieldSizeColumn();
         }
 
-        // ============= ذخیره (هدر + خط‌های محصول با هم) =============
+        // ============= ذخیره (هدر + کالا + پرداخت با هم) =============
         private async void LayInput_BtnSaveClick(object sender, EventArgs e)
         {
             layInput._disableAfterSave = true;
@@ -234,19 +251,36 @@ namespace Kavosh.UI.Forms
                     Details = _dtFactorDetail.Rows
                         .Cast<DataRow>()
                         .Where(r => r.RowState != DataRowState.Deleted)
+                        .Where(r => r["محصول"] != DBNull.Value && r["محصول"] is Guid pid && pid != Guid.Empty)
                         .Select(r => new FactorDetailDto
                         {
                             Id = r["Id"] is Guid gid ? gid : Guid.Empty,
                             ProductId = (Guid)r["محصول"],
                             Count = Convert.ToSingle(r["تعداد"]),
                             PriceUnit = Convert.ToInt64(r["قیمت واحد"])
+                        }).ToList(),
+
+                    // 👇 جدید: همون فیلتر ردیف خالی، این‌بار برای گرید پرداخت
+                    HowToPays = _dtHowToPay.Rows
+                        .Cast<DataRow>()
+                        .Where(r => r.RowState != DataRowState.Deleted)
+                        .Where(r => r["نوع پرداخت"] != DBNull.Value && r["نوع پرداخت"] is Guid tid && tid != Guid.Empty)
+                        .Select(r => new HowToPayDto
+                        {
+                            Id = r["Id"] is Guid gid ? gid : Guid.Empty,
+                            PaymentTypeId = (Guid)r["نوع پرداخت"],
+                            Price = Convert.ToInt64(r["مبلغ"]),
+                            CheckNumber = r["شماره چک"] as string,
+                            CheckDate = r["تاریخ چک"] is DateTime dt ? dt : default,
+                            Settlement = r["تسویه"] != DBNull.Value && Convert.ToBoolean(r["تسویه"]),
+                            Description = r["توضیحات"] as string
                         }).ToList()
                 };
 
                 var savedId = await _factorHeaderService.SaveFactorAsync(dto);
                 _selectedFactorId = savedId;
 
-                await PrepareNewFactor(); // آماده برای فاکتور بعدی
+                await PrepareNewFactor();
                 ClassMessageBox.ShowMSG("فاکتور ذخیره شد.", Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
             }
             catch (Exception ex)
@@ -262,12 +296,74 @@ namespace Kavosh.UI.Forms
 
         private async void LayInput_BtnCancelClick(object sender, EventArgs e)
         {
-            
+
         }
         private async void LayInput_BtnNewClick(object sender, EventArgs e)
         {
             await PrepareNewFactor();
         }
         private void FrmFactor_Load(object sender, EventArgs e) { }
+        // ============= گرید نحوه‌ی پرداخت (پایین، کل عرض) =============
+        public async Task SetFieldDgvHowToPay()
+        {
+            if (dgvHowToPay.ColumnCount() == 0)
+            {
+                _dtHowToPay = dgvHowToPay.GridStructure([
+                    new() { Name = "Id", Type = typeof(Guid) },
+                    new() { Name = "حذف", Action = DeleteRowHotToPay,Object = KavoshGrid.enumObject.Button, ImageValue = MyCom.Properties.Resources.delete },
+                    new() { Name = "نوع پرداخت", Type = typeof(Guid) },
+                    new() { Name = "مبلغ", Type = typeof(long), PriceActive = true },
+                    new() { Name = "شماره چک", Type = typeof(string) },
+                    new() { Name = "تاریخ چک",Action = EventDatePanel, Object = KavoshGrid.enumObject.PnlDate, ImageValue = MyCom.Properties.Resources.adateoccuring },
+                    new() { Name = "تسویه", Type = typeof(bool) },
+                    new() { Name = "توضیحات", Type = typeof(string) },
+                ], true, false, false);
+
+                dgvHowToPay.ActiveScrollGrid();
+                //dgvHowToPay.HiddenColumn("Id");
+                dgvHowToPay.MaxMinWidth("حذف", 45, 45);
+                dgvHowToPay.MaxMinWidth("تاریخ چک", 100, 100);
+                //dgvHowToPay.AllowEditColumn("تاریخ چک");
+                dgvHowToPay.AddAllowNewRowAndType(DefaultBoolean.True, NewItemRowPosition.Top);
+
+                #region Relation - انتخاب نوع پرداخت
+
+                var getPaymentTypes = await _paymentTypeService.GetAllAsync();
+                var cmbPaymentType = dgvHowToPay.AddGridToGrid(getPaymentTypes, "نوع پرداخت", "Id", "Title");
+                cmbPaymentType.HiddenColumn("Id");
+
+                #endregion
+
+                #region Event
+
+                dgvHowToPay.GetViewBase.InitNewRow += (s1, e1) =>
+                {
+                    dgvHowToPay.SetValue("Id",Guid.NewGuid());
+                };
+
+                //dgvHowToPay.AddEventRowCellClick<Guid>(id =>
+                //{
+                //    dgvHowToPay.DeleteRow(false);
+                //}, "Id", "حذف");
+
+                #endregion
+            }
+        }
+
+     
+
+        private void DeleteRowHotToPay(object o)
+        {
+            dgvHowToPay.DeleteRow(false);
+        }
+
+        private void EventDatePanel(object obj)
+        {
+            var dt = obj as string;
+            dgvHowToPay.SetValue("تاریخ چک", dt);
+      
+        }
+
+
     }
 }

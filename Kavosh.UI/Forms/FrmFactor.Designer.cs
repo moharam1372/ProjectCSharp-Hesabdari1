@@ -19,7 +19,9 @@
         {
             components = new System.ComponentModel.Container();
             pnlHowToPay = new Panel();
-            lblHowToPay = new DevExpress.XtraEditors.LabelControl();
+            dgvHowToPay = new MyCom.Object.KavoshGrid(components);
+            viewHowToPay = new DevExpress.XtraGrid.Views.BandedGrid.BandedGridView();
+            gridBand2 = new DevExpress.XtraGrid.Views.BandedGrid.GridBand();
             splitContainerControl1 = new DevExpress.XtraEditors.SplitContainerControl();
             layInput = new MyCom.Object.KavoshLayout(components);
             Root = new DevExpress.XtraLayout.LayoutControlGroup();
@@ -28,6 +30,8 @@
             viewFactorDetail = new DevExpress.XtraGrid.Views.BandedGrid.BandedGridView();
             gridBand1 = new DevExpress.XtraGrid.Views.BandedGrid.GridBand();
             pnlHowToPay.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvHowToPay).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)viewHowToPay).BeginInit();
             ((System.ComponentModel.ISupportInitialize)splitContainerControl1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)splitContainerControl1.Panel1).BeginInit();
             splitContainerControl1.Panel1.SuspendLayout();
@@ -43,25 +47,39 @@
             // pnlHowToPay
             // 
             pnlHowToPay.BackColor = Color.FromArgb(192, 192, 255);
-            pnlHowToPay.Controls.Add(lblHowToPay);
+            pnlHowToPay.Controls.Add(dgvHowToPay);
             pnlHowToPay.Dock = DockStyle.Bottom;
-            pnlHowToPay.Location = new Point(0, 487);
+            pnlHowToPay.Location = new Point(0, 457);
             pnlHowToPay.Name = "pnlHowToPay";
-            pnlHowToPay.Size = new Size(1147, 140);
+            pnlHowToPay.Size = new Size(1147, 224);
             pnlHowToPay.TabIndex = 1;
             // 
-            // lblHowToPay
+            // dgvHowToPay
             // 
-            lblHowToPay.Location = new Point(12, 12);
-            lblHowToPay.Name = "lblHowToPay";
-            lblHowToPay.Size = new Size(216, 13);
-            lblHowToPay.TabIndex = 0;
-            lblHowToPay.Text = "نحوه‌ی پرداخت (HowToPay) — در دست ساخت";
+            dgvHowToPay.Dock = DockStyle.Fill;
+            dgvHowToPay.Location = new Point(0, 0);
+            dgvHowToPay.MainView = viewHowToPay;
+            dgvHowToPay.Name = "dgvHowToPay";
+            dgvHowToPay.RightToLeft = RightToLeft.Yes;
+            dgvHowToPay.Size = new Size(1147, 224);
+            dgvHowToPay.TabIndex = 1;
+            dgvHowToPay.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { viewHowToPay });
+            // 
+            // viewHowToPay
+            // 
+            viewHowToPay.Bands.AddRange(new DevExpress.XtraGrid.Views.BandedGrid.GridBand[] { gridBand2 });
+            viewHowToPay.GridControl = dgvHowToPay;
+            viewHowToPay.Name = "viewHowToPay";
+            // 
+            // gridBand2
+            // 
+            gridBand2.Caption = "gridBand1";
+            gridBand2.Name = "gridBand2";
+            gridBand2.VisibleIndex = 0;
             // 
             // splitContainerControl1
             // 
             splitContainerControl1.Dock = DockStyle.Fill;
-            splitContainerControl1.FixedPanel = DevExpress.XtraEditors.SplitFixedPanel.Panel2;
             splitContainerControl1.IsSplitterFixed = true;
             splitContainerControl1.Location = new Point(0, 0);
             splitContainerControl1.Name = "splitContainerControl1";
@@ -78,8 +96,8 @@
             // 
             splitContainerControl1.Panel2.Controls.Add(dgvFactorDetail);
             splitContainerControl1.Panel2.Text = "Panel2";
-            splitContainerControl1.Size = new Size(1147, 487);
-            splitContainerControl1.SplitterPosition = 725;
+            splitContainerControl1.Size = new Size(1147, 457);
+            splitContainerControl1.SplitterPosition = 382;
             splitContainerControl1.TabIndex = 0;
             // 
             // layInput
@@ -89,7 +107,7 @@
             layInput.Name = "layInput";
             layInput.OptionsView.RightToLeftMirroringApplied = true;
             layInput.Root = Root;
-            layInput.Size = new Size(406, 454);
+            layInput.Size = new Size(382, 424);
             layInput.TabIndex = 0;
             layInput.Text = "kavoshLayoutFactor";
             // 
@@ -98,7 +116,7 @@
             Root.EnableIndentsWithoutBorders = DevExpress.Utils.DefaultBoolean.True;
             Root.GroupBordersVisible = false;
             Root.Name = "Root";
-            Root.Size = new Size(406, 454);
+            Root.Size = new Size(382, 424);
             Root.TextVisible = false;
             // 
             // pnlFunction
@@ -106,7 +124,7 @@
             pnlFunction.Dock = DockStyle.Top;
             pnlFunction.Location = new Point(0, 0);
             pnlFunction.Name = "pnlFunction";
-            pnlFunction.Size = new Size(406, 33);
+            pnlFunction.Size = new Size(382, 33);
             pnlFunction.TabIndex = 2;
             // 
             // dgvFactorDetail
@@ -116,7 +134,7 @@
             dgvFactorDetail.MainView = viewFactorDetail;
             dgvFactorDetail.Name = "dgvFactorDetail";
             dgvFactorDetail.RightToLeft = RightToLeft.Yes;
-            dgvFactorDetail.Size = new Size(725, 487);
+            dgvFactorDetail.Size = new Size(749, 457);
             dgvFactorDetail.TabIndex = 0;
             dgvFactorDetail.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { viewFactorDetail });
             // 
@@ -136,7 +154,7 @@
             // 
             AutoScaleDimensions = new SizeF(6F, 13F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1147, 627);
+            ClientSize = new Size(1147, 681);
             Controls.Add(splitContainerControl1);
             Controls.Add(pnlHowToPay);
             Name = "FrmFactor";
@@ -145,7 +163,8 @@
             Text = "فاکتور";
             Load += FrmFactor_Load;
             pnlHowToPay.ResumeLayout(false);
-            pnlHowToPay.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvHowToPay).EndInit();
+            ((System.ComponentModel.ISupportInitialize)viewHowToPay).EndInit();
             ((System.ComponentModel.ISupportInitialize)splitContainerControl1.Panel1).EndInit();
             splitContainerControl1.Panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)splitContainerControl1.Panel2).EndInit();
@@ -162,7 +181,6 @@
         #endregion
 
         private Panel pnlHowToPay;
-        private DevExpress.XtraEditors.LabelControl lblHowToPay;
         private DevExpress.XtraEditors.SplitContainerControl splitContainerControl1;
         private MyCom.Object.KavoshGrid dgvFactorDetail;
         private DevExpress.XtraGrid.Views.BandedGrid.BandedGridView viewFactorDetail;
@@ -170,5 +188,8 @@
         private MyCom.Object.KavoshLayout layInput;
         private DevExpress.XtraLayout.LayoutControlGroup Root;
         private Panel pnlFunction;
+        private MyCom.Object.KavoshGrid dgvHowToPay;
+        private DevExpress.XtraGrid.Views.BandedGrid.BandedGridView viewHowToPay;
+        private DevExpress.XtraGrid.Views.BandedGrid.GridBand gridBand2;
     }
 }

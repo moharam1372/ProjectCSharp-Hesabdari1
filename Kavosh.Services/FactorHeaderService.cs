@@ -1,5 +1,7 @@
 ﻿using Kavosh.DataAccess.Repositories;
+using Kavosh.Domain;
 using Kavosh.Domain.Entities;
+using Kavosh.Domain.Interfaces;
 using Kavosh.Services.DTOs;
 
 namespace Kavosh.Services
@@ -7,10 +9,12 @@ namespace Kavosh.Services
     public class FactorHeaderService
     {
         private readonly IFactorHeaderRepository _repository;
+        private readonly IRepository<PaymentType> _paymentTypeRepository;   // 👈 جدید
 
-        public FactorHeaderService(IFactorHeaderRepository repository)
+        public FactorHeaderService(IFactorHeaderRepository repository, IRepository<PaymentType> paymentTypeRepository)
         {
             _repository = repository;
+            _paymentTypeRepository = paymentTypeRepository;
         }
 
         public async Task<long> GetNextCodeAsync()
@@ -28,8 +32,9 @@ namespace Kavosh.Services
         public async Task<Guid> SaveFactorAsync(FactorHeaderDto dto)
         {
             Validate(dto);
+     
+            ValidateHowToPays(dto.HowToPays);
 
-            // PriceTotal همیشه سمت سرور از روی خط‌ها محاسبه میشه، نه از چیزی که کلاینت فرستاده
             var calculatedTotal = dto.Details.Sum(d => (long)(d.Count * d.PriceUnit)) - dto.Discount;
 
             var header = new FactorHeader
@@ -51,7 +56,18 @@ namespace Kavosh.Services
                 PriceUnit = d.PriceUnit
             }).ToList();
 
-            var savedId = await _repository.SaveWithDetailsAsync(header, details);
+            var howToPays = dto.HowToPays.Select(p => new HowToPay   // 👈 جدید
+            {
+                Id = p.Id,
+                PaymentTypeId = p.PaymentTypeId,
+                Price = p.Price,
+                CheckNumber = p.CheckNumber,
+                CheckDate = p.CheckDate,
+                Settlement = p.Settlement,
+                Description = p.Description
+            }).ToList();
+
+            var savedId = await _repository.SaveWithDetailsAsync(header, details, howToPays);
             await _repository.SaveChangesAsync();
 
             return savedId;
@@ -62,7 +78,7 @@ namespace Kavosh.Services
             var entity = await _repository.GetById(id);
             if (entity is null) return;
 
-            await _repository.Remove(entity); // Soft Delete روی خود هدر
+            await _repository.Remove(entity);
             await _repository.SaveChangesAsync();
         }
 
@@ -84,6 +100,31 @@ namespace Kavosh.Services
             }
         }
 
+        // 👇 اصلاح‌شده: ساده‌تر، بدون کوئری اضافه به دیتابیس
+        private static void ValidateHowToPays(List<HowToPayDto> howToPays)
+        {
+            if (howToPays is null || howToPays.Count == 0)
+                return;
+
+            foreach (var hp in howToPays)
+            {
+                if (hp.PaymentTypeId == Guid.Empty)
+                    throw new ArgumentException("انتخاب نوع پرداخت الزامی است");
+
+                if (hp.Price <= 0)
+                    throw new ArgumentException("مبلغ پرداخت باید بیشتر از صفر باشد");
+
+                if (hp.PaymentTypeId == PaymentTypeIds.Check)   // 👈 مقایسه‌ی مستقیم Guid، دیگه Contains نیست
+                {
+                    if (string.IsNullOrWhiteSpace(hp.CheckNumber))
+                        throw new ArgumentException("برای پرداخت چکی، شماره چک الزامی است");
+
+                    if (hp.CheckDate == default)
+                        throw new ArgumentException("برای پرداخت چکی، تاریخ چک الزامی است");
+                }
+            }
+        }
+
         private static FactorHeaderDto ToDto(FactorHeader f) => new()
         {
             Id = f.Id,
@@ -101,6 +142,17 @@ namespace Kavosh.Services
                 ProductTitle = d.Product?.Title,
                 Count = d.Count,
                 PriceUnit = d.PriceUnit
+            }).ToList(),
+            HowToPays = f.HowToPays.Select(p => new HowToPayDto   // 👈 جدید
+            {
+                Id = p.Id,
+                PaymentTypeId = p.PaymentTypeId,
+                PaymentTypeTitle = p.PaymentType?.Title,
+                Price = p.Price,
+                CheckNumber = p.CheckNumber,
+                CheckDate = p.CheckDate,
+                Settlement = p.Settlement,
+                Description = p.Description
             }).ToList()
         };
     }

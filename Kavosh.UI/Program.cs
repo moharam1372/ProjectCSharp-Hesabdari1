@@ -65,10 +65,6 @@ namespace Kavosh.UI
 
 
 
-          
-          
-
-
             // Services
             services.AddScoped<CustomerService>();
             services.AddScoped<PersonService>();
@@ -77,6 +73,7 @@ namespace Kavosh.UI
             services.AddScoped<ProductUnitService>();
             services.AddScoped<PersonService>();
             services.AddScoped<FactorHeaderService>();
+            services.AddScoped<PaymentTypeService>();
 
             // Forms
             services.AddTransient<FrmMain>();
@@ -96,6 +93,10 @@ namespace Kavosh.UI
                     // روش ۱: فقط Migration‌ها را اعمال کن (دیتابیس را هم ایجاد می‌کند)
                     dbContext.Database.Migrate();
                     Console.WriteLine("✅ Database migration applied successfully!");
+
+                    // 👇 جدید: چک/ساخت رکوردهای ثابت نوع پرداخت
+                    Kavosh.DataAccess.Seeders.PaymentTypeSeeder.SeedAsync(dbContext).GetAwaiter().GetResult();
+                    Console.WriteLine("✅ PaymentType seed check completed!");
                 }
                 catch (Exception ex)
                 {
@@ -105,7 +106,6 @@ namespace Kavosh.UI
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Error);
 
-                    // در صورت خطا، برنامه را ادامه نده
                     Environment.Exit(1);
                 }
             }

@@ -293,6 +293,7 @@ namespace MyCom.Object
             public object ImageValue { get; set; }
             //public object ImageValue { get; set; }
             public bool RightToLeft { get; set; }
+            public Action<object> Action { get; set; }
 
             public modelColumn()
             {
@@ -322,7 +323,8 @@ namespace MyCom.Object
             CarPelak, //9
             Button, // 10    
             Link, // 11
-            IP
+            IP,
+            PnlDate
         }
 
         private DataTable dt = new DataTable();
@@ -547,17 +549,69 @@ namespace MyCom.Object
                         DGV_Viw.Columns[nc].MaxWidth = 195;
                         DGV_Viw.Columns[nc].MinWidth = 95;
                     }
+                    else if (column[i].Object == enumObject.PnlDate)
+                    {
+                        var addButton = new RepositoryItemButtonEdit
+                        {
+                            Name = nc,
+                        };
+
+
+                        #region Icon
+
+                        if (column[i].ImageValue is not null)
+                        {
+                            var getImage = ConvertToImage(column[i].ImageValue, 19, 19);
+                            addButton.Buttons[0].ImageOptions.Image = getImage;
+                            addButton.Buttons[0].Kind = ButtonPredefines.Glyph;
+                        }
+
+                        var i1 = i;
+                        if (column[i1].Action != null)
+                        {
+                            GetViewBase.RowCellClick += (s1, e1) =>
+                            {
+                                if (e1.Column.FieldName == column[i1].Name)
+                                {
+                                    frmCalender frmCalender = new frmCalender();
+                                    frmCalender.ShowDialog();
+
+                                    var selRowdate = frmCalender.SelDate;
+                                    column[i1].Action?.Invoke(selRowdate);
+                                }
+                            };
+                            addButton.Buttons[0].Click += (s1, e1) =>
+                            {
+                                frmCalender frmCalender = new frmCalender();
+                                frmCalender.ShowDialog();
+
+                                var selRowdate = frmCalender.SelDate;
+                                column[i1].Action?.Invoke(selRowdate);
+                            };
+                        }
+
+                        #endregion
+
+
+
+                        RepositoryItems.Add(addButton);
+                        DGV_Viw.Columns[nc].ColumnEdit = addButton;
+
+                        DGV_Viw.Columns[nc].Caption = column[i].Caption;
+                        DGV_Viw.Columns[nc].OptionsFilter.AllowFilter = false;
+                        DGV_Viw.Columns[nc].OptionsFilter.AllowAutoFilter = false;
+                        DGV_Viw.Columns[nc].OptionsColumn.FixedWidth = false;
+                        DGV_Viw.Columns[nc].OptionsColumn.AllowSize = false;
+                        DGV_Viw.Columns[nc].OptionsColumn.AllowSort = DefaultBoolean.False;
+                        DGV_Viw.Columns[nc].OptionsColumn.AllowEdit = true;
+                        DGV_Viw.Columns[nc].OptionsColumn.ReadOnly = true;
+                    }
                     else if (column[i].Object == enumObject.DateMask)
                     {
                         var maskData = new RepositoryItemTextEdit
                         {
                             Name = nc,
                             Mask = { EditMask = @"___/__/__", MaskType = MaskType.DateTime, UseMaskAsDisplayFormat = true },
-                            ContextImageOptions =
-                            {
-                                //Image = column[i].ImageValue
-                            }
-                            //  riMaskedTextEdit.Mask.UseMaskAsDisplayFormat = true; // If enabled, the mask is also applied even when the 
 
                         };
 
@@ -839,7 +893,19 @@ namespace MyCom.Object
                             var getImage = ConvertToImage(column[i].ImageValue, 19, 19);
                             addButton.Image = getImage;
                         }
-
+                        var i1 = i;
+                        if (column[i1].Action != null)
+                        {
+                            GetViewBase.RowCellClick += (s1, e1) =>
+                            {
+                                if (e1.Column.FieldName == column[i1].Name)
+                                {
+                                    var getId = GetValue<Guid>(e1.RowHandle,"Id");
+                                    column[i1].Action(getId);
+                                }
+                            };
+                      
+                        }
                         addButton.ImageAlignment = HorzAlignment.Center;
 
                         RepositoryItems.Add(addButton);
