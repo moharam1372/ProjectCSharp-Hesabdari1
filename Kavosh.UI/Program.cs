@@ -74,12 +74,14 @@ namespace Kavosh.UI
             services.AddScoped<PersonService>();
             services.AddScoped<FactorHeaderService>();
             services.AddScoped<PaymentTypeService>();
+      
 
             // Forms
             services.AddTransient<FrmMain>();
             services.AddTransient<FrmProduct>();
-            services.AddTransient<FrmPerson>();// 👈 جدید
+            services.AddTransient<FrmPerson>();
             services.AddTransient<FrmFactor>();
+            services.AddTransient<FrmFactorList>();
             //services.AddTransient<CustomerForm>();
         }
         private static void InitializeDatabase()

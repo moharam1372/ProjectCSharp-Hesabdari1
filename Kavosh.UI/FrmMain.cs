@@ -55,8 +55,11 @@ namespace Kavosh.UI
 
         private void barFactor_ItemClick(object sender, ItemClickEventArgs e)
         {
-            var frm = Program.CreateScopedForm<FrmFactor>();
-            frm.OverShowWait<FrmFactor>(this);
+            //var frm = Program.CreateScopedForm<FrmFactor>();
+            //frm.OverShowWait<FrmFactor>(this);
+
+            var frm = Program.CreateScopedForm<FrmFactorList>();   // 👈 قبلاً FrmFactor بود
+            frm.OverShowWait<FrmFactorList>(this);
         }
     }
 }

@@ -8,13 +8,22 @@ namespace Kavosh.DataAccess.Repositories
     {
         Task<FactorHeader> GetByIdWithDetailsAsync(Guid id);
         Task<long> GetMaxCodeAsync();
-        Task<Guid> SaveWithDetailsAsync(FactorHeader header, List<FactorDetail> details, List<HowToPay> howToPays); // 👈 پارامتر جدید
+        Task<Guid> SaveWithDetailsAsync(FactorHeader header, List<FactorDetail> details, List<HowToPay> howToPays);
+        Task<List<FactorHeader>> GetAllWithPersonAsync();   // 👈 جدید
     }
 
     public class FactorHeaderRepository : Repository<FactorHeader>, IFactorHeaderRepository
     {
-        public FactorHeaderRepository(AppDbContext context) : base(context) { }
 
+        public FactorHeaderRepository(AppDbContext context) : base(context) { }
+        public async Task<List<FactorHeader>> GetAllWithPersonAsync()
+        {
+            return await _dbSet
+                .Include(f => f.Person)
+                .Where(f => !f.IsDeleted)
+                .OrderByDescending(f => f.Code)
+                .ToListAsync();
+        }
         public async Task<FactorHeader> GetByIdWithDetailsAsync(Guid id)
         {
             return await _dbSet

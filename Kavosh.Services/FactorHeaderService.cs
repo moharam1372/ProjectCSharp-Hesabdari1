@@ -16,7 +16,24 @@ namespace Kavosh.Services
             _repository = repository;
             _paymentTypeRepository = paymentTypeRepository;
         }
+        public async Task<List<FactorHeaderDto>> GetAllFactorsAsync()
+        {
+            var factors = await _repository.GetAllWithPersonAsync();
+            return factors.Select(ToListDto).ToList();
+        }
 
+        // نسخه‌ی سبک برای گرید — بدون Details/HowToPays (که فقط موقع باز کردن تک فاکتور لازمه)
+        private static FactorHeaderDto ToListDto(FactorHeader f) => new()
+        {
+            Id = f.Id,
+            Code = f.Code,
+            PersonId = f.PersonId,
+            PersonName = f.Person?.FullName,
+            Type = f.Type,
+            DateFactor = f.DateFactor,
+            Discount = f.Discount,
+            PriceTotal = f.PriceTotal
+        };
         public async Task<long> GetNextCodeAsync()
         {
             var maxCode = await _repository.GetMaxCodeAsync();
