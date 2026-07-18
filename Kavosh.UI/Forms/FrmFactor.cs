@@ -39,12 +39,16 @@ namespace Kavosh.UI.Forms
 
         private async void FrmFactor_Shown(object sender, EventArgs e)
         {
-            await Task.WhenAll(
-                SetStyle(),
-                SetFieldLayInput()
-            );
+            //await Task.WhenAll(
+            //    SetStyle(),
+            //    SetFieldLayInput(),
+            //    SetFieldDgvFactorDetail(),
+            //    PrepareNewFactor()
+            //);
 
-            // این دو تا باید بعد از layInput اجرا بشن چون به فیلدهاش وابسته‌ان
+            //// این دو تا باید بعد از layInput اجرا بشن چون به فیلدهاش وابسته‌ان
+            await SetStyle();
+            await SetFieldLayInput();
             await SetFieldDgvFactorDetail();
             await PrepareNewFactor();
         }
@@ -98,7 +102,10 @@ namespace Kavosh.UI.Forms
 
             layInput.BtnCancelClick += LayInput_BtnCancelClick;
             layInput.BtnSaveClick += LayInput_BtnSaveClick;
+            layInput.BtnNewClick += LayInput_BtnNewClick; ;
         }
+
+     
 
 
         // ============= خط‌های محصول (سمت چپ، قابل ویرایش) =============
@@ -111,8 +118,8 @@ namespace Kavosh.UI.Forms
                     new() { Name = "حذف", Object = KavoshGrid.enumObject.Button, ImageValue = MyCom.Properties.Resources.delete },
                     new() { Name = "محصول", Type = typeof(Guid) },
                     new() { Name = "تعداد", Type = typeof(float) },
-                    new() { Name = "قیمت واحد", Type = typeof(long) },
-                    new() { Name = "جمع", Type = typeof(long) },
+                    new() { Name = "قیمت واحد", Type = typeof(long),PriceActive = true},
+                    new() { Name = "جمع", Type = typeof(long),PriceActive = true },
                 ], true, false, false);
 
                 dgvFactorDetail.ActiveScrollGrid();
@@ -125,23 +132,43 @@ namespace Kavosh.UI.Forms
                 var getProducts = (await _productService.GetAllProductsAsync()).Select(s => new { s.Id, s.Title, s.SellPrice }).ToList();
                 var cmbProduct = dgvFactorDetail.AddGridToGrid(getProducts, "محصول", "Id", "Title", select =>
                 {
+                    var getCount = dgvFactorDetail.GetValue<long>("تعداد");
+
                     var getSellPrice = getProducts.First(f => f.Id == select.Id).SellPrice;
                     dgvFactorDetail.SetValue("قیمت واحد", getSellPrice);
-
-
+                    dgvFactorDetail.SetValue("جمع", getSellPrice * getCount);
 
                 });
                 cmbProduct.HiddenColumn("Id");
                 cmbProduct.HiddenColumn("SellPrice");
 
-      
+
                 #endregion
 
                 #region Event
 
+                dgvFactorDetail.GetViewBase.CellValueChanged += (s1, e1) =>
+                {
+                    if (e1.Column.FieldName != "قیمت واحد" && e1.Column.FieldName != "تعداد")
+                        return;
+
+                    // مقدار ستونی که همین الان تغییر کرده رو از e1.Value بگیر
+                    // و مقدار ستون دیگه رو از خود گرید بخون
+                    long getSellPrice = e1.Column.FieldName == "قیمت واحد"
+                        ? e1.Value.GetNum<long>()
+                        : dgvFactorDetail.GetValue<long>("قیمت واحد");
+
+                    long getCount = e1.Column.FieldName == "تعداد"
+                        ? e1.Value.GetNum<long>()
+                        : dgvFactorDetail.GetValue<long>("تعداد");
+
+                    dgvFactorDetail.SetValue("جمع", getSellPrice * getCount);
+
+                };
+
                 dgvFactorDetail.AddEventRowCellClick<Guid>(id =>
                 {
-                    dgvFactorDetail.DeleteRow(true, () => { /* فقط از گرید حذف میشه، ذخیره نهایی موقع Save انجام میشه */ });
+                    dgvFactorDetail.DeleteRow(false);
                 }, "Id", "حذف");
 
                 // TODO: پر کردن خودکار «قیمت واحد» بعد از انتخاب «محصول» + محاسبه‌ی زنده‌ی «جمع»
@@ -162,7 +189,7 @@ namespace Kavosh.UI.Forms
 
             var nextCode = await _factorHeaderService.GetNextCodeAsync();
             layInput.SetValueType("کد فاکتور", nextCode);
-            layInput.SetValueType("تاریخ", DateTime.Now);
+            layInput.SetValueType("تاریخ", DateTime.Now.DateTimePersian().Date);
         }
 
         // ============= بارگذاری فاکتور موجود برای ویرایش =============
@@ -179,7 +206,7 @@ namespace Kavosh.UI.Forms
             layInput.SetValueType("کد فاکتور", dto.Code);
             layInput.SetValueType("طرف حساب", dto.PersonId);
             layInput.SetValueType("نوع فاکتور", dto.Type ? "فروش" : "خرید");
-            layInput.SetValueType("تاریخ", dto.DateFactor);
+            layInput.SetValueType("تاریخ", dto.DateFactor.DateTimePersian().Date);
             layInput.SetValueType("تخفیف", dto.Discount);
 
             _dtFactorDetail.Rows.Clear();
@@ -235,9 +262,12 @@ namespace Kavosh.UI.Forms
 
         private async void LayInput_BtnCancelClick(object sender, EventArgs e)
         {
+            
+        }
+        private async void LayInput_BtnNewClick(object sender, EventArgs e)
+        {
             await PrepareNewFactor();
         }
-
         private void FrmFactor_Load(object sender, EventArgs e) { }
     }
 }

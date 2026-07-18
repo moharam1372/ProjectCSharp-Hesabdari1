@@ -27,6 +27,7 @@ namespace Kavosh.DataAccess.Repositories
         public async Task<long> GetMaxCodeAsync()
         {
             // اگه جدول خالی باشه 999 برمی‌گرده تا اولین کد بشه 1000
+            //var gg= await _dbSet.MaxAsync(f => (long?)f.Code) ;
             return await _dbSet.MaxAsync(f => (long?)f.Code) ?? 999;
         }
 
