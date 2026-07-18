@@ -320,7 +320,7 @@ namespace Kavosh.UI.Forms
                 ], true, false, false);
 
                 dgvHowToPay.ActiveScrollGrid();
-                //dgvHowToPay.HiddenColumn("Id");
+                dgvHowToPay.HiddenColumn("Id");
                 dgvHowToPay.MaxMinWidth("حذف", 45, 45);
                 dgvHowToPay.MaxMinWidth("تاریخ چک", 100, 100);
                 //dgvHowToPay.AllowEditColumn("تاریخ چک");
