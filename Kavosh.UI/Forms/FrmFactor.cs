@@ -21,6 +21,8 @@ namespace Kavosh.UI.Forms
         private readonly ProductService _productService;
         private readonly PaymentTypeService _paymentTypeService;   // 👈 جدید
 
+        public Guid? FactorIdToEdit;   // 👈 این خط رو اضافه کنید
+
         private ClsFont _clsFont = new(false);
         private ClsFont _clsFontBold = new(true);
 
@@ -52,8 +54,12 @@ namespace Kavosh.UI.Forms
             await SetStyle();
             await SetFieldLayInput();
             await SetFieldDgvFactorDetail();
-            await PrepareNewFactor();
-            await SetFieldDgvHowToPay();   // 👈 جدید
+            //await PrepareNewFactor();
+            await SetFieldDgvHowToPay();   
+            if (FactorIdToEdit.HasValue)
+                await LoadFactorToForm(FactorIdToEdit.Value);
+            else
+                await PrepareNewFactor();
         }
 
         public async Task SetStyle()
@@ -246,7 +252,7 @@ namespace Kavosh.UI.Forms
                     Code = layInput.GetValue<long>("کد فاکتور"),
                     PersonId = layInput.GetValue<Guid>("طرف حساب"),
                     Type = layInput.GetValue<string>("نوع فاکتور") == "فروش",
-                    DateFactor = layInput.GetValue<DateTime>("تاریخ"),
+                    DateFactor = layInput.GetValue<string>("تاریخ").ShamsiToMiladi(),
                     Discount = layInput.GetValue<long>("تخفیف"),
                     Details = _dtFactorDetail.Rows
                         .Cast<DataRow>()
@@ -315,7 +321,8 @@ namespace Kavosh.UI.Forms
                     new() { Name = "مبلغ", Type = typeof(long), PriceActive = true },
                     new() { Name = "شماره چک", Type = typeof(string) },
                     new() { Name = "تاریخ چک",Action = EventDatePanel, Object = KavoshGrid.enumObject.PnlDate, ImageValue = MyCom.Properties.Resources.adateoccuring },
-                    new() { Name = "تسویه", Type = typeof(bool) },
+                    new() { Name = "تسویه", Type = typeof(bool),Object = KavoshGrid.enumObject.Checked},
+                    //new() { Name = "تسویه", Type = typeof(bool) },
                     new() { Name = "توضیحات", Type = typeof(string) },
                 ], true, false, false);
 

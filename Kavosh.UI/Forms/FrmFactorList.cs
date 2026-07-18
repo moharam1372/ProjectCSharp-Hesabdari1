@@ -107,7 +107,7 @@ namespace Kavosh.UI.Forms
         {
             var frm = Program.CreateScopedForm<FrmFactor>();
             frm.FactorIdToEdit = id;
-            frm.OverShowWait<FrmFactor>(this);
+            frm.OverShowWait<FrmFactor>(this.MdiParent);
         }
 
         private void FrmFactorList_Load(object sender, EventArgs e) { }

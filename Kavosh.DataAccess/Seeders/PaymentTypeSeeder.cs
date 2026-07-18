@@ -11,7 +11,8 @@ namespace Kavosh.DataAccess.Seeders
         {
             (PaymentTypeIds.Cash, "نقدی"),
             (PaymentTypeIds.Check, "چک"),
-            (PaymentTypeIds.CardToCard, "کارت به کارت")
+            (PaymentTypeIds.CardToCard, "کارت به کارت"),
+            (PaymentTypeIds.Debtor, "بدهی")
         };
 
         public static async Task SeedAsync(AppDbContext context)
