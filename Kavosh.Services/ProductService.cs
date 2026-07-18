@@ -14,18 +14,35 @@ namespace Kavosh.Services
         }
 
         // ============= خواندن =============
+        //public async Task<List<ProductDto>> GetAllProductsAsync()
+        //{
+        //    var products = await _repository.GetAllWithDetailsAsync();
+        //    return products.Select(ToDto).ToList();
+        //}
         public async Task<List<ProductDto>> GetAllProductsAsync()
         {
             var products = await _repository.GetAllWithDetailsAsync();
-            return products.Select(ToDto).ToList();
-        }
+            var movements = await _repository.GetStockMovementForAllAsync();
 
+            return products.Select(p =>
+            {
+                var (input, output) = movements.TryGetValue(p.Id, out var m) ? m : (0f, 0f);
+                return ToDto(p, input, output);
+            }).ToList();
+        }
+        //public async Task<ProductDto> GetProductByIdAsync(Guid id)
+        //{
+        //    var entity = await _repository.GetByIdWithDetailsAsync(id);
+        //    return entity is null ? null : ToDto(entity);
+        //}
         public async Task<ProductDto> GetProductByIdAsync(Guid id)
         {
             var entity = await _repository.GetByIdWithDetailsAsync(id);
-            return entity is null ? null : ToDto(entity);
-        }
+            if (entity is null) return null;
 
+            var (input, output) = await _repository.GetStockMovementAsync(id);
+            return ToDto(entity, input, output);
+        }
         // ============= ذخیره (افزودن + ویرایش با یک متد) =============
         // متد عمومی که خودتون هم می‌تونید صداش بزنید (مثلاً برای نمایش پیش‌فرض توی فرم قبل از ذخیره)
         public async Task<long> GetNextProductCodeAsync()

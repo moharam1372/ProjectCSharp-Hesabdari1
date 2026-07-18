@@ -43,19 +43,19 @@ namespace Kavosh.UI
         {
             //new FrmProduct().OverShowWait<FrmProduct>(this);
 
-            var frm = Program.ServiceProvider.GetRequiredService<FrmProduct>();
+            var frm = Program.CreateScopedForm<FrmProduct>();
             frm.OverShowWait<FrmProduct>(this);
         }
 
         private void barPerson_ItemClick(object sender, ItemClickEventArgs e)
         {
-            var frm = Program.ServiceProvider.GetRequiredService<FrmPerson>();
+            var frm = Program.CreateScopedForm<FrmPerson>();
             frm.OverShowWait<FrmPerson>(this);
         }
 
         private void barFactor_ItemClick(object sender, ItemClickEventArgs e)
         {
-            var frm = Program.ServiceProvider.GetRequiredService<FrmFactor>();
+            var frm = Program.CreateScopedForm<FrmFactor>();
             frm.OverShowWait<FrmFactor>(this);
         }
     }

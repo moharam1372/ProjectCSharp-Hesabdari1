@@ -110,5 +110,12 @@ namespace Kavosh.UI
                 }
             }
         }
+        public static T CreateScopedForm<T>() where T : Form
+        {
+            var scope = ServiceProvider.CreateScope();
+            var form = scope.ServiceProvider.GetRequiredService<T>();
+            form.FormClosed += (s, e) => scope.Dispose();
+            return form;
+        }
     }
 }
