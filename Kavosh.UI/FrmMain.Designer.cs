@@ -84,7 +84,7 @@
             // barBtnAccounting
             // 
             barBtnAccounting.AllowHtmlText = DevExpress.Utils.DefaultBoolean.True;
-            barBtnAccounting.Caption = "صورت حساب مستریان";
+            barBtnAccounting.Caption = "صورت حساب مشتریان";
             barBtnAccounting.Id = 4;
             barBtnAccounting.ImageOptions.SvgImage = Properties.Resources.customerprofilereport;
             barBtnAccounting.LargeWidth = 140;
