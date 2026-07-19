@@ -26,7 +26,7 @@ namespace Kavosh.Domain.Entities
         /// <summary>
         /// تاریخ سررسید چک در صورت پرداخت با چک
         /// </summary>
-        public DateTime CheckDate { get; set; }
+        public DateTime? CheckDate { get; set; }
 
 
         /// <summary>

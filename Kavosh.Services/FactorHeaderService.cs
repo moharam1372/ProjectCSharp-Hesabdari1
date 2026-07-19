@@ -131,12 +131,12 @@ namespace Kavosh.Services
                 if (hp.Price <= 0)
                     throw new ArgumentException("مبلغ پرداخت باید بیشتر از صفر باشد");
 
-                if (hp.PaymentTypeId == PaymentTypeIds.Check)   // 👈 مقایسه‌ی مستقیم Guid، دیگه Contains نیست
+                if (hp.PaymentTypeId == PaymentTypeIds.Check)
                 {
                     if (string.IsNullOrWhiteSpace(hp.CheckNumber))
                         throw new ArgumentException("برای پرداخت چکی، شماره چک الزامی است");
 
-                    if (hp.CheckDate == default)
+                    if (hp.CheckDate is null || hp.CheckDate == default)   // 👈 چک Nullable
                         throw new ArgumentException("برای پرداخت چکی، تاریخ چک الزامی است");
                 }
             }

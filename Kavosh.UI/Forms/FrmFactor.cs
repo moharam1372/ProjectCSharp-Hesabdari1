@@ -235,7 +235,11 @@ namespace Kavosh.UI.Forms
             _dtHowToPay.Rows.Clear();
             foreach (var p in dto.HowToPays)
             {
-                _dtHowToPay.Rows.Add(p.Id, "حذف", p.PaymentTypeId, p.Price, p.CheckNumber, p.CheckDate, p.Settlement, p.Description);
+                _dtHowToPay.Rows.Add(
+                    p.Id, "حذف", p.PaymentTypeId, p.Price, p.CheckNumber,
+                    (object)p.CheckDate ?? DBNull.Value,   // 👈 اگه null بود، DBNull میره تو ستون
+                    p.Settlement, p.Description
+                );
             }
             dgvHowToPay.SetFieldSizeColumn();
         }
@@ -277,7 +281,8 @@ namespace Kavosh.UI.Forms
                             PaymentTypeId = (Guid)r["نوع پرداخت"],
                             Price = Convert.ToInt64(r["مبلغ"]),
                             CheckNumber = r["شماره چک"] as string,
-                            CheckDate = r["تاریخ چک"] is DateTime dt ? dt : default,
+                            //CheckDate = r["تاریخ چک"] is DateTime dt ? dt : default,
+                            CheckDate = r["تاریخ چک"] is DateTime dt ? dt : (DateTime?)null,   // 👈 اصلاح شد
                             Settlement = r["تسویه"] != DBNull.Value && Convert.ToBoolean(r["تسویه"]),
                             Description = r["توضیحات"] as string
                         }).ToList()
