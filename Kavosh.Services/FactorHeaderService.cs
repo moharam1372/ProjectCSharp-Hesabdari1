@@ -9,12 +9,16 @@ namespace Kavosh.Services
     public class FactorHeaderService
     {
         private readonly IFactorHeaderRepository _repository;
-        private readonly IRepository<PaymentType> _paymentTypeRepository;   // 👈 جدید
+        private readonly IRepository<PaymentType> _paymentTypeRepository;   
+        private readonly DefinitiveAccountService _definitiveAccountService;   // 👈 جدید
 
-        public FactorHeaderService(IFactorHeaderRepository repository, IRepository<PaymentType> paymentTypeRepository)
+
+    
+        public FactorHeaderService(IFactorHeaderRepository repository, IRepository<PaymentType> paymentTypeRepository, DefinitiveAccountService definitiveAccountService)
         {
             _repository = repository;
             _paymentTypeRepository = paymentTypeRepository;
+            _definitiveAccountService = definitiveAccountService;
         }
         public async Task<List<FactorHeaderDto>> GetAllFactorsAsync()
         {
@@ -49,8 +53,12 @@ namespace Kavosh.Services
         public async Task<Guid> SaveFactorAsync(FactorHeaderDto dto)
         {
             Validate(dto);
-     
             ValidateHowToPays(dto.HowToPays);
+
+            // 👇 Snapshot از وضعیت «قبل از ذخیره» برای تشخیص تغییرات (فقط اگه ویرایشه)
+            var oldSettlements = dto.Id != Guid.Empty
+                ? await _repository.GetHowToPaySettlementSnapshotAsync(dto.Id)
+                : new Dictionary<Guid, bool>();
 
             var calculatedTotal = dto.Details.Sum(d => (long)(d.Count * d.PriceUnit)) - dto.Discount;
 
@@ -73,7 +81,7 @@ namespace Kavosh.Services
                 PriceUnit = d.PriceUnit
             }).ToList();
 
-            var howToPays = dto.HowToPays.Select(p => new HowToPay   // 👈 جدید
+            var howToPays = dto.HowToPays.Select(p => new HowToPay
             {
                 Id = p.Id,
                 PaymentTypeId = p.PaymentTypeId,
@@ -87,9 +95,43 @@ namespace Kavosh.Services
             var savedId = await _repository.SaveWithDetailsAsync(header, details, howToPays);
             await _repository.SaveChangesAsync();
 
+            // 👇 حالا که HowToPayها Id واقعی گرفتن، منطق DefinitiveAccount رو اجرا می‌کنیم
+            await SyncDefinitiveAccountsAsync(dto.PersonId, dto.Code, howToPays, oldSettlements);
+
             return savedId;
         }
+        private async Task SyncDefinitiveAccountsAsync(
+            Guid personId, long factorCode, List<HowToPay> howToPays, Dictionary<Guid, bool> oldSettlements)
+        {
+            foreach (var hp in howToPays)
+            {
+                bool isDebtType = hp.PaymentTypeId == PaymentTypeIds.Debtor;
+                bool isCheckType = hp.PaymentTypeId == PaymentTypeIds.Check;
 
+                if (!isDebtType && !isCheckType)
+                    continue; // نقدی/کارت به کارت → هیچ بدهی‌ای ثبت نمیشه
+
+                var isNewRow = !oldSettlements.ContainsKey(hp.Id);
+
+                if (isNewRow)
+                {
+                    // ردیف پرداخت تازه‌ست → بدهی اولیه ثبت میشه
+                    await _definitiveAccountService.CreateDebtFromHowToPayAsync(
+                        personId, hp.Id, hp.Price, factorCode, isCheckType);
+
+                    // اگه همون لحظه هم Settlement=true بود (چک از قبل تسویه علامت خورده)، فوری وصولش کن
+                    if (isCheckType && hp.Settlement)
+                        await _definitiveAccountService.SettleCheckByHowToPayIdAsync(hp.Id);
+                }
+                else if (isCheckType)
+                {
+                    // ردیف موجود بود؛ فقط اگه Settlement تازه از false به true تغییر کرده باشه، وصول کن
+                    var wasSettled = oldSettlements[hp.Id];
+                    if (!wasSettled && hp.Settlement)
+                        await _definitiveAccountService.SettleCheckByHowToPayIdAsync(hp.Id);
+                }
+            }
+        }
         public async Task DeleteFactorAsync(Guid id)
         {
             var entity = await _repository.GetById(id);

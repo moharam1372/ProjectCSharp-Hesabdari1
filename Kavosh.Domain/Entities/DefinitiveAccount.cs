@@ -21,7 +21,11 @@
         /// </summary>
         public bool Debtor { get; set; }
         public string? Description { get; set; }
+        // 👇 جدید
+        public bool IsCheck { get; set; }                        // این بدهی ناشی از چکه یا نه
 
+        public Guid? SettledFromId { get; set; }                 // اگه این رکورد، خنثی‌کننده‌ی یه بدهی چک قبلیه
+        public virtual DefinitiveAccount SettledFrom { get; set; }
         public Guid? HowToPayId { get; set; }
         public virtual HowToPay HowToPay { get; set; }
     }

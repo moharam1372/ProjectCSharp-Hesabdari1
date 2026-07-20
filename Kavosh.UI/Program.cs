@@ -62,7 +62,7 @@ namespace Kavosh.UI
             services.AddScoped<IProductGroupRepository, ProductGroupRepository>();
             services.AddScoped<IProductUnitRepository, ProductUnitRepository>();
             services.AddScoped<IFactorHeaderRepository, FactorHeaderRepository>();
-
+            services.AddScoped<IDefinitiveAccountRepository, DefinitiveAccountRepository>();
 
 
             // Services
@@ -74,7 +74,7 @@ namespace Kavosh.UI
             services.AddScoped<PersonService>();
             services.AddScoped<FactorHeaderService>();
             services.AddScoped<PaymentTypeService>();
-      
+            services.AddScoped<DefinitiveAccountService>();
 
             // Forms
             services.AddTransient<FrmMain>();

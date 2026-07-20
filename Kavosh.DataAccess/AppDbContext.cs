@@ -100,8 +100,13 @@ namespace Kavosh.DataAccess
                     .WithMany(h => h.DefinitiveAccounts)
                     .HasForeignKey(d => d.HowToPayId)
                     .OnDelete(DeleteBehavior.Restrict);  // 👈 کلید حل مشکل multiple cascade paths
+                // 👇 جدید — SQL Server اجازه‌ی Cascade روی خودارجاع نمی‌ده، حتماً Restrict
+                entity.HasOne(d => d.SettledFrom)
+                    .WithMany()
+                    .HasForeignKey(d => d.SettledFromId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
-
+      
             base.OnModelCreating(modelBuilder);
         }
     }
