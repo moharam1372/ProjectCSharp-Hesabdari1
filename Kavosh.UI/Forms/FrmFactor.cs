@@ -275,16 +275,19 @@ namespace Kavosh.UI.Forms
                         .Cast<DataRow>()
                         .Where(r => r.RowState != DataRowState.Deleted)
                         .Where(r => r["نوع پرداخت"] != DBNull.Value && r["نوع پرداخت"] is Guid tid && tid != Guid.Empty)
-                        .Select(r => new HowToPayDto
+                        .Select(r =>
                         {
-                            Id = r["Id"] is Guid gid ? gid : Guid.Empty,
-                            PaymentTypeId = (Guid)r["نوع پرداخت"],
-                            Price = Convert.ToInt64(r["مبلغ"]),
-                            CheckNumber = r["شماره چک"] as string,
-                            //CheckDate = r["تاریخ چک"] is DateTime dt ? dt : default,
-                            CheckDate = r["تاریخ چک"] is DateTime dt ? dt : (DateTime?)null,   // 👈 اصلاح شد
-                            Settlement = r["تسویه"] != DBNull.Value && Convert.ToBoolean(r["تسویه"]),
-                            Description = r["توضیحات"] as string
+                            var checkDate = r["تاریخ چک"].ToString().ShamsiToMiladi();
+                            return new HowToPayDto
+                            {
+                                Id = r["Id"] is Guid gid ? gid : Guid.Empty,
+                                PaymentTypeId = (Guid)r["نوع پرداخت"],
+                                Price = Convert.ToInt64(r["مبلغ"]),
+                                CheckNumber = r["شماره چک"] as string,
+                                CheckDate = checkDate, // 👈 اصلاح شد
+                                Settlement = r["تسویه"] != DBNull.Value && Convert.ToBoolean(r["تسویه"]),
+                                Description = r["توضیحات"] as string
+                            };
                         }).ToList()
                 };
 

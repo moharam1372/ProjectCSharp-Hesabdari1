@@ -48,7 +48,7 @@ namespace Kavosh.DataAccess.Repositories
             var existing = header.Id != Guid.Empty
                 ? await _dbSet
                     .Include(f => f.FactorDetails)
-                    .Include(f => f.HowToPays)          // 👈 جدید
+                    .Include(f => f.HowToPays)         
                     .FirstOrDefaultAsync(f => f.Id == header.Id)
                 : null;
 
@@ -68,7 +68,7 @@ namespace Kavosh.DataAccess.Repositories
                 }
                 header.FactorDetails = details;
 
-                foreach (var p in howToPays)             // 👈 جدید
+                foreach (var p in howToPays)           
                 {
                     p.Id = Guid.NewGuid();
                     p.FactorHeaderId = header.Id;
@@ -120,8 +120,7 @@ namespace Kavosh.DataAccess.Repositories
                     existing.FactorDetails.Add(incoming);
                 }
             }
-
-            // 👇 Sync ردیف‌های پرداخت (همون منطق، برای HowToPay)
+            
             var incomingPayIds = howToPays.Where(p => p.Id != Guid.Empty).Select(p => p.Id).ToHashSet();
             var payToRemove = existing.HowToPays.Where(p => !incomingPayIds.Contains(p.Id)).ToList();
             foreach (var p in payToRemove)

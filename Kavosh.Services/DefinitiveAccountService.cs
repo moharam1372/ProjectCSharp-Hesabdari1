@@ -48,7 +48,7 @@ namespace Kavosh.Services
                 Debtor = true,
                 IsCheck = isCheck,
                 HowToPayId = howToPayId,
-                Description = isCheck ? "بدهی از چک دریافتی" : "بدهی از فاکتور"
+                Description = isCheck ? "بدهی بابت چک" : $"{factorCode} بدهی از فاکتور:"
             };
 
             await _repository.Add(entity);
