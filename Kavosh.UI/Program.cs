@@ -82,6 +82,7 @@ namespace Kavosh.UI
             services.AddTransient<FrmPerson>();
             services.AddTransient<FrmFactor>();
             services.AddTransient<FrmFactorList>();
+            services.AddTransient<FrmDefinitiveAccount>();
             //services.AddTransient<CustomerForm>();
         }
         private static void InitializeDatabase()

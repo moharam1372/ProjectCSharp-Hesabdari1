@@ -9,7 +9,8 @@ namespace Kavosh.DataAccess.Repositories
         Task<FactorHeader> GetByIdWithDetailsAsync(Guid id);
         Task<long> GetMaxCodeAsync();
         Task<Guid> SaveWithDetailsAsync(FactorHeader header, List<FactorDetail> details, List<HowToPay> howToPays);
-        Task<List<FactorHeader>> GetAllWithPersonAsync();   // 👈 جدید
+        Task<List<FactorHeader>> GetAllWithPersonAsync();
+        Task<Dictionary<Guid, bool>> GetHowToPaySettlementSnapshotAsync(Guid factorHeaderId);
     }
 
     public class FactorHeaderRepository : Repository<FactorHeader>, IFactorHeaderRepository
@@ -155,6 +156,16 @@ namespace Kavosh.DataAccess.Repositories
             }
 
             return existing.Id;
+        }
+        // FactorHeaderRepository.cs — اضافه کنید
+        public async Task<Dictionary<Guid, bool>> GetHowToPaySettlementSnapshotAsync(Guid factorHeaderId)
+        {
+            // AsNoTracking حیاتیه — وگرنه EF همون Instance ردیابی‌شده رو برمی‌گردونه
+            // و بعداً که SaveWithDetailsAsync مقدارشو عوض کنه، این Snapshot هم عوض میشه!
+            return await _context.Set<HowToPay>()
+                .AsNoTracking()
+                .Where(p => p.FactorHeaderId == factorHeaderId)
+                .ToDictionaryAsync(p => p.Id, p => p.Settlement);
         }
     }
 }

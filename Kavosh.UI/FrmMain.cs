@@ -61,5 +61,12 @@ namespace Kavosh.UI
             var frm = Program.CreateScopedForm<FrmFactorList>();   // 👈 قبلاً FrmFactor بود
             frm.OverShowWait<FrmFactorList>(this);
         }
+
+        private void barBtnAccounting_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var frm = Program.CreateScopedForm<FrmDefinitiveAccount>();
+            // PersonIdToShow رو ست نمی‌کنیم — کاربر خودش از LookUpEdit داخل فرم انتخاب می‌کنه
+            frm.OverShowWait<FrmDefinitiveAccount>(this);
+        }
     }
 }

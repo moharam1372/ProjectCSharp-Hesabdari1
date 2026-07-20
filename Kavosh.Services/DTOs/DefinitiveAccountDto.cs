@@ -13,5 +13,7 @@
         public string Description { get; set; }
         public bool IsCheck { get; set; }
         public Guid? HowToPayId { get; set; }
+        public bool IsSettled { get; set; }   // 👈 جدید — برای تصمیم نمایش دکمه‌ی «وصول چک»
+
     }
 }

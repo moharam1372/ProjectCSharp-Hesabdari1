@@ -100,8 +100,7 @@ namespace Kavosh.Services
 
             return savedId;
         }
-        private async Task SyncDefinitiveAccountsAsync(
-            Guid personId, long factorCode, List<HowToPay> howToPays, Dictionary<Guid, bool> oldSettlements)
+        private async Task SyncDefinitiveAccountsAsync(Guid personId, long factorCode, List<HowToPay> howToPays, Dictionary<Guid, bool> oldSettlements)
         {
             foreach (var hp in howToPays)
             {
@@ -116,8 +115,7 @@ namespace Kavosh.Services
                 if (isNewRow)
                 {
                     // ردیف پرداخت تازه‌ست → بدهی اولیه ثبت میشه
-                    await _definitiveAccountService.CreateDebtFromHowToPayAsync(
-                        personId, hp.Id, hp.Price, factorCode, isCheckType);
+                    await _definitiveAccountService.CreateDebtFromHowToPayAsync(personId, hp.Id, hp.Price, factorCode, isCheckType);
 
                     // اگه همون لحظه هم Settlement=true بود (چک از قبل تسویه علامت خورده)، فوری وصولش کن
                     if (isCheckType && hp.Settlement)

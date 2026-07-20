@@ -16,7 +16,14 @@ namespace Kavosh.Services
         public async Task<List<DefinitiveAccountDto>> GetStatementAsync(Guid personId)
         {
             var items = await _repository.GetByPersonAsync(personId);
-            return items.Select(ToDto).ToList();
+
+            // هر رکوردی که یه رکورد دیگه با SettledFromId بهش اشاره کرده باشه، یعنی قبلاً وصول شده
+            var settledFromIds = items
+                .Where(x => x.SettledFromId.HasValue)
+                .Select(x => x.SettledFromId!.Value)
+                .ToHashSet();
+
+            return items.Select(d => ToDto(d, settledFromIds.Contains(d.Id))).ToList();
         }
 
         public async Task<long> GetNextCodeAsync()
@@ -24,7 +31,7 @@ namespace Kavosh.Services
             var max = await _repository.GetMaxCodeAsync();
             return max + 1;
         }
-
+   
         // فراخوانی خودکار از FactorHeaderService وقتی یه HowToPay از نوع «بدهی» یا «چک» تازه ثبت میشه
         public async Task CreateDebtFromHowToPayAsync(Guid personId, Guid howToPayId, long price, long factorCode, bool isCheck)
         {
@@ -41,7 +48,7 @@ namespace Kavosh.Services
                 Debtor = true,
                 IsCheck = isCheck,
                 HowToPayId = howToPayId,
-                Description = isCheck ? "بدهی ناشی از چک دریافتی" : "بدهی ناشی از فاکتور"
+                Description = isCheck ? "بدهی از چک دریافتی" : "بدهی از فاکتور"
             };
 
             await _repository.Add(entity);
@@ -92,7 +99,10 @@ namespace Kavosh.Services
             await _repository.SaveChangesAsync();
         }
 
-        private static DefinitiveAccountDto ToDto(DefinitiveAccount d) => new()
+  
+  
+
+        private static DefinitiveAccountDto ToDto(DefinitiveAccount d, bool isSettled) => new()
         {
             Id = d.Id,
             Code = d.Code,
@@ -104,7 +114,8 @@ namespace Kavosh.Services
             Debtor = d.Debtor,
             Description = d.Description,
             IsCheck = d.IsCheck,
-            HowToPayId = d.HowToPayId
+            HowToPayId = d.HowToPayId,
+            IsSettled = isSettled
         };
     }
 }

@@ -11,8 +11,7 @@ namespace Kavosh.DataAccess.Repositories
         Task<DefinitiveAccount> GetDebtByHowToPayIdAsync(Guid howToPayId);
         Task<bool> IsAlreadySettledAsync(Guid definitiveAccountId);
 
-        // 👇 برای جلوگیری از مشکل EF Change Tracking (توضیح پایین)
-        Task<Dictionary<Guid, bool>> GetHowToPaySettlementSnapshotAsync(Guid factorHeaderId);
+
     }
 
     public class DefinitiveAccountRepository : Repository<DefinitiveAccount>, IDefinitiveAccountRepository
@@ -22,6 +21,7 @@ namespace Kavosh.DataAccess.Repositories
         public async Task<List<DefinitiveAccount>> GetByPersonAsync(Guid personId)
         {
             return await _dbSet
+                .Include(d => d.Person)  
                 .Where(d => d.PersonId == personId && !d.IsDeleted)
                 .OrderBy(d => d.DateCustom)
                 .ToListAsync();
@@ -43,14 +43,6 @@ namespace Kavosh.DataAccess.Repositories
             return await _dbSet.AnyAsync(d => d.SettledFromId == definitiveAccountId);
         }
 
-        public async Task<Dictionary<Guid, bool>> GetHowToPaySettlementSnapshotAsync(Guid factorHeaderId)
-        {
-            // AsNoTracking حیاتیه — وگرنه EF همون Instance ردیابی‌شده رو برمی‌گردونه
-            // و بعداً که SaveWithDetailsAsync مقدارشو عوض کنه، این Snapshot هم عوض میشه!
-            return await _context.Set<HowToPay>()
-                .AsNoTracking()
-                .Where(p => p.FactorHeaderId == factorHeaderId)
-                .ToDictionaryAsync(p => p.Id, p => p.Settlement);
-        }
+   
     }
 }

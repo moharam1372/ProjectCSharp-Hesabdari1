@@ -89,6 +89,7 @@
             barBtnAccounting.ImageOptions.SvgImage = Properties.Resources.customerprofilereport;
             barBtnAccounting.LargeWidth = 140;
             barBtnAccounting.Name = "barBtnAccounting";
+            barBtnAccounting.ItemClick += barBtnAccounting_ItemClick;
             // 
             // barBtnSetting
             // 

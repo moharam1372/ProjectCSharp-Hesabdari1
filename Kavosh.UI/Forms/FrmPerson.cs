@@ -7,6 +7,7 @@ using MyCom.Object;
 using System;
 using System.Data;
 using System.Windows.Forms;
+using DevExpress.XtraGrid.Columns;
 using DevExpress.XtraLayout;
 using DevExpress.XtraLayout.Utils;
 
@@ -63,12 +64,21 @@ namespace Kavosh.UI.Forms
                         new() { Name = "موبایل", Type = typeof(string) },
                         new() { Name = "کد ملی", Type = typeof(string) },
                         new() { Name = "آدرس", Type = typeof(string) },
+                        new() { Name = "صورت‌حساب", Object = KavoshGrid.enumObject.Button, ImageValue = MyCom.Properties.Resources.view },   // 👈 جدید
+
                     ], false, true, true);
                     dgvPerson.ActiveScrollGrid();
 
                     dgvPerson.HiddenColumn("Id");
-
+                    dgvPerson.FixColumn("صورت‌حساب", FixedStyle.Left);
                     #region Event
+
+                    dgvPerson.AddEventRowCellClick<Guid>(id =>
+                    {
+                        var frm = Program.CreateScopedForm<FrmDefinitiveAccount>();
+                        frm.PersonIdToShow = id;
+                        frm.OverShowWait<FrmDefinitiveAccount>(this.MdiParent ?? this);
+                    }, "Id", "صورت‌حساب");
 
                     dgvPerson.AddEventRowCellClick<Guid>(async id =>
                     {
