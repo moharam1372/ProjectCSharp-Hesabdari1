@@ -76,6 +76,7 @@ namespace Kavosh.UI
             services.AddScoped<PaymentTypeService>();
             services.AddScoped<DefinitiveAccountService>();
             services.AddScoped<StoreInfoService>();
+
             // Forms
             services.AddTransient<FrmMain>();
             services.AddTransient<FrmProduct>();

@@ -1,4 +1,5 @@
 ﻿using Kavosh.Services.DTOs;
+using MyCom.Class;
 
 namespace Kavosh.UI.Reports.Factor
 {
@@ -19,7 +20,7 @@ namespace Kavosh.UI.Reports.Factor
 
             lblHeader2.Text = data.Header;
             lblNum.Text = data.Num;
-            lblDate.Text = data.Date;
+            lblDate.Text = data.Date.DateTimePersian().Date;
             lblBuyerName.Text = data.Buyer;
             lblBuyerMobile.Text = data.Mobile;
             lblAddress.Text = data.Address;
@@ -29,7 +30,7 @@ namespace Kavosh.UI.Reports.Factor
             txtTaxes.Text = data.TaxAmount.ToString("N0");
             txtPreviousDebt.Text = data.PreviousDebt.ToString("N0");
           
-            xrLabel26.Text = data.PreviousDebt.ToString("N0");
+            txtSumTotal.Text = data.PreviousDebt.ToString("N0");
             xrLabel25.Text = @"مبلغ قابل پرداخت: " + data.PayableAmount.ToString("N0");
             txt.Text = $"شماره کارت: {data.CardNumber}";
             xrLabel8.Text = $"شماره شبا: {data.ShabaNumber}";

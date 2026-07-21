@@ -1,5 +1,8 @@
 ﻿using DevExpress.Utils;
+using DevExpress.XtraGrid.Columns;
+using DevExpress.XtraReports.UI;
 using Kavosh.Services;
+using Kavosh.UI.Reports.Factor;
 using MyCom.Class;
 using MyCom.Object;
 using System;
@@ -57,14 +60,26 @@ namespace Kavosh.UI.Forms
                     new() { Name = "نوع فاکتور", Type = typeof(string) },
                     new() { Name = "تاریخ", Type = typeof(DateTime) },
                     new() { Name = "مبلغ کل", Type = typeof(long), PriceActive = true },
+                    new() { Name = "چاپ", Object = KavoshGrid.enumObject.Button, ImageValue = MyCom.Properties.Resources.Print2 },
                 ], false, true, true);
 
                 dgvFactor.ActiveScrollGrid();
                 dgvFactor.HiddenColumn("Id");
                 dgvFactor.MaxMinWidth("ویرایش", 40, 40);
                 dgvFactor.MaxMinWidth("حذف", 40, 40);
+                dgvFactor.MaxMinWidth("چاپ", 40, 40);
+                //dgvFactor.FixColumn("چاپ", FixedStyle.MiddleLeft);
 
                 #region Event
+                dgvFactor.AddEventRowCellClick<Guid>(async id =>
+                {
+
+                    var rpt = new Kavosh.UI.Reports.Factor.RptFactorA4();
+                    var modelFactor = await _factorHeaderService.GetFactorReportDataAsync(id);
+                    rpt.Tag = modelFactor;
+                    rpt.ShowPreview(); // or rpt.Print();
+
+                }, "Id", "چاپ");
 
                 dgvFactor.AddEventRowCellClick<Guid>(id =>
                 {

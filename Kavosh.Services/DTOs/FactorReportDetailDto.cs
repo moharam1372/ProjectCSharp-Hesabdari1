@@ -5,6 +5,7 @@
         public string ProductTitle { get; set; }
         public float Count { get; set; }
         public long PriceUnit { get; set; }
+        public string Unit { get; set; }
     }
 
     public class FactorReportDto
@@ -12,7 +13,7 @@
         // اطلاعات هدر فاکتور
         public string Header { get; set; }
         public string Num { get; set; }
-        public string Date { get; set; }
+        public DateTime Date { get; set; }
         public string Buyer { get; set; }
         public string Mobile { get; set; }
         public string Address { get; set; }

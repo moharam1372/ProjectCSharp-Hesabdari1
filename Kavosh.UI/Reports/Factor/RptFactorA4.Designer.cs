@@ -49,7 +49,7 @@
             this.xrLabel7 = new DevExpress.XtraReports.UI.XRLabel();
             this.BottomMargin = new DevExpress.XtraReports.UI.BottomMarginBand();
             this.txt = new DevExpress.XtraReports.UI.XRLabel();
-            this.xrLabel26 = new DevExpress.XtraReports.UI.XRLabel();
+            this.txtSumTotal = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabel25 = new DevExpress.XtraReports.UI.XRLabel();
             this.txtPreviousDebt = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabel23 = new DevExpress.XtraReports.UI.XRLabel();
@@ -76,9 +76,9 @@
             this.xrLabel2 = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabel15 = new DevExpress.XtraReports.UI.XRLabel();
             this.GroupFooter1 = new DevExpress.XtraReports.UI.GroupFooterBand();
+            this.picMohr = new DevExpress.XtraReports.UI.XRPictureBox();
             this.xrLabel9 = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabel8 = new DevExpress.XtraReports.UI.XRLabel();
-            this.picMohr = new DevExpress.XtraReports.UI.XRPictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.xrTable1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
             // 
@@ -335,24 +335,24 @@
             this.txt.Text = "شماره کارت: 1373 3842 8510 5057";
             this.txt.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             // 
-            // xrLabel26
+            // txtSumTotal
             // 
-            this.xrLabel26.Borders = ((DevExpress.XtraPrinting.BorderSide)((((DevExpress.XtraPrinting.BorderSide.Left | DevExpress.XtraPrinting.BorderSide.Top) 
+            this.txtSumTotal.Borders = ((DevExpress.XtraPrinting.BorderSide)((((DevExpress.XtraPrinting.BorderSide.Left | DevExpress.XtraPrinting.BorderSide.Top) 
             | DevExpress.XtraPrinting.BorderSide.Right) 
             | DevExpress.XtraPrinting.BorderSide.Bottom)));
-            this.xrLabel26.Dpi = 25.4F;
-            this.xrLabel26.Font = new DevExpress.Drawing.DXFont("Samim FD", 12F);
-            this.xrLabel26.LocationFloat = new DevExpress.Utils.PointFloat(0F, 20.16124F);
-            this.xrLabel26.Multiline = true;
-            this.xrLabel26.Name = "xrLabel26";
-            this.xrLabel26.Padding = new DevExpress.XtraPrinting.PaddingInfo(0.5291666F, 0.5291666F, 0F, 0F, 25.4F);
-            this.xrLabel26.RightToLeft = DevExpress.XtraReports.UI.RightToLeft.Yes;
-            this.xrLabel26.SizeF = new System.Drawing.SizeF(50.79998F, 6.720416F);
-            this.xrLabel26.StylePriority.UseBorders = false;
-            this.xrLabel26.StylePriority.UseFont = false;
-            this.xrLabel26.StylePriority.UseTextAlignment = false;
-            this.xrLabel26.Text = "0\r\n";
-            this.xrLabel26.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
+            this.txtSumTotal.Dpi = 25.4F;
+            this.txtSumTotal.Font = new DevExpress.Drawing.DXFont("Samim FD", 12F);
+            this.txtSumTotal.LocationFloat = new DevExpress.Utils.PointFloat(0F, 20.16124F);
+            this.txtSumTotal.Multiline = true;
+            this.txtSumTotal.Name = "txtSumTotal";
+            this.txtSumTotal.Padding = new DevExpress.XtraPrinting.PaddingInfo(0.5291666F, 0.5291666F, 0F, 0F, 25.4F);
+            this.txtSumTotal.RightToLeft = DevExpress.XtraReports.UI.RightToLeft.Yes;
+            this.txtSumTotal.SizeF = new System.Drawing.SizeF(50.79998F, 6.720416F);
+            this.txtSumTotal.StylePriority.UseBorders = false;
+            this.txtSumTotal.StylePriority.UseFont = false;
+            this.txtSumTotal.StylePriority.UseTextAlignment = false;
+            this.txtSumTotal.Text = "0\r\n";
+            this.txtSumTotal.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             // 
             // xrLabel25
             // 
@@ -796,7 +796,7 @@
             this.xrLabel9,
             this.xrLabel8,
             this.txt,
-            this.xrLabel26,
+            this.txtSumTotal,
             this.xrLabel25,
             this.txtPreviousDebt,
             this.xrLabel23,
@@ -809,6 +809,15 @@
             this.GroupFooter1.Dpi = 25.4F;
             this.GroupFooter1.HeightF = 131.8812F;
             this.GroupFooter1.Name = "GroupFooter1";
+            // 
+            // picMohr
+            // 
+            this.picMohr.Dpi = 25.4F;
+            this.picMohr.ImageSource = new DevExpress.XtraPrinting.Drawing.ImageSource("img", resources.GetString("picMohr.ImageSource"));
+            this.picMohr.LocationFloat = new DevExpress.Utils.PointFloat(5.820833F, 40.14101F);
+            this.picMohr.Name = "picMohr";
+            this.picMohr.SizeF = new System.Drawing.SizeF(38.89373F, 32.385F);
+            this.picMohr.Sizing = DevExpress.XtraPrinting.ImageSizeMode.ZoomImage;
             // 
             // xrLabel9
             // 
@@ -845,16 +854,7 @@
             this.xrLabel8.Text = "شماره شبا: IR900690020080902929207001";
             this.xrLabel8.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             // 
-            // picMohr
-            // 
-            this.picMohr.Dpi = 25.4F;
-            this.picMohr.ImageSource = new DevExpress.XtraPrinting.Drawing.ImageSource("img", resources.GetString("picMohr.ImageSource"));
-            this.picMohr.LocationFloat = new DevExpress.Utils.PointFloat(5.820833F, 40.14101F);
-            this.picMohr.Name = "picMohr";
-            this.picMohr.SizeF = new System.Drawing.SizeF(38.89373F, 32.385F);
-            this.picMohr.Sizing = DevExpress.XtraPrinting.ImageSizeMode.ZoomImage;
-            // 
-            // RptFactor
+            // RptFactorA4
             // 
             this.Bands.AddRange(new DevExpress.XtraReports.UI.Band[] {
             this.TopMargin,
@@ -911,7 +911,7 @@
         private DevExpress.XtraReports.UI.XRLabel xrLabel23;
         private DevExpress.XtraReports.UI.XRLabel xrLabel22;
         private DevExpress.XtraReports.UI.XRLabel txtTaxes;
-        private DevExpress.XtraReports.UI.XRLabel xrLabel26;
+        private DevExpress.XtraReports.UI.XRLabel txtSumTotal;
         private DevExpress.XtraReports.UI.XRLabel xrLabel25;
         private DevExpress.XtraReports.UI.XRLabel txt;
         private DevExpress.XtraReports.UI.GroupFooterBand GroupFooter1;

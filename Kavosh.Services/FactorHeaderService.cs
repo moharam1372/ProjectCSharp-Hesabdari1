@@ -10,15 +10,17 @@ namespace Kavosh.Services
     {
         private readonly IFactorHeaderRepository _repository;
         private readonly IRepository<PaymentType> _paymentTypeRepository;   
-        private readonly DefinitiveAccountService _definitiveAccountService;   // 👈 جدید
+        private readonly DefinitiveAccountService _definitiveAccountService;
+        private readonly StoreInfoService _storeInfoService;   
 
 
-    
-        public FactorHeaderService(IFactorHeaderRepository repository, IRepository<PaymentType> paymentTypeRepository, DefinitiveAccountService definitiveAccountService)
+
+        public FactorHeaderService(IFactorHeaderRepository repository, IRepository<PaymentType> paymentTypeRepository, DefinitiveAccountService definitiveAccountService, StoreInfoService storeInfoService)
         {
             _repository = repository;
             _paymentTypeRepository = paymentTypeRepository;
             _definitiveAccountService = definitiveAccountService;
+            _storeInfoService = storeInfoService;
         }
         public async Task<List<FactorHeaderDto>> GetAllFactorsAsync()
         {
@@ -182,16 +184,93 @@ namespace Kavosh.Services
             }
         }
 
+        //private static FactorHeaderDto ToDto(FactorHeader f) => new()
+        //{
+        //    Id = f.Id,
+        //    Code = f.Code,
+        //    PersonId = f.PersonId,
+        //    PersonName = f.Person?.FullName,
+        //    Type = f.Type,
+        //    DateFactor = f.DateFactor,
+        //    Discount = f.Discount,
+        //    PriceTotal = f.PriceTotal,
+        //    Details = f.FactorDetails.Select(d => new FactorDetailDto
+        //    {
+        //        Id = d.Id,
+        //        ProductId = d.ProductId,
+        //        ProductTitle = d.Product?.Title,
+        //        Count = d.Count,
+        //        PriceUnit = d.PriceUnit
+        //    }).ToList(),
+        //    HowToPays = f.HowToPays.Select(p => new HowToPayDto   // 👈 جدید
+        //    {
+        //        Id = p.Id,
+        //        PaymentTypeId = p.PaymentTypeId,
+        //        PaymentTypeTitle = p.PaymentType?.Title,
+        //        Price = p.Price,
+        //        CheckNumber = p.CheckNumber,
+        //        CheckDate = p.CheckDate,
+        //        Settlement = p.Settlement,
+        //        Description = p.Description
+        //    }).ToList()
+        //};
+
+
+        // 👇 جدید — تبدیل به مدل مخصوص چاپ
+ 
+        public async Task<FactorReportDto> GetFactorReportDataAsync(Guid factorId)
+        {
+            var factor = await GetFactorByIdAsync(factorId);
+            if (factor is null) return null;
+
+            var storeInfo = await _storeInfoService.GetAsync();
+            var taxPercent = storeInfo?.TaxPercent ?? 0;
+            var taxAmount = (long)(factor.PriceTotal * taxPercent / 100);
+            var payable = factor.PreviousDebt + factor.PriceTotal + taxAmount;
+
+            return new FactorReportDto
+            {
+                Header = storeInfo?.StoreName ?? "",
+                Num = factor.Code.ToString(),
+                Date = factor.DateFactor,
+                Buyer = factor.PersonName,
+                Mobile = factor.PersonMobile,
+                Address = factor.PersonAddress,
+                FactorDetails = factor.Details.Select(d => new FactorReportDetailDto
+                {
+                    ProductTitle = d.ProductTitle,
+                    Count = d.Count,
+                    PriceUnit = d.PriceUnit
+                }).ToList(),
+                Discount = factor.Discount,
+                PriceTotal = factor.PriceTotal,
+                TaxAmount = taxAmount,
+                PreviousDebt = factor.PreviousDebt,
+                PayableAmount = payable,
+                BankName = storeInfo?.BankName,
+                AccountHolderName = storeInfo?.AccountHolderName,
+                CardNumber = storeInfo?.CardNumber,
+                ShabaNumber = storeInfo?.ShabaNumber,
+                Logo = storeInfo?.Logo,
+                Mohr = storeInfo?.Mohr
+            };
+        }
+
+        // ... GetNextCodeAsync, DeleteFactorAsync, Validate, ValidateHowToPays, SyncDefinitiveAccountsAsync بدون تغییر
+        //FactorReportDetailDto
         private static FactorHeaderDto ToDto(FactorHeader f) => new()
         {
             Id = f.Id,
             Code = f.Code,
             PersonId = f.PersonId,
             PersonName = f.Person?.FullName,
+            PersonMobile = f.Person?.Mobile,     
+            PersonAddress = f.Person?.Address,   
             Type = f.Type,
             DateFactor = f.DateFactor,
             Discount = f.Discount,
             PriceTotal = f.PriceTotal,
+            //PreviousDebt = f.PreviousDebt,        // 👈 جدید
             Details = f.FactorDetails.Select(d => new FactorDetailDto
             {
                 Id = d.Id,
@@ -200,7 +279,8 @@ namespace Kavosh.Services
                 Count = d.Count,
                 PriceUnit = d.PriceUnit
             }).ToList(),
-            HowToPays = f.HowToPays.Select(p => new HowToPayDto   // 👈 جدید
+
+            HowToPays = f.HowToPays.Select(p => new HowToPayDto
             {
                 Id = p.Id,
                 PaymentTypeId = p.PaymentTypeId,
