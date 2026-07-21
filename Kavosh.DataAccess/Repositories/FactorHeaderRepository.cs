@@ -20,6 +20,7 @@ namespace Kavosh.DataAccess.Repositories
         public async Task<List<FactorHeader>> GetAllWithPersonAsync()
         {
             return await _dbSet
+                .AsNoTracking()   // 👈 جدید
                 .Include(f => f.Person)
                 .Where(f => !f.IsDeleted)
                 .OrderByDescending(f => f.Code)
@@ -28,11 +29,12 @@ namespace Kavosh.DataAccess.Repositories
         public async Task<FactorHeader> GetByIdWithDetailsAsync(Guid id)
         {
             return await _dbSet
+                .AsNoTracking()   // 👈 جدید
                 .Include(f => f.Person)
                 .Include(f => f.FactorDetails)
                 .ThenInclude(d => d.Product)
-                .Include(f => f.HowToPays)              // 👈 جدید
-                .ThenInclude(p => p.PaymentType)     // 👈 جدید
+                .Include(f => f.HowToPays)             
+                .ThenInclude(p => p.PaymentType)    
                 .FirstOrDefaultAsync(f => f.Id == id);
         }
 

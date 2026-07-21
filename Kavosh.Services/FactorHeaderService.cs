@@ -12,15 +12,17 @@ namespace Kavosh.Services
         private readonly IRepository<PaymentType> _paymentTypeRepository;   
         private readonly DefinitiveAccountService _definitiveAccountService;
         private readonly StoreInfoService _storeInfoService;   
+        private readonly ProductUnitService _productUnitService;   
 
 
 
-        public FactorHeaderService(IFactorHeaderRepository repository, IRepository<PaymentType> paymentTypeRepository, DefinitiveAccountService definitiveAccountService, StoreInfoService storeInfoService)
+        public FactorHeaderService(IFactorHeaderRepository repository, IRepository<PaymentType> paymentTypeRepository, DefinitiveAccountService definitiveAccountService, StoreInfoService storeInfoService, ProductUnitService productUnitService)
         {
             _repository = repository;
             _paymentTypeRepository = paymentTypeRepository;
             _definitiveAccountService = definitiveAccountService;
             _storeInfoService = storeInfoService;
+            _productUnitService = productUnitService;
         }
         public async Task<List<FactorHeaderDto>> GetAllFactorsAsync()
         {
@@ -240,8 +242,10 @@ namespace Kavosh.Services
                 {
                     ProductTitle = d.ProductTitle,
                     Count = d.Count,
-                    PriceUnit = d.PriceUnit
+                    PriceUnit = d.PriceUnit,
+                    UnitTitle = d.Unit
                 }).ToList(),
+
                 Discount = factor.Discount,
                 PriceTotal = factor.PriceTotal,
                 TaxAmount = taxAmount,
@@ -277,7 +281,8 @@ namespace Kavosh.Services
                 ProductId = d.ProductId,
                 ProductTitle = d.Product?.Title,
                 Count = d.Count,
-                PriceUnit = d.PriceUnit
+                PriceUnit = d.PriceUnit,
+                Unit = d.Product?.ProductUnit.Title
             }).ToList(),
 
             HowToPays = f.HowToPays.Select(p => new HowToPayDto

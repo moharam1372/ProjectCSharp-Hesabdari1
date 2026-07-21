@@ -17,6 +17,8 @@ namespace Kavosh.UI.Reports.Factor
                 base.BeforeReportPrint();
                 return;
             }
+            DataSource = data.FactorDetails; // لیست محصولات در DetailReport نمایش داده میشه
+
 
             lblHeader2.Text = data.Header;
             lblNum.Text = data.Num;
@@ -24,7 +26,7 @@ namespace Kavosh.UI.Reports.Factor
             lblBuyerName.Text = data.Buyer;
             lblBuyerMobile.Text = data.Mobile;
             lblAddress.Text = data.Address;
-            DataSource = data.FactorDetails;
+           
 
             // فیلدهای GroupFooter که قبلاً متن ثابت بودن، حالا داینامیک میشن
             txtTaxes.Text = data.TaxAmount.ToString("N0");
