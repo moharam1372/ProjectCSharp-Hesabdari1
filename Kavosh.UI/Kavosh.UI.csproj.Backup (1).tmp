@@ -13,13 +13,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="Report\**" />
-	  <EmbeddedResource Remove="Report\**" />
-	  <None Remove="Report\**" />
-	  <Page Remove="Report\**" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="DevExpress.Utils" Version="25.2.3" />
 		<PackageReference Include="DevExpress.Win.BonusSkins" Version="25.2.3" />
 		<PackageReference Include="DevExpress.Win.Design" Version="25.2.3" />
@@ -59,6 +52,10 @@
 		<None Update="appsettings.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Reports\" />
 	</ItemGroup>
 
 </Project>
