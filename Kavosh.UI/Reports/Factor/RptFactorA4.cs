@@ -1,6 +1,6 @@
 ﻿using Kavosh.Services.DTOs;
 
-namespace Kavosh.UI.Reports
+namespace Kavosh.UI.Reports.Factor
 {
     public partial class RptFactorA4 : DevExpress.XtraReports.UI.XtraReport
     {

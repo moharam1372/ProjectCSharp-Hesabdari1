@@ -1,4 +1,4 @@
-﻿namespace Kavosh.UI.Reports
+﻿namespace Kavosh.UI.Reports.Factor
 {
     partial class RptFactorA4
     {
