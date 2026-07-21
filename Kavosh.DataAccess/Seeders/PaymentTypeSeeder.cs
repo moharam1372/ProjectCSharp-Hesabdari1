@@ -1,4 +1,4 @@
-﻿using Kavosh.Domain;
+﻿using Kavosh.Domain.Constants;
 using Kavosh.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 

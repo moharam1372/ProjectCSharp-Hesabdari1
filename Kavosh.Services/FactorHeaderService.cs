@@ -1,5 +1,5 @@
 ﻿using Kavosh.DataAccess.Repositories;
-using Kavosh.Domain;
+using Kavosh.Domain.Constants;
 using Kavosh.Domain.Entities;
 using Kavosh.Domain.Interfaces;
 using Kavosh.Services.DTOs;

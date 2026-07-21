@@ -1,4 +1,4 @@
-﻿namespace Kavosh.Domain
+﻿namespace Kavosh.Domain.Constants
 {
     public static class PaymentTypeIds
     {
