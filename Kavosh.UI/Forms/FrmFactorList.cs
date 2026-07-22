@@ -124,7 +124,11 @@ namespace Kavosh.UI.Forms
                                 BarButtonItem customButton = new BarButtonItem(barManager, "نسخه چاپی");
                                 customButton.Hint = "نسخه چاپی";
                                 customButton.ItemAppearance.Normal.Font = new Font("Samim FD", 12);
-                                customButton.ImageOptions.SvgImage = MyCom.Properties.Resources.Print2;
+                                //customButton.ImageOptions.SvgImage = MyCom.Properties.Resources.Print2;
+                                customButton.AllowHtmlText = DefaultBoolean.True;
+                                customButton.Caption = "چاپ";
+                                customButton.LargeWidth = 110;
+                               
                                 //customButton.Alignment = BarItemLinkAlignment.Left;
                                 // می‌توانید یک آیکون نیز تنظیم کنید
                                 // customButton.ImageOptions.Image = ...;
@@ -143,8 +147,8 @@ namespace Kavosh.UI.Forms
                                     // کاری که می‌خواهید دکمه انجام دهد را اینجا بنویسید
                                     // مثلاً نمایش یک پیام یا باز کردن یک فرم
                                     MessageBox.Show("دکمه سفارشی کلیک شد!");
-                                    //rpt.ExportToImage("123.jpg");
-                                    rpt.ExportToPdf("123.pdf");
+                                    rpt.PrintDialog();
+                                   // rpt.ExportToPdf("123.pdf");
                                 };
 
                                 #endregion
