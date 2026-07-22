@@ -1,8 +1,10 @@
 ﻿using DevExpress.XtraBars;
+using DevExpress.XtraBars.Ribbon;
 using Kavosh.UI.Forms;
 using Microsoft.Extensions.DependencyInjection;
 using MyCom.Class;
 using MyCom.Form_Portable;
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,7 +13,6 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using DevExpress.XtraBars.Ribbon;
 
 namespace Kavosh.UI
 {
@@ -68,5 +69,13 @@ namespace Kavosh.UI
             // PersonIdToShow رو ست نمی‌کنیم — کاربر خودش از LookUpEdit داخل فرم انتخاب می‌کنه
             frm.OverShowWait<FrmDefinitiveAccount>(this);
         }
+
+        private void barBtnDebtorsList_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var frm = Program.CreateScopedForm<FrmDebtorsList>();
+            frm.OverShowWait<FrmDebtorsList>(this);
+        }
+
+  
     }
 }

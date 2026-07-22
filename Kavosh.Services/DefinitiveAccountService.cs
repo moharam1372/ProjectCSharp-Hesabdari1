@@ -12,7 +12,38 @@ namespace Kavosh.Services
         {
             _repository = repository;
         }
+        public async Task<List<DebtorSummaryDto>> GetDebtorsListAsync()
+        {
+            var all = await _repository.GetAllWithPersonAsync();
 
+            return all
+                .GroupBy(d => d.PersonId)
+                .Select(g =>
+                {
+                    // چون چک وصول‌شده خودش یه رکورد بستانکار خنثی‌کننده داره،
+                    // جمع‌زدن ساده‌ی این گروه خودکار مانده‌ی واقعی چک رو میده (وصول‌شده = صفر)
+                    var checkDebt = g.Where(x => x.IsCheck).Sum(x => x.Debtor ? x.Price : -x.Price);
+                    var otherDebt = g.Where(x => !x.IsCheck).Sum(x => x.Debtor ? x.Price : -x.Price);
+
+                    var lastDebtDate = g.Where(x => x.Debtor)
+                        .Select(x => x.DateCustom)
+                        .DefaultIfEmpty()
+                        .Max();
+
+                    return new DebtorSummaryDto
+                    {
+                        PersonId = g.Key,
+                        PersonName = g.First().Person?.FullName,
+                        Mobile = g.First().Person?.Mobile,
+                        LastDebtDate = lastDebtDate,
+                        CheckDebt = checkDebt,
+                        OtherDebt = otherDebt
+                    };
+                })
+                .Where(x => x.TotalDebt > 0)              // فقط کسایی که واقعاً هنوز بدهکارن
+                .OrderByDescending(x => x.TotalDebt)       // بدهکارترین‌ها اول (اولویت پیگیری)
+                .ToList();
+        }
         public async Task<List<DefinitiveAccountDto>> GetStatementAsync(Guid personId)
         {
             var items = await _repository.GetByPersonAsync(personId);

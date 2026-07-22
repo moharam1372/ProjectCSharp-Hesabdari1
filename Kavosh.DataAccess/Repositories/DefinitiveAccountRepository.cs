@@ -7,6 +7,7 @@ namespace Kavosh.DataAccess.Repositories
     public interface IDefinitiveAccountRepository : IRepository<DefinitiveAccount>
     {
         Task<List<DefinitiveAccount>> GetByPersonAsync(Guid personId);
+        Task<List<DefinitiveAccount>> GetAllWithPersonAsync();   
         Task<long> GetMaxCodeAsync();
         Task<DefinitiveAccount> GetDebtByHowToPayIdAsync(Guid howToPayId);
         Task<bool> IsAlreadySettledAsync(Guid definitiveAccountId);
@@ -18,6 +19,14 @@ namespace Kavosh.DataAccess.Repositories
     {
         public DefinitiveAccountRepository(AppDbContext context) : base(context) { }
 
+        public async Task<List<DefinitiveAccount>> GetAllWithPersonAsync()
+        {
+            return await _dbSet
+                .AsNoTracking()   // 👈 درس همون باگی که قبلاً دیدیم رو رعایت کردم
+                .Include(d => d.Person)
+                .Where(d => !d.IsDeleted)
+                .ToListAsync();
+        }
         public async Task<List<DefinitiveAccount>> GetByPersonAsync(Guid personId)
         {
             return await _dbSet

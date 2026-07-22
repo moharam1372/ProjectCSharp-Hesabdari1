@@ -35,6 +35,7 @@
             barBtnAccounting = new DevExpress.XtraBars.BarButtonItem();
             barBtnSetting = new DevExpress.XtraBars.BarButtonItem();
             barBtnPardakhtDaryaft = new DevExpress.XtraBars.BarButtonItem();
+            barBtnDebtorsList = new DevExpress.XtraBars.BarButtonItem();
             ribbonPage1 = new DevExpress.XtraBars.Ribbon.RibbonPage();
             ribbonPageGroup1 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             ribbonStatusBar = new DevExpress.XtraBars.Ribbon.RibbonStatusBar();
@@ -44,9 +45,9 @@
             // ribbon
             // 
             ribbon.ExpandCollapseItem.Id = 0;
-            ribbon.Items.AddRange(new DevExpress.XtraBars.BarItem[] { ribbon.ExpandCollapseItem, barBtnProduct, barPerson, barFactor, barBtnAccounting, barBtnSetting, barBtnPardakhtDaryaft });
+            ribbon.Items.AddRange(new DevExpress.XtraBars.BarItem[] { ribbon.ExpandCollapseItem, barBtnProduct, barPerson, barFactor, barBtnAccounting, barBtnSetting, barBtnPardakhtDaryaft, barBtnDebtorsList });
             ribbon.Location = new Point(0, 0);
-            ribbon.MaxItemId = 7;
+            ribbon.MaxItemId = 8;
             ribbon.Name = "ribbon";
             ribbon.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] { ribbonPage1 });
             ribbon.Size = new Size(1175, 201);
@@ -109,6 +110,16 @@
             barBtnPardakhtDaryaft.LargeWidth = 100;
             barBtnPardakhtDaryaft.Name = "barBtnPardakhtDaryaft";
             // 
+            // barBtnDebtorsList
+            // 
+            barBtnDebtorsList.AllowHtmlText = DevExpress.Utils.DefaultBoolean.True;
+            barBtnDebtorsList.Caption = "لیست بدهکاران";
+            barBtnDebtorsList.Id = 7;
+            barBtnDebtorsList.ImageOptions.SvgImage = Properties.Resources.listviewappointmentdeletedoccurrence;
+            barBtnDebtorsList.LargeWidth = 100;
+            barBtnDebtorsList.Name = "barBtnDebtorsList";
+            barBtnDebtorsList.ItemClick += barBtnDebtorsList_ItemClick;
+            // 
             // ribbonPage1
             // 
             ribbonPage1.Groups.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPageGroup[] { ribbonPageGroup1 });
@@ -123,6 +134,7 @@
             ribbonPageGroup1.ItemLinks.Add(barBtnPardakhtDaryaft);
             ribbonPageGroup1.ItemLinks.Add(barBtnAccounting);
             ribbonPageGroup1.ItemLinks.Add(barBtnSetting);
+            ribbonPageGroup1.ItemLinks.Add(barBtnDebtorsList);
             ribbonPageGroup1.Name = "ribbonPageGroup1";
             // 
             // ribbonStatusBar
@@ -165,5 +177,6 @@
         private DevExpress.XtraBars.BarButtonItem barBtnAccounting;
         private DevExpress.XtraBars.BarButtonItem barBtnSetting;
         private DevExpress.XtraBars.BarButtonItem barBtnPardakhtDaryaft;
+        private DevExpress.XtraBars.BarButtonItem barBtnDebtorsList;
     }
 }
