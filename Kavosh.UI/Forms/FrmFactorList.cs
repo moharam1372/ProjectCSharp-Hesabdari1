@@ -9,6 +9,8 @@ using System;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
+using DevExpress.XtraBars;
+using DevExpress.XtraPrinting;
 
 namespace Kavosh.UI.Forms
 {
@@ -73,11 +75,86 @@ namespace Kavosh.UI.Forms
                 #region Event
                 dgvFactor.AddEventRowCellClick<Guid>(async id =>
                 {
-
                     var rpt = new Kavosh.UI.Reports.Factor.RptFactorA4();
                     var modelFactor = await _factorHeaderService.GetFactorReportDataAsync(id);
                     rpt.Tag = modelFactor;
-                    rpt.ShowPreview(); // or rpt.Print();
+
+                    using (ReportPrintTool printTool = new ReportPrintTool(rpt))
+                    {
+                        PrintingSystemBase ps = printTool.PrintingSystem;
+
+                        // غیرفعال کردن همه دکمه‌ها
+                        foreach (PrintingSystemCommand cmd in Enum.GetValues(typeof(PrintingSystemCommand)))
+                        {
+                            ps.SetCommandVisibility(cmd, CommandVisibility.None);
+                        }
+                        // فعال کردن دکمه‌های مورد نظر
+                        ps.SetCommandVisibility(PrintingSystemCommand.Print, CommandVisibility.All);
+                        ps.SetCommandVisibility(PrintingSystemCommand.ExportPdf, CommandVisibility.All);
+                        ps.SetCommandVisibility(PrintingSystemCommand.ExportFile, CommandVisibility.All);
+
+                        // قفل کردن کامل نوار ابزار و جلوگیری از جابجایی
+                        if (printTool.PreviewForm != null)
+                        {
+                            printTool.PreviewForm.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+                            printTool.PreviewForm.RightToLeftLayout = false;
+                            var barManager = printTool.PreviewForm.PrintBarManager;
+                            if (barManager != null)
+                            {
+                                // غیرفعال کردن شخصی‌سازی
+                                barManager.AllowCustomization = false;
+                                barManager.AllowQuickCustomization = false;
+                                barManager.AllowShowToolbarsPopup = false;
+                                barManager.AllowMoveBarOnToolbar = false;
+
+              
+
+                                // قفل کردن تمام نوارهای ابزار موجود
+                                foreach (Bar bar in barManager.Bars)
+                                {
+                                    bar.OptionsBar.AllowQuickCustomization = false;
+                                  
+                                 
+                                    bar.OptionsBar.AllowRename = false;
+                                    bar.OptionsBar.AllowDelete = false;
+                                }
+
+                                #region Add Button
+
+                                BarButtonItem customButton = new BarButtonItem(barManager, "نسخه چاپی");
+                                customButton.Hint = "نسخه چاپی";
+                                customButton.ItemAppearance.Normal.Font = new Font("Samim FD", 12);
+                                customButton.ImageOptions.SvgImage = MyCom.Properties.Resources.Print2;
+                                //customButton.Alignment = BarItemLinkAlignment.Left;
+                                // می‌توانید یک آیکون نیز تنظیم کنید
+                                // customButton.ImageOptions.Image = ...;
+
+                                // 2. اضافه کردن دکمه به نوار ابزار اصلی
+                                // نوار ابزار اصلی معمولاً اولین نوار در مجموعه Bars است
+                                Bar toolbar = barManager.Bars[0];
+                                if (toolbar != null)
+                                {
+                                    
+                                    toolbar.ItemLinks.Add(customButton);
+                                }
+
+                                // 3. تعریف عملکرد دکمه
+                                customButton.ItemClick += (s, e) => {
+                                    // کاری که می‌خواهید دکمه انجام دهد را اینجا بنویسید
+                                    // مثلاً نمایش یک پیام یا باز کردن یک فرم
+                                    MessageBox.Show("دکمه سفارشی کلیک شد!");
+                                    //rpt.ExportToImage("123.jpg");
+                                    rpt.ExportToPdf("123.pdf");
+                                };
+
+                                #endregion
+                            }
+                        }
+                  
+                        // نمایش پیش‌نمایش
+                        printTool.ShowPreviewDialog();
+                    }
+
 
                 }, "Id", "چاپ");
 

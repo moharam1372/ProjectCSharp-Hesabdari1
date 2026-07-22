@@ -7,7 +7,7 @@
         public string ProductTitle { get; set; }
         public float Count { get; set; }
         public long PriceUnit { get; set; }
-        public string Unit { get; set; }
+        public Guid UnitId { get; set; }
         public long LineTotal => (long)(Count * PriceUnit);
     }
 }   

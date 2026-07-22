@@ -9,10 +9,10 @@ namespace Kavosh.Services
     public class FactorHeaderService
     {
         private readonly IFactorHeaderRepository _repository;
-        private readonly IRepository<PaymentType> _paymentTypeRepository;   
+        private readonly IRepository<PaymentType> _paymentTypeRepository;
         private readonly DefinitiveAccountService _definitiveAccountService;
-        private readonly StoreInfoService _storeInfoService;   
-        private readonly ProductUnitService _productUnitService;   
+        private readonly StoreInfoService _storeInfoService;
+        private readonly ProductUnitService _productUnitService;
 
 
 
@@ -82,7 +82,7 @@ namespace Kavosh.Services
                 Id = d.Id,
                 ProductId = d.ProductId,
                 Count = d.Count,
-                PriceUnit = d.PriceUnit
+                PriceUnit = d.PriceUnit,
             }).ToList();
 
             var howToPays = dto.HowToPays.Select(p => new HowToPay
@@ -219,9 +219,10 @@ namespace Kavosh.Services
 
 
         // 👇 جدید — تبدیل به مدل مخصوص چاپ
- 
+
         public async Task<FactorReportDto> GetFactorReportDataAsync(Guid factorId)
         {
+            var units = await _productUnitService.GetAllAsync();
             var factor = await GetFactorByIdAsync(factorId);
             if (factor is null) return null;
 
@@ -243,7 +244,7 @@ namespace Kavosh.Services
                     ProductTitle = d.ProductTitle,
                     Count = d.Count,
                     PriceUnit = d.PriceUnit,
-                    UnitTitle = d.Unit
+                    UnitTitle = units.First(f => f.Id == d.UnitId).Title
                 }).ToList(),
 
                 Discount = factor.Discount,
@@ -268,8 +269,8 @@ namespace Kavosh.Services
             Code = f.Code,
             PersonId = f.PersonId,
             PersonName = f.Person?.FullName,
-            PersonMobile = f.Person?.Mobile,     
-            PersonAddress = f.Person?.Address,   
+            PersonMobile = f.Person?.Mobile,
+            PersonAddress = f.Person?.Address,
             Type = f.Type,
             DateFactor = f.DateFactor,
             Discount = f.Discount,
@@ -282,7 +283,7 @@ namespace Kavosh.Services
                 ProductTitle = d.Product?.Title,
                 Count = d.Count,
                 PriceUnit = d.PriceUnit,
-                Unit = d.Product?.ProductUnit.Title
+                UnitId = d.Product.ProductUnitId
             }).ToList(),
 
             HowToPays = f.HowToPays.Select(p => new HowToPayDto
