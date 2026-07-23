@@ -597,6 +597,16 @@ namespace MyCom.Object
                 // else
                 // checkedListBoxContro
             }
+            else if (getCtrl is PanelControl panelControl)
+            {
+                foreach (PictureEdit i in panelControl.Controls.OfType<PictureEdit>())
+                {
+                    i.Image = !string.IsNullOrEmpty(value.ToString()) 
+                        ? ((byte[])value).ByteArrayToImage() 
+                        : null;
+                }
+
+            }
             else if (getCtrl is TimeEdit timeEdit)
             {
                 timeEdit.EditValue = value == null ? "" : value.ToString();
@@ -918,12 +928,16 @@ namespace MyCom.Object
                             foreach (Control control3 in pnl3.Controls)
                             {
                                 if (control3 is GroupControl grp2)
+                                {
                                     foreach (Control control4 in grp2.Controls)
                                     {
                                         if (NNAS != null && NNAS.Any(a => a != control4.Name))
                                             continue;
                                         ctrl(control4);
                                     }
+                                }
+
+
                                 else
                                 {
                                     if (NNAS != null && NNAS.Any(a => a != control3.Name))
@@ -931,6 +945,15 @@ namespace MyCom.Object
                                     ctrl(control3);
                                 }
                             }
+                }
+                else if (control is PanelControl panelControl)
+                {
+                    foreach (Control control4 in panelControl.Controls)
+                    {
+                        if (NNAS != null && NNAS.Any(a => a != control4.Name))
+                            continue;
+                        ctrl(control4);
+                    }
                 }
                 else
                 {
@@ -968,6 +991,10 @@ namespace MyCom.Object
                     {
                         pnlTextEdit.Text = null;
                     }
+                    if (control2 is PictureEdit pictureEdit)
+                    {
+                        pictureEdit.Image = null;
+                    }
                 }
             }
             if (c is CheckedListBoxControl listBoxControl)
@@ -977,6 +1004,11 @@ namespace MyCom.Object
                     item.CheckState = CheckState.Unchecked;
                 }
             }
+            if (c is PictureEdit pictureEdit1)
+            {
+                pictureEdit1.Image = null;
+            }
+
         }
 
         #region NullText To PersianName

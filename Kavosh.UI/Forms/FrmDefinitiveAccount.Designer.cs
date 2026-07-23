@@ -104,8 +104,8 @@
             //
             // FrmDefinitiveAccount
             //
-            AutoScaleDimensions = new SizeF(6F, 13F);
-            AutoScaleMode = AutoScaleMode.Font;
+            //AutoScaleDimensions = new SizeF(6F, 13F);
+            //AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(950, 550);
             Controls.Add(dgvStatement);
             Controls.Add(pnlTop);

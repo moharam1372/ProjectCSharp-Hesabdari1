@@ -157,8 +157,8 @@
             // 
             // FrmMain
             // 
-            AutoScaleDimensions = new SizeF(6F, 13F);
-            AutoScaleMode = AutoScaleMode.Font;
+            //AutoScaleMode = AutoScaleMode.None;
+            AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(1175, 622);
             Controls.Add(ribbon);
             Controls.Add(ribbonStatusBar);

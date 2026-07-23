@@ -40,7 +40,8 @@ namespace Kavosh.DataAccess
                 var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
 
                 // فقط برای Migration - مستقیم Connection String رو اینجا بنویس
-                optionsBuilder.UseSqlServer("Data Source=MOJTABAPC\\MOJTABA;Initial Catalog=Account1;Integrated Security=false;MultipleActiveResultSets=true;TrustServerCertificate=True;User ID=sa;Password=Moaz1370110;");
+                optionsBuilder.UseSqlServer("Data Source=.\\Kavosh;Initial Catalog=Account1;Integrated Security=false;MultipleActiveResultSets=true;TrustServerCertificate=True;User ID=sa;Password=Moaz1370110;");
+                //optionsBuilder.UseSqlServer("Data Source=MOJTABAPC\\MOJTABA;Initial Catalog=Account1;Integrated Security=false;MultipleActiveResultSets=true;TrustServerCertificate=True;User ID=sa;Password=Moaz1370110;");
 
                 return new AppDbContext(optionsBuilder.Options);
             }

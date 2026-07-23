@@ -67,8 +67,8 @@
             // 
             // FrmBackup
             // 
-            AutoScaleDimensions = new SizeF(6F, 13F);
-            AutoScaleMode = AutoScaleMode.Font;
+            //AutoScaleDimensions = new SizeF(6F, 13F);
+            //AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(371, 435);
             Controls.Add(lstBackups);
             Controls.Add(pnlFunction);

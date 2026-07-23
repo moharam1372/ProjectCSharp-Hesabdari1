@@ -231,6 +231,8 @@ namespace Kavosh.Services
             var taxAmount = (long)(factor.PriceTotal * taxPercent / 100);
             var payable = factor.PreviousDebt + factor.PriceTotal + taxAmount;
 
+
+
             return new FactorReportDto
             {
                 Header = storeInfo?.StoreName ?? "",

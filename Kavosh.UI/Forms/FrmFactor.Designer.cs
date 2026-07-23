@@ -152,8 +152,8 @@
             // 
             // FrmFactor
             // 
-            AutoScaleDimensions = new SizeF(6F, 13F);
-            AutoScaleMode = AutoScaleMode.Font;
+            //AutoScaleDimensions = new SizeF(6F, 13F);
+            //AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1147, 681);
             Controls.Add(splitContainerControl1);
             Controls.Add(pnlHowToPay);

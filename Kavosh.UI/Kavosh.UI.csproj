@@ -8,7 +8,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>disable</Nullable>
 		<RootNamespace>Kavosh.UI</RootNamespace>
-		<ApplicationIcon></ApplicationIcon>
+		<ApplicationIcon>256 256 (PNG).ico</ApplicationIcon>
 		<SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
@@ -17,6 +17,10 @@
 	  <EmbeddedResource Remove="Report\**" />
 	  <None Remove="Report\**" />
 	  <Page Remove="Report\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="256 256 (PNG).ico" />
 	</ItemGroup>
 
 	<ItemGroup>

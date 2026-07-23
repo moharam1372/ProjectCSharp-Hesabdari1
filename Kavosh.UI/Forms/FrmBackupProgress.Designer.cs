@@ -35,8 +35,8 @@
             // 
             // FrmBackupProgress
             // 
-            AutoScaleDimensions = new SizeF(6F, 13F);
-            AutoScaleMode = AutoScaleMode.Font;
+            //AutoScaleDimensions = new SizeF(6F, 13F);
+            //AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(400, 100);
             ControlBox = false;
             Controls.Add(progressBar);

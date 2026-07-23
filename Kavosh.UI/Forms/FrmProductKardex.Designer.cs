@@ -93,8 +93,8 @@
             //
             // FrmProductKardex
             //
-            AutoScaleDimensions = new SizeF(6F, 13F);
-            AutoScaleMode = AutoScaleMode.Font;
+            //AutoScaleDimensions = new SizeF(6F, 13F);
+            //AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 550);
             Controls.Add(dgvKardex);
             Controls.Add(pnlTop);

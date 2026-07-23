@@ -17,8 +17,8 @@ namespace Kavosh.DataAccess
             var builder = new SqlConnectionStringBuilder(_connectionString);
             _databaseName = builder.InitialCatalog;
 
-            //_backupFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Backups");
-            _backupFolder =  "d:\\Backups Khani";
+            _backupFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Backups");
+            //_backupFolder =  "d:\\Backups Khani";
             Directory.CreateDirectory(_backupFolder);
         }
 

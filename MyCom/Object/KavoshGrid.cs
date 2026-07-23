@@ -1791,8 +1791,11 @@ namespace MyCom.Object
 
                 if (getType == typeof(Guid).FullName)
                 {
-                    var getValue2 = Guid.Parse(rowCellValue.ToString());
-                    return ChangeType<T>(getValue2);
+                    if (rowCellValue != null)
+                    {
+                        var getValue2 = Guid.Parse(rowCellValue.ToString());
+                        return ChangeType<T>(getValue2);
+                    }
                 }
 
 

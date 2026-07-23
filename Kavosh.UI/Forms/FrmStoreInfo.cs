@@ -31,6 +31,7 @@ namespace Kavosh.UI.Forms
         private async void FrmStoreInfo_Shown(object sender, EventArgs e)
         {
             await SetFieldLayInput();
+
             await LoadDataAsync();
         }
 
@@ -39,6 +40,7 @@ namespace Kavosh.UI.Forms
             layInput.RightToLeft = RightToLeft.Yes;
             pnlFunction.Controls.Add(layInput.ShowPanelOperation());
             layInput.AddButtonOperation();
+            layInput._btnCancel.Enabled = false;
 
             txtStoreName = ClsCollect.ModelTextEdit("نام فروشگاه", 150, "");
             txtPhone = ClsCollect.ModelTextEditNumber("تلفن", 15, "");
@@ -64,12 +66,13 @@ namespace Kavosh.UI.Forms
                 new() { Grp = 1, Ctrl = txtTaxPercent, },
                 new() { Grp = 1, Ctrl = txtAddress, SizeType = SizeConstraintsType.Custom, AutoHeight = 80 },
 
-                new() { Grp = 2, Ctrl = imgLogo, SizeType = SizeConstraintsType.Custom, AutoHeight = 150 },
-                new() { Grp = 2, Ctrl = imgMohr, SizeType = SizeConstraintsType.Custom, AutoHeight = 150 },
+                new() { Grp = 2, Ctrl = imgLogo, SizeType = SizeConstraintsType.Custom, AutoHeight = 200 },
+                new() { Grp = 2, Ctrl = imgMohr, SizeType = SizeConstraintsType.Custom, AutoHeight = 200 },
             ]);
 
             layInput.BtnSaveClick += LayInput_BtnSaveClick;
-
+            layInput.CallNew();
+            //layInput.SetNull();
         }
 
         private async Task LoadDataAsync()
@@ -86,12 +89,15 @@ namespace Kavosh.UI.Forms
             txtShabaNumber.Text = dto.ShabaNumber;
             txtTaxPercent.Text = dto.TaxPercent.ToString();
 
+            layInput.SetValueType("لوگو", dto.Logo);
+            layInput.SetValueType("مهر|امضا", dto.Mohr);
             //picLogo.Image = BytesToImage(dto.Logo);
             //picMohr.Image = BytesToImage(dto.Mohr);
         }
 
         private async void LayInput_BtnSaveClick(object sender, EventArgs e)
         {
+            layInput._disableAfterSave = true;
             try
             {
                 var dto = new StoreInfoDto
@@ -112,6 +118,10 @@ namespace Kavosh.UI.Forms
 
                 await _storeInfoService.SaveAsync(dto);
                 XtraMessageBox.Show("اطلاعات فروشگاه ذخیره شد.", "موفق", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                layInput._disableAfterSave = false;
+                layInput.CallNew();
+                await LoadDataAsync();
+
             }
             catch (Exception ex)
             {

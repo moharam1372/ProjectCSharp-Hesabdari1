@@ -120,8 +120,8 @@
             //
             // FrmDebtorsList
             //
-            AutoScaleDimensions = new SizeF(6F, 13F);
-            AutoScaleMode = AutoScaleMode.Font;
+            //AutoScaleDimensions = new SizeF(6F, 13F);
+            //AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1000, 600);
             Controls.Add(dgvDebtors);
             Controls.Add(pnlSummary);

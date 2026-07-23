@@ -42,17 +42,17 @@ namespace Kavosh.UI.Forms
         private async void FrmMain_Shown(object sender, EventArgs e)
         {
 
-            await Task.WhenAll(
-                SetStyle(),
-                SetFieldLayInput(),
-                SetFieldDgvProduct()
-            );
+            //await Task.WhenAll(
+            //    SetStyle(),
+            //    SetFieldLayInput(),
+            //    SetFieldDgvProduct()
+            //);
 
             //try
             //{
-            //    await SetStyle();
-            //    await SetFieldLayInput();
-            //    await SetFieldDgvProduct();
+            await SetStyle();
+            await SetFieldLayInput();
+            await SetFieldDgvProduct();
             //}
             //catch (Exception e1)
             //{

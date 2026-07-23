@@ -52,19 +52,28 @@ namespace Kavosh.DataAccess.Repositories
 
         public async Task<Dictionary<Guid, (float Input, float Output)>> GetStockMovementForAllAsync()
         {
-            var details = await _context.Set<FactorDetail>()
-                .Include(d => d.FactorHeader)
-                .Where(d => !d.IsDeleted && !d.FactorHeader.IsDeleted)
-                .ToListAsync();
+        reBack:
+            try
+            {
+                var details = await _context.Set<FactorDetail>()
+                    .Include(d => d.FactorHeader)
+                    .Where(d => !d.IsDeleted && !d.FactorHeader.IsDeleted)
+                    .ToListAsync();
 
-            return details
-                .GroupBy(d => d.ProductId)
-                .ToDictionary(
-                    g => g.Key,
-                    g => (
-                        Input: g.Where(d => !d.FactorHeader.Type).Sum(d => d.Count),
-                        Output: g.Where(d => d.FactorHeader.Type).Sum(d => d.Count)
-                    ));
+                return details
+                    .GroupBy(d => d.ProductId)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => (
+                            Input: g.Where(d => !d.FactorHeader.Type).Sum(d => d.Count),
+                            Output: g.Where(d => d.FactorHeader.Type).Sum(d => d.Count)
+                        ));
+            }
+            catch (Exception e)
+            {
+                await Task.Delay(500);
+                goto reBack;
+            }
         }
 
         public async Task<List<Product>> GetAllWithDetailsAsync()

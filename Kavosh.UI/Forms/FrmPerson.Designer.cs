@@ -110,8 +110,8 @@
             // 
             // FrmPerson
             // 
-            AutoScaleDimensions = new SizeF(6F, 13F);
-            AutoScaleMode = AutoScaleMode.Font;
+            //AutoScaleDimensions = new SizeF(6F, 13F);
+            //AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1135, 619);
             Controls.Add(splitContainerControl1);
             Name = "FrmPerson";
