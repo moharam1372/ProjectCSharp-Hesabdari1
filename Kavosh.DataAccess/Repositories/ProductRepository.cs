@@ -10,10 +10,11 @@ namespace Kavosh.DataAccess.Repositories
         Task<List<Product>> GetAllWithDetailsAsync();
         Task<Product> GetByIdWithDetailsAsync(Guid id);
         Task<Product> GetByCodeAsync(long code);
-        Task<long> GetMaxCodeAsync();   // 👈 جدید
-        // IProductRepository.cs — اضافه به اینترفیس موجود
+        Task<long> GetMaxCodeAsync(); 
         Task<(float Input, float Output)> GetStockMovementAsync(Guid productId);
         Task<Dictionary<Guid, (float Input, float Output)>> GetStockMovementForAllAsync();
+        // IProductRepository.cs — اضافه به اینترفیس موجود
+        Task<List<FactorDetail>> GetKardexAsync(Guid productId);
     }
 
     public class ProductRepository : Repository<Product>, IProductRepository
@@ -25,7 +26,16 @@ namespace Kavosh.DataAccess.Repositories
             // شامل رکوردهای Soft-Delete شده هم میشه تا کد تکراری تولید نشه
             return await _dbSet.MaxAsync(p => (long?)p.ProductCode) ?? 0;
         }
-
+        // ProductRepository.cs
+        public async Task<List<FactorDetail>> GetKardexAsync(Guid productId)
+        {
+            return await _context.Set<FactorDetail>()
+                .AsNoTracking()
+                .Include(d => d.FactorHeader)
+                .Where(d => d.ProductId == productId && !d.IsDeleted && !d.FactorHeader.IsDeleted)
+                .OrderBy(d => d.FactorHeader.DateFactor)
+                .ToListAsync();
+        }
         // ProductRepository.cs
         public async Task<(float Input, float Output)> GetStockMovementAsync(Guid productId)
         {

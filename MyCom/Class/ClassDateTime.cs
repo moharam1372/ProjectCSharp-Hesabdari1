@@ -60,6 +60,8 @@ namespace MyCom.Class
 
             public string LongDateTime => Year + "/" + Month + "/" + Day + " - " + Hour + ":" + Minute + ":" + Second;
             public string LongTimeDate => Hour + ":" + Minute + ":" + Second + " - " + Year + "/" + Month + "/" + Day;
+            public string DateTimeForName => Year + "-" + Month + "-" + Day + "  -  (" + Hour + "-" + Minute + "-" + Second+")";
+
 
             public string ShortDateTime => Year + "/" + Month + "/" + Day + " - " + Hour + ":" + Minute;
             public string ShortTimeDate => Hour + ":" + Minute + " - " + Year + "/" + Month + "/" + Day;

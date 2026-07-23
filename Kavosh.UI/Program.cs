@@ -76,7 +76,9 @@ namespace Kavosh.UI
             services.AddScoped<PaymentTypeService>();
             services.AddScoped<DefinitiveAccountService>();
             services.AddScoped<StoreInfoService>();
-            services.AddTransient<FrmDebtorsList>();
+
+            services.AddScoped<DatabaseBackupService>();
+
 
             // Forms
             services.AddTransient<FrmMain>();
@@ -85,6 +87,12 @@ namespace Kavosh.UI
             services.AddTransient<FrmFactor>();
             services.AddTransient<FrmFactorList>();
             services.AddTransient<FrmDefinitiveAccount>();
+            services.AddTransient<FrmDebtorsList>();
+            services.AddTransient<FrmProductKardex>();
+            services.AddTransient<FrmStoreInfo>();
+
+            services.AddTransient<FrmBackup>();
+            services.AddTransient<FrmBackupProgress>();
             //services.AddTransient<CustomerForm>();
         }
         private static void InitializeDatabase()

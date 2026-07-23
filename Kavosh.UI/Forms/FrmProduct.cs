@@ -89,6 +89,7 @@ namespace Kavosh.UI.Forms
                         new() { Name = "خروجی", Type = typeof(float) },
                         new() { Name = "فعلی", Type = typeof(float) },
                     ], false, true, true);
+
                     dgvProduct.ActiveScrollGrid();
 
                     dgvProduct.HiddenColumn(["Id"]);
@@ -108,7 +109,10 @@ namespace Kavosh.UI.Forms
 
                     dgvProduct.AddEventRowCellClick<Guid>(value =>
                     {
-
+                        var frm = Program.CreateScopedForm<FrmProductKardex>();
+                        frm.ProductId = value;
+                        frm.ShowDialog();
+                        //frm.OverShowWait<FrmProductKardex>(this.MdiParent ?? this);
                     }, "Id", "کاردکس");
 
                     dgvProduct.AddEventRowCellClick<Guid>(async void (value) =>

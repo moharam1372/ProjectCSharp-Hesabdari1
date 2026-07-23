@@ -6,6 +6,7 @@ using DevExpress.Skins;
 using DevExpress.Spreadsheet;
 using DevExpress.UserSkins;
 using DevExpress.Utils;
+using DevExpress.Utils.Drawing;
 using DevExpress.Utils.Extensions;
 using DevExpress.Utils.Svg;
 using DevExpress.XtraBars.Docking2010;
@@ -32,6 +33,7 @@ using DevExpress.XtraWaitForm;
 using DocumentFormat.OpenXml.Vml.Spreadsheet;
 using MyCom.Object;
 using Newtonsoft.Json;
+using Svg;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -53,6 +55,7 @@ using ImageLocation = DevExpress.XtraEditors.ImageLocation;
 using Label = System.Windows.Forms.Label;
 using Padding = System.Windows.Forms.Padding;
 using ShowFilterPanelMode = DevExpress.XtraVerticalGrid.ShowFilterPanelMode;
+using SvgImage = DevExpress.Utils.Svg.SvgImage;
 
 //using System.Windows;
 
@@ -2354,7 +2357,7 @@ namespace MyCom.Class
 
         public static GridLookUpEdit ModelGridToDataLayout<EF>(string name, List<EF> dtData, string valueMember, string displayMember, string nullText, TextEditStyles styles = TextEditStyles.Standard, float sizeFont = 13f) where EF : class
         {
-           
+
             GridLookUpEdit gridComboEdit = new GridLookUpEdit
             {
                 Name = name,
@@ -2377,7 +2380,7 @@ namespace MyCom.Class
                 },
             };
 
-       
+
 
             gridComboEdit.EditValueChanged += (s1, e1) =>
             {
@@ -2429,15 +2432,15 @@ namespace MyCom.Class
                     : Color.FromArgb(16, 1, 1);
             };
 
-         
+
             // gridView.View.RowStyle += test_View_RowStyle;
             // ColumnView getData = gridComboEdit.Properties.PopupView;
 
-       
+
 
             return gridComboEdit;
         }
-        public static GroupControl ModelGridToDataLayoutBtn<EF>(string name, List<EF> dtData, string valueMember, string displayMember, string nullText,Action action=null, TextEditStyles styles = TextEditStyles.Standard, float sizeFont = 13f)
+        public static GroupControl ModelGridToDataLayoutBtn<EF>(string name, List<EF> dtData, string valueMember, string displayMember, string nullText, Action action = null, TextEditStyles styles = TextEditStyles.Standard, float sizeFont = 13f)
         {
             GridLookUpEdit gridComboEdit = new GridLookUpEdit
             {
@@ -2512,13 +2515,13 @@ namespace MyCom.Class
 
             GroupControl groupControl = new GroupControl
             {
-                Name = gridComboEdit.Name, 
-                Dock = DockStyle.None, 
+                Name = gridComboEdit.Name,
+                Dock = DockStyle.None,
                 ShowCaption = false,
                 BorderStyle = BorderStyles.NoBorder
             };
             // {Name = "GridPnl_" + gridComboEdit.Name, Dock = DockStyle.Fill,ShowCaption = false,BorderStyle = BorderStyles.NoBorder};
-     
+
 
             #region Button
 
@@ -3220,7 +3223,7 @@ namespace MyCom.Class
                 //MessageBox.Show("Right: "+Ctrl.Right.ToString());
                 //MessageBox.Show("Width: " + Ctrl.Width.ToString());
             };
-         
+
             return Ctrl;
         }
         //public static pnlDateOpen ModelDate(string name, bool enabled = true, string nullText = "")
@@ -3863,6 +3866,7 @@ namespace MyCom.Class
             public TextEdit TextEdit { get; set; }
         }
 
+
         /// <summary>
         /// Panel Merge (BUTTON & TEXTEDIT)
         /// </summary>
@@ -3942,6 +3946,90 @@ namespace MyCom.Class
                 }
 
             return pictureEdit;
+        }
+
+        //public class ClassModelPicture
+        // {
+        //     public SimpleButton SimpleButton { get; set; }
+        //     public PictureEdit PictureEdit { get; set; }
+        // }
+        public static PanelControl ModelPicture2(string name, string address = null, bool enabled = true)
+        {
+            PanelControl panel = new PanelControl
+            {
+                Name = name,
+                Dock = DockStyle.Fill,
+                LookAndFeel =
+                    {UseDefaultLookAndFeel = false, SkinName = "WXI"}
+            };
+
+
+            SimpleButton btnLoadImage = new SimpleButton
+            {
+
+                Font = _fontBold.ChangeFont(),
+                Dock = DockStyle.Bottom,
+                Height = 30,
+                Text = "بارگذاری",
+                ImageOptions =
+                {
+                    SvgImage =Properties.Resources.Save21,
+                    SvgImageSize = new Size(22,22),
+                    // Image = image,
+                    Location = ImageLocation.MiddleLeft
+                },
+                LookAndFeel =
+                    //{UseDefaultLookAndFeel = false, SkinName = "WXI"},
+                    {UseDefaultLookAndFeel = false, SkinName = "Glass Oceans" },
+
+            }; 
+            PictureEdit pictureEdit = new PictureEdit
+            {
+                Name = name,
+                Enabled = enabled,
+                Dock = DockStyle.Fill,
+                Properties =
+                {
+                    ShowMenu = false,
+                    SizeMode = PictureSizeMode.Zoom
+                }
+            };
+
+            btnLoadImage.Click += (s1, e1) =>
+            {
+                OpenFileDialog fileDialog = new OpenFileDialog
+                {
+                    Multiselect = false,
+                    CheckFileExists = true,
+                    ShowPreview = true,
+                    //Image
+
+
+
+                };
+                var getOk = fileDialog.ShowDialog();
+                if (getOk == DialogResult.OK)
+                {
+                    pictureEdit.Image = Image.FromFile(fileDialog.FileName);
+                }
+            };
+         
+
+            panel.Controls.Add(pictureEdit);
+            panel.Controls.Add(btnLoadImage);
+
+
+            if (!string.IsNullOrEmpty(address))
+                try
+                {
+                    pictureEdit.Image = Image.FromFile(address);
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+
+            return panel;
         }
         public class modelRadioGroup
         {

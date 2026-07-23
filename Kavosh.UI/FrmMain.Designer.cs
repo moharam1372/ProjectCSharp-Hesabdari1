@@ -36,6 +36,7 @@
             barBtnSetting = new DevExpress.XtraBars.BarButtonItem();
             barBtnPardakhtDaryaft = new DevExpress.XtraBars.BarButtonItem();
             barBtnDebtorsList = new DevExpress.XtraBars.BarButtonItem();
+            barButtonItem1 = new DevExpress.XtraBars.BarButtonItem();
             ribbonPage1 = new DevExpress.XtraBars.Ribbon.RibbonPage();
             ribbonPageGroup1 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             ribbonStatusBar = new DevExpress.XtraBars.Ribbon.RibbonStatusBar();
@@ -45,10 +46,11 @@
             // ribbon
             // 
             ribbon.ExpandCollapseItem.Id = 0;
-            ribbon.Items.AddRange(new DevExpress.XtraBars.BarItem[] { ribbon.ExpandCollapseItem, barBtnProduct, barPerson, barFactor, barBtnAccounting, barBtnSetting, barBtnPardakhtDaryaft, barBtnDebtorsList });
+            ribbon.Items.AddRange(new DevExpress.XtraBars.BarItem[] { ribbon.ExpandCollapseItem, barBtnProduct, barPerson, barFactor, barBtnAccounting, barBtnSetting, barBtnPardakhtDaryaft, barBtnDebtorsList, barButtonItem1 });
             ribbon.Location = new Point(0, 0);
-            ribbon.MaxItemId = 8;
+            ribbon.MaxItemId = 9;
             ribbon.Name = "ribbon";
+            ribbon.PageHeaderItemLinks.Add(barButtonItem1);
             ribbon.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] { ribbonPage1 });
             ribbon.Size = new Size(1175, 201);
             ribbon.StatusBar = ribbonStatusBar;
@@ -100,6 +102,7 @@
             barBtnSetting.ImageOptions.SvgImage = Properties.Resources.viewsettings;
             barBtnSetting.LargeWidth = 70;
             barBtnSetting.Name = "barBtnSetting";
+            barBtnSetting.ItemClick += barBtnSetting_ItemClick;
             // 
             // barBtnPardakhtDaryaft
             // 
@@ -120,6 +123,14 @@
             barBtnDebtorsList.Name = "barBtnDebtorsList";
             barBtnDebtorsList.ItemClick += barBtnDebtorsList_ItemClick;
             // 
+            // barButtonItem1
+            // 
+            barButtonItem1.Caption = "btnBackup";
+            barButtonItem1.Id = 8;
+            barButtonItem1.ImageOptions.SvgImage = Properties.Resources.actions_database;
+            barButtonItem1.Name = "barButtonItem1";
+            barButtonItem1.ItemClick += barButtonItem1_ItemClick;
+            // 
             // ribbonPage1
             // 
             ribbonPage1.Groups.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPageGroup[] { ribbonPageGroup1 });
@@ -133,8 +144,8 @@
             ribbonPageGroup1.ItemLinks.Add(barFactor);
             ribbonPageGroup1.ItemLinks.Add(barBtnPardakhtDaryaft);
             ribbonPageGroup1.ItemLinks.Add(barBtnAccounting);
-            ribbonPageGroup1.ItemLinks.Add(barBtnSetting);
             ribbonPageGroup1.ItemLinks.Add(barBtnDebtorsList);
+            ribbonPageGroup1.ItemLinks.Add(barBtnSetting);
             ribbonPageGroup1.Name = "ribbonPageGroup1";
             // 
             // ribbonStatusBar
@@ -159,6 +170,7 @@
             StatusBar = ribbonStatusBar;
             Text = "صفحه اصلی";
             WindowState = FormWindowState.Maximized;
+            FormClosing += FrmMain_FormClosing;
             Load += FrmMain_Load;
             ((System.ComponentModel.ISupportInitialize)ribbon).EndInit();
             ResumeLayout(false);
@@ -178,5 +190,6 @@
         private DevExpress.XtraBars.BarButtonItem barBtnSetting;
         private DevExpress.XtraBars.BarButtonItem barBtnPardakhtDaryaft;
         private DevExpress.XtraBars.BarButtonItem barBtnDebtorsList;
+        private DevExpress.XtraBars.BarButtonItem barButtonItem1;
     }
 }

@@ -19,6 +19,19 @@ namespace Kavosh.Services
         //    var products = await _repository.GetAllWithDetailsAsync();
         //    return products.Select(ToDto).ToList();
         //}
+        public async Task<List<ProductKardexRowDto>> GetKardexAsync(Guid productId)
+        {
+            var details = await _repository.GetKardexAsync(productId);
+
+            return details.Select(d => new ProductKardexRowDto
+            {
+                Date = d.FactorHeader.DateFactor,
+                FactorCode = d.FactorHeader.Code,
+                Type = d.FactorHeader.Type,
+                Input = !d.FactorHeader.Type ? d.Count : 0,   // خرید = ورودی
+                Output = d.FactorHeader.Type ? d.Count : 0    // فروش = خروجی
+            }).ToList();
+        }
         public async Task<List<ProductDto>> GetAllProductsAsync()
         {
             var products = await _repository.GetAllWithDetailsAsync();

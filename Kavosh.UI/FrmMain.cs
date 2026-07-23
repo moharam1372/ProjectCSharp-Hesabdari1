@@ -1,5 +1,7 @@
 ﻿using DevExpress.XtraBars;
 using DevExpress.XtraBars.Ribbon;
+using DevExpress.XtraEditors;
+using Kavosh.DataAccess;
 using Kavosh.UI.Forms;
 using Microsoft.Extensions.DependencyInjection;
 using MyCom.Class;
@@ -76,6 +78,53 @@ namespace Kavosh.UI
             frm.OverShowWait<FrmDebtorsList>(this);
         }
 
-  
+        private void barBtnSetting_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var frm = Program.CreateScopedForm<FrmStoreInfo>();
+            frm.OverShowWait<FrmStoreInfo>(this);
+        }
+
+        private bool _backupCompleted = false;
+
+        private async void FrmMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (_backupCompleted)
+                return;   // بکاپ گرفته شده، اجازه بده واقعاً بسته بشه
+
+            e.Cancel = true;   // موقتاً جلوی بسته‌شدن رو بگیر
+
+            using var scope = Program.ServiceProvider.CreateScope();
+            var backupService = scope.ServiceProvider.GetRequiredService<DatabaseBackupService>();
+
+            using var progressForm = new FrmBackupProgress("در حال تهیه پشتیبان قبل از خروج...");
+            progressForm.Show(this);
+            Application.DoEvents();
+
+            try
+            {
+                var progress = new Progress<int>(p => progressForm.SetProgress(p));
+                var fileName = DateTime.Now.DateTimePersian().DateTimeForName + ".bak";
+                await backupService.BackupAsync(progress, fileName);
+            }
+            catch (Exception ex)
+            {
+                XtraMessageBox.Show(
+                    $"خطا در تهیه پشتیبان خودکار:\n{ex.Message}\n\nبرنامه بدون بکاپ بسته می‌شود.",
+                    "خطا", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            finally
+            {
+                progressForm.Close();
+            }
+
+            _backupCompleted = true;
+            Close();
+        }
+
+        private void barButtonItem1_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var frm = Program.CreateScopedForm<FrmBackup>();
+            frm.OverShowWait<FrmBackup>(this);
+        }
     }
 }

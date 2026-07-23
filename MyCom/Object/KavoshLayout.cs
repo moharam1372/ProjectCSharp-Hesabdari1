@@ -19,14 +19,14 @@ namespace MyCom.Object
 {
     public partial class KavoshLayout : LayoutControl
     {
-        readonly ClsFont _font = new ClsFont(ClsFont.enumFont.samimBoldFD,true);
+        readonly ClsFont _font = new ClsFont(ClsFont.enumFont.samimBoldFD, true);
         //readonly ClsFont _font = new ClsFont();
         public bool _disableAfterSave = true;
 
         [Category("Action")]
         public event EventHandler BtnNewClick;
         [Category("Action")]
-        public event EventHandler BtnCancelClick;   
+        public event EventHandler BtnCancelClick;
         [Category("Action")]
         public event EventHandler BtnSaveClick;
 
@@ -227,7 +227,7 @@ namespace MyCom.Object
         public SimpleButton _btnNew = new SimpleButton { Width = 72, };
         public SimpleButton _btnCancel = new SimpleButton { Width = 72, Visible = false, };
         public SimpleButton _btnSave = new SimpleButton { Width = 72, Visible = false, };
-     //   private Splitter _spl1 = new Splitter {Dock = DockStyle.Right,Width = 4};
+        //   private Splitter _spl1 = new Splitter {Dock = DockStyle.Right,Width = 4};
         public void AddButtonOperation()
         {
             _btnNew.RightToLeft = RightToLeft;
@@ -236,7 +236,7 @@ namespace MyCom.Object
 
             if (RightToLeft == RightToLeft.Yes)
             {
-               // _btnNew.ImageOptions.ImageToTextAlignment = ImageAlignToText.LeftCenter;
+                // _btnNew.ImageOptions.ImageToTextAlignment = ImageAlignToText.LeftCenter;
 
                 _btnNew.Dock = DockStyle.Right;
                 _btnCancel.Dock = DockStyle.Left;
@@ -248,8 +248,8 @@ namespace MyCom.Object
             }
             else
             {
-             //   _btnNew.ImageOptions.ImageToTextAlignment = ImageAlignToText.RightCenter;
-              //  _btnNew.ImageOptions.ImageToTextIndent = 15;
+                //   _btnNew.ImageOptions.ImageToTextAlignment = ImageAlignToText.RightCenter;
+                //  _btnNew.ImageOptions.ImageToTextIndent = 15;
 
                 _btnNew.Dock = DockStyle.Left;
                 _btnCancel.Dock = DockStyle.Right;
@@ -260,7 +260,7 @@ namespace MyCom.Object
                 _btnSave.Text = @"Save";
             }
 
-            _pnlOperation.Controls.AddRange(new Control[] { _btnNew,  _btnCancel, _btnSave });
+            _pnlOperation.Controls.AddRange(new Control[] { _btnNew, _btnCancel, _btnSave });
             SetIconBtn();
             _btnNew.Click += (s, e) =>
             {
@@ -389,7 +389,7 @@ namespace MyCom.Object
                 //pnlDown.Visible = _disableAfterSave && _usedDelete;
                 //btnDelete.SendToBack();
                 //btnPrint.Visible = _disableAfterSave && _usedPrint;
-              //  if (_disableAfterSave)
+                //  if (_disableAfterSave)
                 //    _btnCancel.BringToFront();
                 Root.Enabled = !_disableAfterSave;
             }
@@ -823,14 +823,55 @@ namespace MyCom.Object
                     }
                 }
             }
+            else if (getCtrl is PanelControl panelControl)
+            {
+                foreach (Control control in panelControl.Controls)
+                {
+                    if (control is PictureEdit pictureEdit1)
+                    {
+                        getValue = pictureEdit1.Image;
 
+                        //getValue = pictureEdit1.Text == pictureEdit1.Properties.NullText
+                        //    ? ""
+                        //    : pictureEdit1.Text.Trim();
+                    }
+                }
+            }
             if (getValue == null || ReferenceEquals(getValue, ""))
+            {
                 if (defualtValue != null)
                 {
                     return (T)Convert.ChangeType(defualtValue, typeof(T));
                 }
+
                 else
                     return default;
+            }
+
+            #region Image
+
+            var targetType = typeof(T);
+
+            // برای انواع تصویر، رفتار متفاوت داشته باش
+            if (targetType == typeof(Bitmap) || targetType == typeof(Image) || targetType.IsSubclassOf(typeof(Image)))
+            {
+
+                if (getValue is Image imageValue)
+                {
+                    // اگر نوع هدف دقیقاً Bitmap است و imageValue از نوع Bitmap نیست
+                    if (targetType == typeof(Bitmap) && !(imageValue is Bitmap))
+                    {
+                        // تبدیل به Bitmap
+                        return (T)(object)new Bitmap(imageValue);
+                    }
+
+                    // در غیر این صورت، مستقیماً برگردان
+                    return (T)(object)imageValue;
+                }
+
+            }
+
+            #endregion
 
             try
             {
@@ -840,7 +881,7 @@ namespace MyCom.Object
                 {
                     var getValue2 = Guid.Parse(getValue.ToString());
                     return (T)Convert.ChangeType(getValue2, typeof(T));
-                } 
+                }
                 if (getType == typeof(long).FullName || getType == typeof(int).FullName || getType == typeof(short).FullName)
                 {
                     var getValue2 = Convert.ToDecimal(getValue.ToString());
@@ -1347,6 +1388,6 @@ namespace MyCom.Object
         #endregion
 
 
-    
+
     }
 }

@@ -73,6 +73,16 @@ namespace Kavosh.UI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type DevExpress.Utils.Svg.SvgImage.
         /// </summary>
+        internal static DevExpress.Utils.Svg.SvgImage actions_database {
+            get {
+                object obj = ResourceManager.GetObject("actions_database", resourceCulture);
+                return ((DevExpress.Utils.Svg.SvgImage)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type DevExpress.Utils.Svg.SvgImage.
+        /// </summary>
         internal static DevExpress.Utils.Svg.SvgImage bo_employee {
             get {
                 object obj = ResourceManager.GetObject("bo_employee", resourceCulture);
