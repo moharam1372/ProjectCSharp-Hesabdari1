@@ -113,5 +113,15 @@ namespace Kavosh.UI.Forms
         }
 
         private void FrmDebtorsList_Load(object sender, EventArgs e) { }
+
+        private void pnlSummary_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void lblCheckDebtValue_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

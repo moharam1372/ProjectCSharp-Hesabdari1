@@ -119,7 +119,9 @@ namespace Kavosh.DataAccess.Repositories
                     incoming.FactorHeaderId = existing.Id;
                     incoming.CreatedAt = DateTime.UtcNow;
                     incoming.IsDeleted = false;
-                    existing.FactorDetails.Add(incoming);
+                    //existing.FactorDetails.Add(incoming);
+                    _context.Set<FactorDetail>().Add(incoming);   // 👈 به‌جای existing.FactorDetails.Add(incoming)
+
                 }
             }
             
@@ -152,7 +154,9 @@ namespace Kavosh.DataAccess.Repositories
                     incoming.FactorHeaderId = existing.Id;
                     incoming.CreatedAt = DateTime.UtcNow;
                     incoming.IsDeleted = false;
-                    existing.HowToPays.Add(incoming);
+                    //existing.HowToPays.Add(incoming);
+                    _context.Set<HowToPay>().Add(incoming);   // 👈 به‌جای existing.HowToPays.Add(incoming)
+
                 }
             }
 

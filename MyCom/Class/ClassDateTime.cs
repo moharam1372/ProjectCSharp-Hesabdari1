@@ -164,7 +164,7 @@ namespace MyCom.Class
                 //   var getToMilady = new DateTime();
                 var getToMilady = (Year + "/" + Month + "/" + tmpDay).ShamsiToMiladi();
 
-                var date1 = DateTimePersian(getToMilady);
+                var date1 = DateTimePersian(getToMilady.Value);
 
                 return date1;
             }
@@ -408,7 +408,7 @@ namespace MyCom.Class
         }
         public static ModelDateTimePersian MergeDateAndTime(string persianDate, string end)
         {
-            var getDate = persianDate.ShamsiToMiladi();
+            var getDate = persianDate.ShamsiToMiladi().Value;
             var date1 = new DateTime(getDate.Year, getDate.Month, getDate.Day,
                 Convert.ToInt32(end.Substring(0, 2)), Convert.ToInt32(end.Substring(3, 2)), 0);
             var gg = date1.DateTimePersian();
@@ -439,9 +439,12 @@ namespace MyCom.Class
                 : "Error";
         }
 
-        public static DateTime ShamsiToMiladi(this string sdate)
+        public static DateTime? ShamsiToMiladi(this string sdate)
         {
-
+            if (string.IsNullOrEmpty(sdate))
+            {
+                return null;
+            }
             int year = Convert.ToInt32(sdate.Substring(0, 4));
             int month = Convert.ToInt32(sdate.Substring(5, 2));
             int day = Convert.ToInt32(sdate.Substring(8, 2));
@@ -822,7 +825,7 @@ namespace MyCom.Class
 
         public static string DayShamsiName(string _date)
         {
-            var convertDate = _date.ShamsiToMiladi();
+            var convertDate = _date.ShamsiToMiladi().Value;
             switch (convertDate.DayOfWeek)
             {
                 case DayOfWeek.Saturday:
@@ -861,7 +864,7 @@ namespace MyCom.Class
 
         public static string DayShamsiDate(this string Date_Shamsi)
         {
-            var Value = DayShamsi(ShamsiToMiladi(Date_Shamsi).DayOfWeek);
+            var Value = DayShamsi(ShamsiToMiladi(Date_Shamsi).Value.DayOfWeek);
             return Value;
         }
 

@@ -266,8 +266,8 @@ namespace Kavosh.UI.Forms
         private async void LayInput_BtnSaveClick(object sender, EventArgs e)
         {
             layInput._disableAfterSave = true;
-            try
-            {
+          //  try
+         //   {
                 var dto = new ProductDto();
                 dto.Id = _selectedProductId;
                 dto.ProductCode = layInput.GetValue<long>("کد محصول");
@@ -286,12 +286,12 @@ namespace Kavosh.UI.Forms
                 await SetFieldDgvProduct(); // رفرش گرید
                 ClassMessageBox.ShowMSG("اطلاعات ذخیره شد.", Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
                 layInput._disableAfterSave = false;
-            }
-            catch (Exception ex)
-            {
-                var message = ex.InnerException?.Message ?? ex.Message;
-                ClassMessageBox.ShowMSG(message, Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    var message = ex.InnerException?.Message ?? ex.Message;
+            //    ClassMessageBox.ShowMSG(message, Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
+            //}
         }
 
         private void FrmProduct_Load(object sender, EventArgs e)

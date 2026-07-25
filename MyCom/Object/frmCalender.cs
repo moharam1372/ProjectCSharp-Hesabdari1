@@ -198,7 +198,7 @@ namespace MyCom.Object
             {
                 var value = Convert.ToInt16(o);
                 SelDate = Temp_Date.Substring(0, 8) + (value < 10 ? "0" + value : value.ToString());
-                SelDateEnglish = SelDate.ShamsiToMiladi();
+                SelDateEnglish = SelDate.ShamsiToMiladi().Value;
                 Close();
             }
         }
@@ -342,7 +342,7 @@ namespace MyCom.Object
             }
 
             Temp_Date = Com_Date.Cmb_Year.Text + "/" + Com_Date.Cmb_Month.Text + "/01";
-            Temp_DateMiladi = Temp_Date.ShamsiToMiladi().ToString("yyyy/MM/dd");
+            Temp_DateMiladi = Temp_Date.ShamsiToMiladi().Value.ToString("yyyy/MM/dd");
             int startDay = Convert.ToInt32(CC1.Shamsi2Miladi(Temp_Date, "day", false));
             SetDayShamsi(startDay);
             var getBetWeen1 = ClsDateTime.ModelDateTimePersianFunction.BetweenDateTime(DateTime.Now, SelDateEnglish);
@@ -561,7 +561,7 @@ namespace MyCom.Object
             var _dateConToMilad = ClassDateTime.ShamsiToMiladi(
                 Com_Date.Cmb_Year.Text + "/" +
                 Com_Date.Cmb_Month.Text + "/" +
-                Com_Date.Cmb_Day.Text);
+                Com_Date.Cmb_Day.Text).Value;
             //  Com_Date.Cmb_Day.Text);
 
 

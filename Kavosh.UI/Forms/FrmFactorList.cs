@@ -189,7 +189,7 @@ namespace Kavosh.UI.Forms
             _dtFactor.Rows.Clear();
             foreach (var f in factors)
             {
-                _dtFactor.Rows.Add(f.Id, "ویرایش", "حذف", f.Code, f.PersonName, f.Type ? "فروش" : "خرید", f.DateFactor, f.PriceTotal);
+                _dtFactor.Rows.Add(f.Id, "ویرایش", "حذف", f.Code, f.PersonName, f.Type ? "فروش" : "خرید", f.DateFactor.DateTimePersian().Date, f.PriceTotal);
             }
             dgvFactor.SetFieldSizeColumn();
         }

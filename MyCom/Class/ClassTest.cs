@@ -149,7 +149,7 @@ namespace MyCom.Class
                     var timeData = JsonConvert.DeserializeObject<ApiResponse>(responseBody);
                     var timeData1 = timeData.Result as Result1;
                     //  TimeData timeData = JsonConvert.DeserializeObject<string >(responseBody);
-                    DateTime dateTime = FormatDate(timeData1.Date).ShamsiToMiladi();
+                    DateTime dateTime = FormatDate(timeData1.Date).ShamsiToMiladi().Value;
                     return dateTime;
                     // return dateTime;
 

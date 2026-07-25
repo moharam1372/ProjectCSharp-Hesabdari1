@@ -248,15 +248,15 @@ namespace Kavosh.UI.Forms
         private async void LayInput_BtnSaveClick(object sender, EventArgs e)
         {
             layInput._disableAfterSave = true;
-            try
-            {
+        //    try
+          //  {
                 var dto = new FactorHeaderDto
                 {
                     Id = _selectedFactorId,
                     Code = layInput.GetValue<long>("کد فاکتور"),
                     PersonId = layInput.GetValue<Guid>("طرف حساب"),
                     Type = layInput.GetValue<string>("نوع فاکتور") == "فروش",
-                    DateFactor = layInput.GetValue<string>("تاریخ").ShamsiToMiladi(),
+                    DateFactor = layInput.GetValue<string>("تاریخ").ShamsiToMiladi().Value,
                     Discount = layInput.GetValue<long>("تخفیف"),
                     Details = _dtFactorDetail.Rows
                         .Cast<DataRow>()
@@ -296,16 +296,17 @@ namespace Kavosh.UI.Forms
 
                 await PrepareNewFactor();
                 ClassMessageBox.ShowMSG("فاکتور ذخیره شد.", Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
-            }
-            catch (Exception ex)
-            {
-                var message = ex.InnerException?.Message ?? ex.Message;
-                ClassMessageBox.ShowMSG(message, Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
-            }
-            finally
-            {
                 layInput._disableAfterSave = false;
-            }
+            //  }
+            //  catch (Exception ex)
+            //  {
+            //   var message = ex.InnerException?.Message ?? ex.Message;
+            //    ClassMessageBox.ShowMSG(message, Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
+            //}
+            //finally
+            //{
+            //    layInput._disableAfterSave = false;
+            //}
         }
 
         private async void LayInput_BtnCancelClick(object sender, EventArgs e)

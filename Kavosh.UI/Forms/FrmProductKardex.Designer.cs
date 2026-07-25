@@ -25,76 +25,83 @@
             dgvKardex = new MyCom.Object.KavoshGrid(components);
             viewKardex = new DevExpress.XtraGrid.Views.BandedGrid.BandedGridView();
             gridBand1 = new DevExpress.XtraGrid.Views.BandedGrid.GridBand();
-
             pnlTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvKardex).BeginInit();
             ((System.ComponentModel.ISupportInitialize)viewKardex).BeginInit();
             SuspendLayout();
-
-            //
+            // 
             // pnlTop
-            //
-            pnlTop.Dock = DockStyle.Top;
-            pnlTop.Height = 45;
+            // 
+            pnlTop.BackColor = Color.FromArgb(255, 255, 192);
             pnlTop.Controls.Add(lblStockValue);
             pnlTop.Controls.Add(lblStockTitle);
             pnlTop.Controls.Add(lblProductTitle);
+            pnlTop.Dock = DockStyle.Top;
+            pnlTop.Location = new Point(0, 0);
             pnlTop.Name = "pnlTop";
-
-            //
-            // lblProductTitle
-            //
-            lblProductTitle.Location = new Point(12, 15);
-            lblProductTitle.Name = "lblProductTitle";
-            lblProductTitle.Text = "کالا: ...";
-            lblProductTitle.Appearance.Font = new Font(lblProductTitle.Appearance.Font, FontStyle.Bold);
-
-            //
-            // lblStockTitle
-            //
-            lblStockTitle.Location = new Point(340, 15);
-            lblStockTitle.Name = "lblStockTitle";
-            lblStockTitle.Text = "موجودی فعلی:";
-
-            //
+            pnlTop.Size = new Size(800, 33);
+            pnlTop.TabIndex = 2;
+            // 
             // lblStockValue
-            //
-            lblStockValue.Location = new Point(420, 15);
+            // 
+            lblStockValue.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            lblStockValue.Appearance.Font = new Font("Samim FD", 9.75F, FontStyle.Bold);
+            lblStockValue.Appearance.Options.UseFont = true;
+            lblStockValue.Location = new Point(298, 6);
             lblStockValue.Name = "lblStockValue";
+            lblStockValue.Size = new Size(6, 20);
+            lblStockValue.TabIndex = 0;
             lblStockValue.Text = "0";
-            lblStockValue.Appearance.Font = new Font(lblStockValue.Appearance.Font, FontStyle.Bold);
-
-            //
+            // 
+            // lblStockTitle
+            // 
+            lblStockTitle.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            lblStockTitle.Appearance.Font = new Font("Samim FD", 9.75F, FontStyle.Bold);
+            lblStockTitle.Appearance.Options.UseFont = true;
+            lblStockTitle.Location = new Point(355, 6);
+            lblStockTitle.Name = "lblStockTitle";
+            lblStockTitle.Size = new Size(76, 20);
+            lblStockTitle.TabIndex = 1;
+            lblStockTitle.Text = "موجودی فعلی:";
+            // 
+            // lblProductTitle
+            // 
+            lblProductTitle.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            lblProductTitle.Appearance.Font = new Font("Samim FD", 9.75F, FontStyle.Bold);
+            lblProductTitle.Appearance.Options.UseFont = true;
+            lblProductTitle.AutoSizeMode = DevExpress.XtraEditors.LabelAutoSizeMode.None;
+            lblProductTitle.Location = new Point(437, 6);
+            lblProductTitle.Name = "lblProductTitle";
+            lblProductTitle.Size = new Size(355, 20);
+            lblProductTitle.TabIndex = 2;
+            lblProductTitle.Text = "کالا: ...";
+            // 
             // dgvKardex
-            //
+            // 
             dgvKardex.Dock = DockStyle.Fill;
-            dgvKardex.Location = new Point(0, 45);
+            dgvKardex.Location = new Point(0, 33);
             dgvKardex.MainView = viewKardex;
             dgvKardex.Name = "dgvKardex";
             dgvKardex.RightToLeft = RightToLeft.Yes;
+            dgvKardex.Size = new Size(800, 517);
             dgvKardex.TabIndex = 1;
             dgvKardex.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { viewKardex });
-
-            //
+            // 
             // viewKardex
-            //
+            // 
             viewKardex.Bands.AddRange(new DevExpress.XtraGrid.Views.BandedGrid.GridBand[] { gridBand1 });
             viewKardex.GridControl = dgvKardex;
             viewKardex.Name = "viewKardex";
             viewKardex.OptionsBehavior.Editable = false;
-
-            //
+            // 
             // gridBand1
-            //
+            // 
             gridBand1.Caption = "gridBand1";
             gridBand1.Name = "gridBand1";
             gridBand1.VisibleIndex = 0;
-
-            //
+            // 
             // FrmProductKardex
-            //
-            //AutoScaleDimensions = new SizeF(6F, 13F);
-            //AutoScaleMode = AutoScaleMode.Font;
+            // 
             ClientSize = new Size(800, 550);
             Controls.Add(dgvKardex);
             Controls.Add(pnlTop);
@@ -103,8 +110,8 @@
             StartPosition = FormStartPosition.CenterScreen;
             Text = "کاردکس کالا";
             Load += FrmProductKardex_Load;
-
             pnlTop.ResumeLayout(false);
+            pnlTop.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvKardex).EndInit();
             ((System.ComponentModel.ISupportInitialize)viewKardex).EndInit();
             ResumeLayout(false);

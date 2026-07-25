@@ -30,6 +30,7 @@
             // 
             // pnlFunction
             // 
+            pnlFunction.BackColor = Color.FromArgb(255, 255, 192);
             pnlFunction.Controls.Add(btnNew);
             pnlFunction.Dock = DockStyle.Top;
             pnlFunction.Location = new Point(0, 0);
@@ -39,10 +40,13 @@
             // 
             // btnNew
             // 
+            btnNew.Appearance.Font = new Font("Samim FD", 9.75F, FontStyle.Bold);
+            btnNew.Appearance.Options.UseFont = true;
             btnNew.Dock = DockStyle.Right;
-            btnNew.Location = new Point(874, 0);
+            btnNew.ImageOptions.SvgImage = Properties.Resources.newproduct;
+            btnNew.Location = new Point(852, 0);
             btnNew.Name = "btnNew";
-            btnNew.Size = new Size(126, 36);
+            btnNew.Size = new Size(148, 36);
             btnNew.TabIndex = 0;
             btnNew.Text = "فاکتور جدید";
             btnNew.Click += btnNew_Click;
@@ -73,8 +77,6 @@
             // 
             // FrmFactorList
             // 
-            //AutoScaleDimensions = new SizeF(6F, 13F);
-            //AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1000, 598);
             Controls.Add(dgvFactor);
             Controls.Add(pnlFunction);

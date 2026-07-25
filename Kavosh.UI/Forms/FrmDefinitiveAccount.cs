@@ -7,6 +7,7 @@ using System;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
+using DevExpress.XtraEditors.Controls;
 
 namespace Kavosh.UI.Forms
 {
@@ -47,13 +48,26 @@ namespace Kavosh.UI.Forms
             _clsFontBold.ChangeFont(dgvStatement);
             await dgvStatement.SetStyle();
         }
-
+        GridLookUpEdit cmbPerson;
         private async Task SetFieldPersonLookUp()
         {
-            var persons = await _personService.GetAllPersonsAsync();
-            cmbPerson.Properties.DataSource = persons;
-            cmbPerson.Properties.DisplayMember = nameof(PersonDto.FullName);
-            cmbPerson.Properties.ValueMember = nameof(PersonDto.Id);
+            var persons = (await _personService.GetAllPersonsAsync()).Select(s => new { s.Id, s.FullName }).ToList();
+
+
+            cmbPerson = ClsCollect.ModelGridToDataLayout("مشتری", persons, "Id", "FullName", "");
+            cmbPerson.HiddenColumn("Id");
+            cmbPerson.Dock = DockStyle.Fill;
+            tablePanel1.Controls.Add(cmbPerson);
+            tablePanel1.SetRow(cmbPerson, 0);
+            tablePanel1.SetColumn(cmbPerson, 2);
+            cmbPerson.Margin = new Padding(-10);
+            cmbPerson.EditValueChanged += async (s1, e1) =>
+            {
+                if (cmbPerson.EditValue is not Guid personId || personId == Guid.Empty)
+                    return;
+
+                await RefreshGridAsync(personId);
+            };
         }
 
         private void SetFieldDgvStatement()
@@ -77,20 +91,34 @@ namespace Kavosh.UI.Forms
                 dgvStatement.HiddenColumn(["Id", "IsCheck", "IsSettled"]);
                 dgvStatement.MaxMinWidth("وصول چک", 90, 90);
 
+                #region Event
+
+                dgvStatement.GetViewBase.RowCellStyle += (s1, e1) =>
+                {
+                   
+                    var getClm = e1.Column.FieldName;
+                    if (getClm=="بدهکار")
+                    {
+                        e1.Appearance.ForeColor = Color.FromArgb(168, 255, 0, 0);
+                    }
+                    else if (getClm == "بستانکار")
+                    {
+                        e1.Appearance.ForeColor = Color.FromArgb(255, 70, 243, 91);
+                    }
+                };
+
                 dgvStatement.AddEventRowCellClick<Guid>(async id =>
                 {
                     await SettleCheckRow(id);
                 }, "Id", "وصول چک");
+
+                #endregion
+
+
             }
         }
 
-        private async void cmbPerson_EditValueChanged(object sender, EventArgs e)
-        {
-            if (cmbPerson.EditValue is not Guid personId || personId == Guid.Empty)
-                return;
 
-            await RefreshGridAsync(personId);
-        }
 
         private async Task RefreshGridAsync(Guid personId)
         {

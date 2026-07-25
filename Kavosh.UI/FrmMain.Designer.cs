@@ -52,7 +52,7 @@
             ribbon.Name = "ribbon";
             ribbon.PageHeaderItemLinks.Add(barButtonItem1);
             ribbon.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] { ribbonPage1 });
-            ribbon.Size = new Size(1175, 201);
+            ribbon.Size = new Size(1218, 201);
             ribbon.StatusBar = ribbonStatusBar;
             // 
             // barBtnProduct
@@ -150,16 +150,15 @@
             // 
             // ribbonStatusBar
             // 
-            ribbonStatusBar.Location = new Point(0, 585);
+            ribbonStatusBar.Location = new Point(0, 634);
             ribbonStatusBar.Name = "ribbonStatusBar";
             ribbonStatusBar.Ribbon = ribbon;
-            ribbonStatusBar.Size = new Size(1175, 37);
+            ribbonStatusBar.Size = new Size(1218, 37);
             // 
             // FrmMain
             // 
-            //AutoScaleMode = AutoScaleMode.None;
             AutoScaleMode = AutoScaleMode.Dpi;
-            ClientSize = new Size(1175, 622);
+            ClientSize = new Size(1218, 671);
             Controls.Add(ribbon);
             Controls.Add(ribbonStatusBar);
             IsMdiContainer = true;

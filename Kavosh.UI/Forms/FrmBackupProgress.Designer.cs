@@ -19,9 +19,11 @@
             // 
             // lblStatus
             // 
-            lblStatus.Location = new Point(20, 25);
+            lblStatus.Appearance.Font = new Font("Samim FD", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            lblStatus.Appearance.Options.UseFont = true;
+            lblStatus.Location = new Point(20, 19);
             lblStatus.Name = "lblStatus";
-            lblStatus.Size = new Size(77, 13);
+            lblStatus.Size = new Size(98, 23);
             lblStatus.TabIndex = 1;
             lblStatus.Text = "در حال پردازش...";
             // 
@@ -35,8 +37,6 @@
             // 
             // FrmBackupProgress
             // 
-            //AutoScaleDimensions = new SizeF(6F, 13F);
-            //AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(400, 100);
             ControlBox = false;
             Controls.Add(progressBar);

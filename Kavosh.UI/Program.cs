@@ -19,24 +19,15 @@ namespace Kavosh.UI
         [STAThread]
         static void Main()
         {
-            // حتماً قبل از ایجاد فرم، اسکین یا کنترل
-            WindowsFormsSettings.SetPerMonitorDpiAware();
+            //WindowsFormsSettings.SetDPIAware();
+            //ApplicationConfiguration.Initialize();
 
-            // فعال بودن DPI Scaling در DevExpress
-            WindowsFormsSettings.AllowDpiScale = true;
+            MyCom.Class.GlobalExceptionHandler.Initialize();
+            Application.SetHighDpiMode(HighDpiMode.SystemAware); // به‌جای WindowsFormsSettings.SetDPIAware()
 
-
-            // =========================================================
-            // تنظیم DPI
-            // باید قبل از ایجاد هر Form یا Control اجرا شود
-            // =========================================================
-            //Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            // =========================================================
-            // ثبت DevExpress Skin
-            // =========================================================
             BonusSkins.Register();
             SkinManager.EnableFormSkins();
             SkinManager.EnableMdiFormSkins();
@@ -56,7 +47,7 @@ namespace Kavosh.UI
                         optional: false,
                         reloadOnChange: true)
                     .Build();
-
+           
             // =========================================================
             // Dependency Injection
             // =========================================================
@@ -220,6 +211,7 @@ namespace Kavosh.UI
         public static T CreateScopedForm<T>()
             where T : Form
         {
+           
             var scope =
                 ServiceProvider.CreateScope();
 
