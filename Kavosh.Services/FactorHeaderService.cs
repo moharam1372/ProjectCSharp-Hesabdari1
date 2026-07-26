@@ -24,6 +24,15 @@ namespace Kavosh.Services
             _storeInfoService = storeInfoService;
             _productUnitService = productUnitService;
         }
+
+        public async Task<FactorHeaderDto> GetLastFactorAsync()
+        {
+            // GetAllWithPersonAsync از قبل نزولی بر اساس Code مرتب‌شده
+            var factors = await _repository.GetAllWithPersonAsync();
+            var last = factors.FirstOrDefault();
+
+            return last is null ? null : ToListDto(last);
+        }
         public async Task<List<FactorHeaderDto>> GetAllFactorsAsync()
         {
             var factors = await _repository.GetAllWithPersonAsync();

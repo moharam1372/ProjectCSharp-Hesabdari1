@@ -12,6 +12,18 @@ namespace Kavosh.Services
         {
             _repository = repository;
         }
+
+        public async Task<(long TotalDebt, long CheckDebt, long OtherDebt)> GetDebtSummaryAsync()
+        {
+            var debtors = await GetDebtorsListAsync();   // منطق فیلتر (فقط بدهکارهای واقعی) از قبل توش هست
+
+            var checkDebt = debtors.Sum(d => d.CheckDebt);
+            var otherDebt = debtors.Sum(d => d.OtherDebt);
+
+            return (checkDebt + otherDebt, checkDebt, otherDebt);
+        }
+
+
         public async Task<List<DebtorSummaryDto>> GetDebtorsListAsync()
         {
             var all = await _repository.GetAllWithPersonAsync();

@@ -235,10 +235,20 @@ namespace MyCom.Class
         }
         public static Image ByteArrayToImage(this byte[] imageIn)
         {
-            using (var ms = new MemoryStream(imageIn))
+         
+            try
             {
-                return Image.FromStream(ms);
+                using (var ms = new MemoryStream(imageIn))
+                {
+                    return Image.FromStream(ms);
+                }
             }
+            catch (Exception e)
+            {
+                
+            }
+
+            return null;
         }
         //public static Image GetImagePost(this IFormFile file)
         //{

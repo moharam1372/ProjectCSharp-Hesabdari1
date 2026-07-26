@@ -601,7 +601,7 @@ namespace MyCom.Object
             {
                 foreach (PictureEdit i in panelControl.Controls.OfType<PictureEdit>())
                 {
-                    i.Image = !string.IsNullOrEmpty(value.ToString()) 
+                    i.Image = value != null && !string.IsNullOrEmpty(value.ToString()) 
                         ? ((byte[])value).ByteArrayToImage() 
                         : null;
                 }

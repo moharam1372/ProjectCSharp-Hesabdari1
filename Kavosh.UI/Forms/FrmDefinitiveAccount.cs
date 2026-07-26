@@ -72,38 +72,54 @@ namespace Kavosh.UI.Forms
 
         private void SetFieldDgvStatement()
         {
+
             if (dgvStatement.ColumnCount() == 0)
             {
                 _dtStatement = dgvStatement.GridStructure([
                     new() { Name = "Id", Type = typeof(Guid) },
-                    new() { Name = "IsCheck", Type = typeof(bool) },      // مخفی، فقط برای منطق دکمه
-                    new() { Name = "IsSettled", Type = typeof(bool) },    // مخفی، فقط برای منطق دکمه
+                    new() { Name = "IsCheck", Type = typeof(bool) },
+                    new() { Name = "IsSettled", Type = typeof(bool) },
                     new() { Name = "تاریخ", Type = typeof(DateTime) },
                     new() { Name = "شماره سند", Type = typeof(long) },
                     new() { Name = "شرح", Type = typeof(string) },
                     new() { Name = "بدهکار", Type = typeof(long), PriceActive = true },
                     new() { Name = "بستانکار", Type = typeof(long), PriceActive = true },
                     new() { Name = "مانده", Type = typeof(long), PriceActive = true },
+                    new() { Name = "وضعیت", Type = typeof(string) }, // 👈 ستون جدید
                     new() { Name = "وصول چک", Object = KavoshGrid.enumObject.Button, ImageValue = MyCom.Properties.Resources.edit },
                 ], false, true, true);
 
                 dgvStatement.ActiveScrollGrid();
                 dgvStatement.HiddenColumn(["Id", "IsCheck", "IsSettled"]);
                 dgvStatement.MaxMinWidth("وصول چک", 90, 90);
+                dgvStatement.MaxMinWidth("وضعیت", 80, 80);
 
                 #region Event
 
                 dgvStatement.GetViewBase.RowCellStyle += (s1, e1) =>
                 {
-                   
                     var getClm = e1.Column.FieldName;
-                    if (getClm=="بدهکار")
+
+                    if (getClm == "بدهکار")
                     {
                         e1.Appearance.ForeColor = Color.FromArgb(168, 255, 0, 0);
                     }
                     else if (getClm == "بستانکار")
                     {
                         e1.Appearance.ForeColor = Color.FromArgb(255, 70, 243, 91);
+                    }
+                    else if (getClm == "مانده" || getClm == "وضعیت")
+                    {
+                        // مانده رو از خود ردیف می‌خونیم (نه فقط بدهکار/بستانکار همون خط)
+                        var balanceObj = viewStatement.GetRowCellValue(e1.RowHandle, "مانده");
+                        if (balanceObj != null && balanceObj != DBNull.Value)
+                        {
+                            var balance = Convert.ToInt64(balanceObj);
+                            if (balance > 0)
+                                e1.Appearance.ForeColor = Color.FromArgb(255, 0, 0); // بدهکار = قرمز
+                            else if (balance < 0)
+                                e1.Appearance.ForeColor = Color.FromArgb(0, 150, 0); // بستانکار = سبز
+                        }
                     }
                 };
 
@@ -113,10 +129,9 @@ namespace Kavosh.UI.Forms
                 }, "Id", "وصول چک");
 
                 #endregion
-
-
             }
         }
+
 
 
 
@@ -131,6 +146,11 @@ namespace Kavosh.UI.Forms
             {
                 runningBalance += d.Debtor ? d.Price : -d.Price;
 
+                // وضعیت بر اساس مانده‌ی تجمعیِ همین ردیف
+                string status = runningBalance > 0 ? "بدهکار"
+                    : runningBalance < 0 ? "بستانکار"
+                    : "تسویه";
+
                 _dtStatement.Rows.Add(
                     d.Id,
                     d.IsCheck,
@@ -138,9 +158,10 @@ namespace Kavosh.UI.Forms
                     d.DateCustom,
                     d.DocNumber,
                     d.Description,
-                    d.Debtor ? d.Price : 0,      // ستون بدهکار
-                    !d.Debtor ? d.Price : 0,     // ستون بستانکار
-                    runningBalance,
+                    d.Debtor ? d.Price : 0,      // بدهکار
+                    !d.Debtor ? d.Price : 0,     // بستانکار
+                    runningBalance,              // مانده
+                    status,                      // 👈 وضعیت
                     "وصول چک"
                 );
             }
@@ -181,6 +202,15 @@ namespace Kavosh.UI.Forms
                     await RefreshGridAsync(personId);
 
                 XtraMessageBox.Show("چک با موفقیت وصول شد.", "موفق", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+
+
+                #region Main
+
+                Kavosh.Services.AppEvents.RaiseDataChanged();   // 👈 اضافه شد
+
+                #endregion
+
             }
             catch (Exception ex)
             {

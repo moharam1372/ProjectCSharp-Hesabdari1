@@ -295,7 +295,10 @@ namespace Kavosh.UI.Forms
                 _selectedFactorId = savedId;
 
                 await PrepareNewFactor();
-                ClassMessageBox.ShowMSG("فاکتور ذخیره شد.", Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
+
+                Kavosh.Services.AppEvents.RaiseDataChanged();   // 👈 اضافه شد
+
+            ClassMessageBox.ShowMSG("فاکتور ذخیره شد.", Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
                 layInput._disableAfterSave = false;
             //  }
             //  catch (Exception ex)

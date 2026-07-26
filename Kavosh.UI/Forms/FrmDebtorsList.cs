@@ -21,7 +21,9 @@ namespace Kavosh.UI.Forms
         private ClsFont _clsFontBold = new(true);
 
         private DataTable _dtDebtors;
-
+        // 👇 جدید
+        public enum DebtFilterType { All, CheckOnly, OtherOnly }
+        private DebtFilterType _filterType = DebtFilterType.All;
         public FrmDebtorsList(DefinitiveAccountService definitiveAccountService)
         {
             InitializeComponent();
@@ -34,9 +36,24 @@ namespace Kavosh.UI.Forms
         {
             await SetStyle();
             SetFieldDgvDebtors();
+            ApplyFilterTitle();          // 👈 جدید
             await RefreshGridAsync();
         }
 
+        // 👇 جدید — عنوان فرم رو بر اساس فیلتر عوض می‌کنه تا کاربر گیج نشه
+        private void ApplyFilterTitle()
+        {
+            Text = _filterType switch
+            {
+                DebtFilterType.CheckOnly => "لیست بدهکاران - فقط بدهی چک",
+                DebtFilterType.OtherOnly => "لیست بدهکاران - فقط بدهی غیرچک",
+                _ => "لیست بدهکاران"
+            };
+        }
+        public void SetFilter(DebtFilterType filterType)
+        {
+            _filterType = filterType;
+        }
         private async void FrmDebtorsList_Activated(object sender, EventArgs e)
         {
             if (_dtDebtors is not null)
@@ -93,7 +110,15 @@ namespace Kavosh.UI.Forms
 
         private async Task RefreshGridAsync()
         {
-            var debtors = await _definitiveAccountService.GetDebtorsListAsync();
+            //var debtors = await _definitiveAccountService.GetDebtorsListAsync();
+            var allDebtors = await _definitiveAccountService.GetDebtorsListAsync();
+            // 👇 اعمال فیلتر
+            var debtors = _filterType switch
+            {
+                DebtFilterType.CheckOnly => allDebtors.Where(d => d.CheckDebt > 0).ToList(),
+                DebtFilterType.OtherOnly => allDebtors.Where(d => d.OtherDebt > 0).ToList(),
+                _ => allDebtors
+            };
 
             _dtDebtors.Rows.Clear();
             foreach (var d in debtors)
