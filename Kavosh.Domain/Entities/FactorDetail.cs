@@ -10,6 +10,15 @@
 
 
         public float Count { get; set; }
-        public long PriceUnit { get; set; } 
+
+        /// <summary>
+        /// مبلغ خرید (بهای تمام‌شده) — اطلاعاتی، در چاپ فاکتور نمایش داده نمی‌شود
+        /// </summary>
+        public long PriceUnit { get; set; }
+
+        /// <summary>
+        /// مبلغ فروش — قابل ویرایش توسط کاربر، همین مبلغ در چاپ فاکتور نمایش داده می‌شود
+        /// </summary>
+        public long SellPrice { get; set; }
     }
-}       
+}

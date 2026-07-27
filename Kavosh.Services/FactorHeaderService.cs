@@ -73,7 +73,8 @@ namespace Kavosh.Services
                 ? await _repository.GetHowToPaySettlementSnapshotAsync(dto.Id)
                 : new Dictionary<Guid, bool>();
 
-            var calculatedTotal = dto.Details.Sum(d => (long)(d.Count * d.PriceUnit)) - dto.Discount;
+            // 👇 جمع کل فاکتور بر مبنای «مبلغ فروش» محاسبه می‌شود (نه مبلغ خرید)
+            var calculatedTotal = dto.Details.Sum(d => (long)(d.Count * d.SellPrice)) - dto.Discount;
 
             var header = new FactorHeader
             {
@@ -92,6 +93,7 @@ namespace Kavosh.Services
                 ProductId = d.ProductId,
                 Count = d.Count,
                 PriceUnit = d.PriceUnit,
+                SellPrice = d.SellPrice,   // 👈 جدید
             }).ToList();
 
             var howToPays = dto.HowToPays.Select(p => new HowToPay
@@ -195,40 +197,7 @@ namespace Kavosh.Services
             }
         }
 
-        //private static FactorHeaderDto ToDto(FactorHeader f) => new()
-        //{
-        //    Id = f.Id,
-        //    Code = f.Code,
-        //    PersonId = f.PersonId,
-        //    PersonName = f.Person?.FullName,
-        //    Type = f.Type,
-        //    DateFactor = f.DateFactor,
-        //    Discount = f.Discount,
-        //    PriceTotal = f.PriceTotal,
-        //    Details = f.FactorDetails.Select(d => new FactorDetailDto
-        //    {
-        //        Id = d.Id,
-        //        ProductId = d.ProductId,
-        //        ProductTitle = d.Product?.Title,
-        //        Count = d.Count,
-        //        PriceUnit = d.PriceUnit
-        //    }).ToList(),
-        //    HowToPays = f.HowToPays.Select(p => new HowToPayDto   // 👈 جدید
-        //    {
-        //        Id = p.Id,
-        //        PaymentTypeId = p.PaymentTypeId,
-        //        PaymentTypeTitle = p.PaymentType?.Title,
-        //        Price = p.Price,
-        //        CheckNumber = p.CheckNumber,
-        //        CheckDate = p.CheckDate,
-        //        Settlement = p.Settlement,
-        //        Description = p.Description
-        //    }).ToList()
-        //};
-
-
         // 👇 جدید — تبدیل به مدل مخصوص چاپ
-
         public async Task<FactorReportDto> GetFactorReportDataAsync(Guid factorId)
         {
             var units = await _productUnitService.GetAllAsync();
@@ -257,7 +226,8 @@ namespace Kavosh.Services
                 {
                     ProductTitle = d.ProductTitle,
                     Count = d.Count,
-                    PriceUnit = d.PriceUnit,
+                    // 👇 در چاپ، «مبلغ واحد» همان مبلغ فروش است (نه مبلغ خرید)
+                    PriceUnit = d.SellPrice,
                     UnitTitle = units.First(f => f.Id == d.UnitId).Title
                 }).ToList(),
 
@@ -275,8 +245,6 @@ namespace Kavosh.Services
             };
         }
 
-        // ... GetNextCodeAsync, DeleteFactorAsync, Validate, ValidateHowToPays, SyncDefinitiveAccountsAsync بدون تغییر
-        //FactorReportDetailDto
         private static FactorHeaderDto ToDto(FactorHeader f) => new()
         {
             Id = f.Id,
@@ -289,7 +257,6 @@ namespace Kavosh.Services
             DateFactor = f.DateFactor,
             Discount = f.Discount,
             PriceTotal = f.PriceTotal,
-            //PreviousDebt = f.PreviousDebt,        // 👈 جدید
             Details = f.FactorDetails.Select(d => new FactorDetailDto
             {
                 Id = d.Id,
@@ -297,6 +264,7 @@ namespace Kavosh.Services
                 ProductTitle = d.Product?.Title,
                 Count = d.Count,
                 PriceUnit = d.PriceUnit,
+                SellPrice = d.SellPrice,   // 👈 جدید
                 UnitId = d.Product.ProductUnitId
             }).ToList(),
 

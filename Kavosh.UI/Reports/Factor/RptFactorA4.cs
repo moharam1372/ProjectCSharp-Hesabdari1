@@ -1,6 +1,8 @@
 ﻿using Kavosh.Services.DTOs;
 using MyCom.Class;
 using System.Globalization;
+using DevExpress.XtraPrinting;
+using DevExpress.XtraReports.UI;
 
 namespace Kavosh.UI.Reports.Factor
 {
@@ -12,8 +14,13 @@ namespace Kavosh.UI.Reports.Factor
             // Format String Number Float =>            {0:#,#}
         }
 
+
+
+ 
+
         protected override void BeforeReportPrint()
         {
+            var gg = Pages.Count;
             //CultureInfo customCulture = new CultureInfo("fa-IR");
 
             //// تغییر کاراکتر اعشار به / (یا هر کاراکتر دلخواه)
@@ -29,7 +36,7 @@ namespace Kavosh.UI.Reports.Factor
 
             //if (xrTableCell4 != null && xrTableCell4.DataBindings.Count > 0)
 
-
+            
 
 
             if (Tag is not FactorReportDto data)
@@ -64,6 +71,11 @@ namespace Kavosh.UI.Reports.Factor
                 picMohr.Image = System.Drawing.Image.FromStream(new System.IO.MemoryStream(data.Mohr));
 
             base.BeforeReportPrint();
+        }
+
+        private void lblPage_PrintOnPage(object sender, PrintOnPageEventArgs e)
+        {
+            lblPage.Text = "صفحه: "+ (e.PageIndex + 1) +" از "+this.Pages.Count;
         }
     }
 }

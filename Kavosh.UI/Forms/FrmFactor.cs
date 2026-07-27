@@ -43,19 +43,10 @@ namespace Kavosh.UI.Forms
 
         private async void FrmFactor_Shown(object sender, EventArgs e)
         {
-            //await Task.WhenAll(
-            //    SetStyle(),
-            //    SetFieldLayInput(),
-            //    SetFieldDgvFactorDetail(),
-            //    PrepareNewFactor()
-            //);
-
-            //// این دو تا باید بعد از layInput اجرا بشن چون به فیلدهاش وابسته‌ان
             await SetStyle();
             await SetFieldLayInput();
             await SetFieldDgvFactorDetail();
-            //await PrepareNewFactor();
-            await SetFieldDgvHowToPay();   
+            await SetFieldDgvHowToPay();
             if (FactorIdToEdit.HasValue)
                 await LoadFactorToForm(FactorIdToEdit.Value);
             else
@@ -86,13 +77,6 @@ namespace Kavosh.UI.Forms
             var cmbPerson = ClsCollect.ModelGridToDataLayoutBtn("طرف حساب", getPersons, "Id", "FullName", "");
             cmbPerson.ConvertGroupToGrid().HiddenColumn("Id");
 
-            //var cmbType = ClsCollect.ModelComboBox("نوع فاکتور", new[] { "خرید", "فروش" }, "");
-            //var cmbType = ClsCollect.ModelGridToDataLayout("نوع فاکتور", new List<ClsCollect.modelDataTable>
-            //{
-            //    new() { Code = 1, Title = "فروش" },
-            //    new() { Code = 2, Title = "خرید" },
-            //}, "");
-
             var cmbType = ClsCollect.ModelRadioGroup("نوع فاکتور", new List<ClsCollect.modelRadioGroup>{
                 new() { Column = 1,Field = "فروش" },
                 new() { Column = 2,Field = "خرید" },
@@ -120,7 +104,6 @@ namespace Kavosh.UI.Forms
 
 
         // ============= خط‌های محصول (سمت چپ، قابل ویرایش) =============
-        // ============= خط‌های محصول (سمت چپ، قابل ویرایش) =============
         public async Task SetFieldDgvFactorDetail()
         {
             if (dgvFactorDetail.ColumnCount() == 0)
@@ -130,7 +113,8 @@ namespace Kavosh.UI.Forms
                     new() { Name = "حذف", Object = KavoshGrid.enumObject.Button, ImageValue = MyCom.Properties.Resources.delete },
                     new() { Name = "محصول", Type = typeof(Guid) },
                     new() { Name = "تعداد", Type = typeof(float) },
-                    new() { Name = "قیمت واحد", Type = typeof(long),PriceActive = true},
+                    new() { Name = "قیمت واحد", Type = typeof(long),PriceActive = true},   // مبلغ خرید - اطلاعاتی
+                    new() { Name = "قیمت فروش", Type = typeof(long),PriceActive = true},   // 👈 جدید - قابل ویرایش، مبنای جمع و چاپ
                     new() { Name = "جمع", Type = typeof(long),PriceActive = true },
                 ], true, false, false);
 
@@ -141,22 +125,18 @@ namespace Kavosh.UI.Forms
 
                 #region Relation - انتخاب محصول از لیست محصولات
 
-                // 👇 UnitPrice هم اضافه شد (مبلغ خرید)
+                // 👇 UnitPrice (مبلغ خرید) هم علاوه بر SellPrice (مبلغ فروش) گرفته می‌شود
                 var getProducts = (await _productService.GetAllProductsAsync())
                     .Select(s => new { s.Id, s.Title, s.SellPrice, s.UnitPrice }).ToList();
 
                 var cmbProduct = dgvFactorDetail.AddGridToGrid(getProducts, "محصول", "Id", "Title", select =>
                 {
                     var getCount = dgvFactorDetail.GetValue<long>("تعداد");
-
                     var product = getProducts.First(f => f.Id == select.Id);
 
-                    // 👇 نوع فاکتور: فروش => مبلغ فروش (SellPrice) | خرید => مبلغ خرید (UnitPrice)
-                    var isSell = layInput.GetValue<string>("نوع فاکتور") == "فروش";
-                    var getUnitPrice = isSell ? product.SellPrice : product.UnitPrice;
-
-                    dgvFactorDetail.SetValue("قیمت واحد", getUnitPrice);
-                    dgvFactorDetail.SetValue("جمع", getUnitPrice * getCount);
+                    dgvFactorDetail.SetValue("قیمت واحد", product.UnitPrice);   // مبلغ خرید - فقط اطلاعاتی
+                    dgvFactorDetail.SetValue("قیمت فروش", product.SellPrice);   // مبلغ فروش - پیش‌فرض، قابل تغییر توسط کاربر
+                    dgvFactorDetail.SetValue("جمع", product.SellPrice * getCount);
                 });
                 cmbProduct.HiddenColumn("Id");
                 cmbProduct.HiddenColumn("SellPrice");
@@ -168,18 +148,20 @@ namespace Kavosh.UI.Forms
 
                 dgvFactorDetail.GetViewBase.CellValueChanged += (s1, e1) =>
                 {
-                    if (e1.Column.FieldName != "قیمت واحد" && e1.Column.FieldName != "تعداد")
+                    // 👇 جمع فقط بر اساس «تعداد» و «قیمت فروش» محاسبه می‌شود (نه قیمت واحد/خرید)
+                    if (e1.Column.FieldName != "قیمت فروش" && e1.Column.FieldName != "تعداد")
                         return;
 
-                    long getSellPrice = e1.Column.FieldName == "قیمت واحد"
+                    long getSellPrice = e1.Column.FieldName == "قیمت فروش"
                         ? e1.Value.GetNum<long>()
-                        : dgvFactorDetail.GetValue<long>("قیمت واحد");
+                        : dgvFactorDetail.GetValue<long>("قیمت فروش");
 
                     long getCount = e1.Column.FieldName == "تعداد"
                         ? e1.Value.GetNum<long>()
                         : dgvFactorDetail.GetValue<long>("تعداد");
 
                     dgvFactorDetail.SetValue("جمع", getSellPrice * getCount);
+
                 };
 
                 dgvFactorDetail.AddEventRowCellClick<Guid>(id =>
@@ -231,7 +213,7 @@ namespace Kavosh.UI.Forms
             _dtFactorDetail.Rows.Clear();
             foreach (var d in dto.Details)
             {
-                _dtFactorDetail.Rows.Add(d.Id, "حذف", d.ProductId, d.Count, d.PriceUnit, d.LineTotal);
+                _dtFactorDetail.Rows.Add(d.Id, "حذف", d.ProductId, d.Count, d.PriceUnit, d.SellPrice, d.LineTotal);
             }
             dgvFactorDetail.SetFieldSizeColumn();
 
@@ -252,8 +234,6 @@ namespace Kavosh.UI.Forms
         private async void LayInput_BtnSaveClick(object sender, EventArgs e)
         {
             layInput._disableAfterSave = true;
-            //    try
-            //  {
             var dto = new FactorHeaderDto
             {
                 Id = _selectedFactorId,
@@ -271,7 +251,8 @@ namespace Kavosh.UI.Forms
                         Id = r["Id"] is Guid gid ? gid : Guid.Empty,
                         ProductId = (Guid)r["محصول"],
                         Count = Convert.ToSingle(r["تعداد"]),
-                        PriceUnit = Convert.ToInt64(r["قیمت واحد"])
+                        PriceUnit = Convert.ToInt64(r["قیمت واحد"]),
+                        SellPrice = Convert.ToInt64(r["قیمت فروش"])   // 👈 جدید
                     }).ToList(),
 
                 // 👇 جدید: همون فیلتر ردیف خالی، این‌بار برای گرید پرداخت
@@ -304,16 +285,6 @@ namespace Kavosh.UI.Forms
 
             ClassMessageBox.ShowMSG("فاکتور ذخیره شد.", Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
             layInput._disableAfterSave = false;
-            //  }
-            //  catch (Exception ex)
-            //  {
-            //   var message = ex.InnerException?.Message ?? ex.Message;
-            //    ClassMessageBox.ShowMSG(message, Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
-            //}
-            //finally
-            //{
-            //    layInput._disableAfterSave = false;
-            //}
         }
 
         private async void LayInput_BtnCancelClick(object sender, EventArgs e)
@@ -338,7 +309,6 @@ namespace Kavosh.UI.Forms
                     new() { Name = "شماره چک", Type = typeof(string) },
                     new() { Name = "تاریخ چک",Action = EventDatePanel, Object = KavoshGrid.enumObject.PnlDate, ImageValue = MyCom.Properties.Resources.adateoccuring },
                     new() { Name = "تسویه", Type = typeof(bool),Object = KavoshGrid.enumObject.Checked},
-                    //new() { Name = "تسویه", Type = typeof(bool) },
                     new() { Name = "توضیحات", Type = typeof(string) },
                 ], true, false, false);
 
@@ -346,7 +316,6 @@ namespace Kavosh.UI.Forms
                 dgvHowToPay.HiddenColumn("Id");
                 dgvHowToPay.MaxMinWidth("حذف", 45, 45);
                 dgvHowToPay.MaxMinWidth("تاریخ چک", 100, 100);
-                //dgvHowToPay.AllowEditColumn("تاریخ چک");
                 dgvHowToPay.AddAllowNewRowAndType(DefaultBoolean.True, NewItemRowPosition.Top);
 
                 #region Relation - انتخاب نوع پرداخت
@@ -361,19 +330,14 @@ namespace Kavosh.UI.Forms
 
                 dgvHowToPay.GetViewBase.InitNewRow += (s1, e1) =>
                 {
-                    dgvHowToPay.SetValue("Id",Guid.NewGuid());
+                    dgvHowToPay.SetValue("Id", Guid.NewGuid());
                 };
-
-                //dgvHowToPay.AddEventRowCellClick<Guid>(id =>
-                //{
-                //    dgvHowToPay.DeleteRow(false);
-                //}, "Id", "حذف");
 
                 #endregion
             }
         }
 
-     
+
 
         private void DeleteRowHotToPay(object o)
         {
@@ -384,7 +348,7 @@ namespace Kavosh.UI.Forms
         {
             var dt = obj as string;
             dgvHowToPay.SetValue("تاریخ چک", dt);
-      
+
         }
 
 

@@ -33,15 +33,14 @@ namespace Kavosh.DataAccess.Repositories
                 .Include(f => f.Person)
                 .Include(f => f.FactorDetails)
                 .ThenInclude(d => d.Product)
-                .Include(f => f.HowToPays)             
-                .ThenInclude(p => p.PaymentType)    
+                .Include(f => f.HowToPays)
+                .ThenInclude(p => p.PaymentType)
                 .FirstOrDefaultAsync(f => f.Id == id);
         }
 
         public async Task<long> GetMaxCodeAsync()
         {
             // اگه جدول خالی باشه 999 برمی‌گرده تا اولین کد بشه 1000
-            //var gg= await _dbSet.MaxAsync(f => (long?)f.Code) ;
             return await _dbSet.MaxAsync(f => (long?)f.Code) ?? 999;
         }
 
@@ -50,7 +49,7 @@ namespace Kavosh.DataAccess.Repositories
             var existing = header.Id != Guid.Empty
                 ? await _dbSet
                     .Include(f => f.FactorDetails)
-                    .Include(f => f.HowToPays)         
+                    .Include(f => f.HowToPays)
                     .FirstOrDefaultAsync(f => f.Id == header.Id)
                 : null;
 
@@ -70,7 +69,7 @@ namespace Kavosh.DataAccess.Repositories
                 }
                 header.FactorDetails = details;
 
-                foreach (var p in howToPays)           
+                foreach (var p in howToPays)
                 {
                     p.Id = Guid.NewGuid();
                     p.FactorHeaderId = header.Id;
@@ -111,6 +110,7 @@ namespace Kavosh.DataAccess.Repositories
                     match.ProductId = incoming.ProductId;
                     match.Count = incoming.Count;
                     match.PriceUnit = incoming.PriceUnit;
+                    match.SellPrice = incoming.SellPrice;   // 👈 جدید
                     match.UpdatedAt = DateTime.UtcNow;
                 }
                 else
@@ -119,12 +119,10 @@ namespace Kavosh.DataAccess.Repositories
                     incoming.FactorHeaderId = existing.Id;
                     incoming.CreatedAt = DateTime.UtcNow;
                     incoming.IsDeleted = false;
-                    //existing.FactorDetails.Add(incoming);
-                    _context.Set<FactorDetail>().Add(incoming);   // 👈 به‌جای existing.FactorDetails.Add(incoming)
-
+                    _context.Set<FactorDetail>().Add(incoming);
                 }
             }
-            
+
             var incomingPayIds = howToPays.Where(p => p.Id != Guid.Empty).Select(p => p.Id).ToHashSet();
             var payToRemove = existing.HowToPays.Where(p => !incomingPayIds.Contains(p.Id)).ToList();
             foreach (var p in payToRemove)
@@ -154,19 +152,15 @@ namespace Kavosh.DataAccess.Repositories
                     incoming.FactorHeaderId = existing.Id;
                     incoming.CreatedAt = DateTime.UtcNow;
                     incoming.IsDeleted = false;
-                    //existing.HowToPays.Add(incoming);
-                    _context.Set<HowToPay>().Add(incoming);   // 👈 به‌جای existing.HowToPays.Add(incoming)
-
+                    _context.Set<HowToPay>().Add(incoming);
                 }
             }
 
             return existing.Id;
         }
-        // FactorHeaderRepository.cs — اضافه کنید
+
         public async Task<Dictionary<Guid, bool>> GetHowToPaySettlementSnapshotAsync(Guid factorHeaderId)
         {
-            // AsNoTracking حیاتیه — وگرنه EF همون Instance ردیابی‌شده رو برمی‌گردونه
-            // و بعداً که SaveWithDetailsAsync مقدارشو عوض کنه، این Snapshot هم عوض میشه!
             return await _context.Set<HowToPay>()
                 .AsNoTracking()
                 .Where(p => p.FactorHeaderId == factorHeaderId)
