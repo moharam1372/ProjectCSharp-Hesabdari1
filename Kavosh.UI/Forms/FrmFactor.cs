@@ -194,17 +194,21 @@ namespace Kavosh.UI.Forms
         // ============= آماده‌سازی رکورد جدید =============
         private async Task PrepareNewFactor()
         {
-            _selectedFactorId = Guid.Empty;
-            layInput.CallNew();
-            if (_dtFactorDetail is { Columns.Count: > 0 })
-                _dtFactorDetail.Rows.Clear();
+            layInput.WaitDownPage(async () =>
+            {
+                _selectedFactorId = Guid.Empty;
+                layInput.CallNew();
+                if (_dtFactorDetail is { Columns.Count: > 0 })
+                    _dtFactorDetail.Rows.Clear();
 
-            if (_dtHowToPay is { Columns.Count: > 0 })
-                _dtHowToPay.Rows.Clear();   // 👈 جدید
+                if (_dtHowToPay is { Columns.Count: > 0 })
+                    _dtHowToPay.Rows.Clear(); // 👈 جدید
 
-            var nextCode = await _factorHeaderService.GetNextCodeAsync();
-            layInput.SetValueType("کد فاکتور", nextCode);
-            layInput.SetValueType("تاریخ", DateTime.Now.DateTimePersian().Date);
+                var nextCode = await _factorHeaderService.GetNextCodeAsync();
+                layInput.SetValueType("کد فاکتور", nextCode);
+                layInput.SetValueType("تاریخ", DateTime.Now.DateTimePersian().Date);
+            });
+
         }
 
         // ============= بارگذاری فاکتور موجود =============
@@ -248,58 +252,58 @@ namespace Kavosh.UI.Forms
         private async void LayInput_BtnSaveClick(object sender, EventArgs e)
         {
             layInput._disableAfterSave = true;
-        //    try
-          //  {
-                var dto = new FactorHeaderDto
-                {
-                    Id = _selectedFactorId,
-                    Code = layInput.GetValue<long>("کد فاکتور"),
-                    PersonId = layInput.GetValue<Guid>("طرف حساب"),
-                    Type = layInput.GetValue<string>("نوع فاکتور") == "فروش",
-                    DateFactor = layInput.GetValue<string>("تاریخ").ShamsiToMiladi().Value,
-                    Discount = layInput.GetValue<long>("تخفیف"),
-                    Details = _dtFactorDetail.Rows
-                        .Cast<DataRow>()
-                        .Where(r => r.RowState != DataRowState.Deleted)
-                        .Where(r => r["محصول"] != DBNull.Value && r["محصول"] is Guid pid && pid != Guid.Empty)
-                        .Select(r => new FactorDetailDto
+            //    try
+            //  {
+            var dto = new FactorHeaderDto
+            {
+                Id = _selectedFactorId,
+                Code = layInput.GetValue<long>("کد فاکتور"),
+                PersonId = layInput.GetValue<Guid>("طرف حساب"),
+                Type = layInput.GetValue<string>("نوع فاکتور") == "فروش",
+                DateFactor = layInput.GetValue<string>("تاریخ").ShamsiToMiladi().Value,
+                Discount = layInput.GetValue<long>("تخفیف"),
+                Details = _dtFactorDetail.Rows
+                    .Cast<DataRow>()
+                    .Where(r => r.RowState != DataRowState.Deleted)
+                    .Where(r => r["محصول"] != DBNull.Value && r["محصول"] is Guid pid && pid != Guid.Empty)
+                    .Select(r => new FactorDetailDto
+                    {
+                        Id = r["Id"] is Guid gid ? gid : Guid.Empty,
+                        ProductId = (Guid)r["محصول"],
+                        Count = Convert.ToSingle(r["تعداد"]),
+                        PriceUnit = Convert.ToInt64(r["قیمت واحد"])
+                    }).ToList(),
+
+                // 👇 جدید: همون فیلتر ردیف خالی، این‌بار برای گرید پرداخت
+                HowToPays = _dtHowToPay.Rows
+                    .Cast<DataRow>()
+                    .Where(r => r.RowState != DataRowState.Deleted)
+                    .Where(r => r["نوع پرداخت"] != DBNull.Value && r["نوع پرداخت"] is Guid tid && tid != Guid.Empty)
+                    .Select(r =>
+                    {
+                        var checkDate = r["تاریخ چک"].ToString().ShamsiToMiladi();
+                        return new HowToPayDto
                         {
                             Id = r["Id"] is Guid gid ? gid : Guid.Empty,
-                            ProductId = (Guid)r["محصول"],
-                            Count = Convert.ToSingle(r["تعداد"]),
-                            PriceUnit = Convert.ToInt64(r["قیمت واحد"])
-                        }).ToList(),
+                            PaymentTypeId = (Guid)r["نوع پرداخت"],
+                            Price = Convert.ToInt64(r["مبلغ"]),
+                            CheckNumber = r["شماره چک"] as string,
+                            CheckDate = checkDate, // 👈 اصلاح شد
+                            Settlement = r["تسویه"] != DBNull.Value && Convert.ToBoolean(r["تسویه"]),
+                            Description = r["توضیحات"] as string
+                        };
+                    }).ToList()
+            };
 
-                    // 👇 جدید: همون فیلتر ردیف خالی، این‌بار برای گرید پرداخت
-                    HowToPays = _dtHowToPay.Rows
-                        .Cast<DataRow>()
-                        .Where(r => r.RowState != DataRowState.Deleted)
-                        .Where(r => r["نوع پرداخت"] != DBNull.Value && r["نوع پرداخت"] is Guid tid && tid != Guid.Empty)
-                        .Select(r =>
-                        {
-                            var checkDate = r["تاریخ چک"].ToString().ShamsiToMiladi();
-                            return new HowToPayDto
-                            {
-                                Id = r["Id"] is Guid gid ? gid : Guid.Empty,
-                                PaymentTypeId = (Guid)r["نوع پرداخت"],
-                                Price = Convert.ToInt64(r["مبلغ"]),
-                                CheckNumber = r["شماره چک"] as string,
-                                CheckDate = checkDate, // 👈 اصلاح شد
-                                Settlement = r["تسویه"] != DBNull.Value && Convert.ToBoolean(r["تسویه"]),
-                                Description = r["توضیحات"] as string
-                            };
-                        }).ToList()
-                };
+            var savedId = await _factorHeaderService.SaveFactorAsync(dto);
+            _selectedFactorId = savedId;
 
-                var savedId = await _factorHeaderService.SaveFactorAsync(dto);
-                _selectedFactorId = savedId;
+            await PrepareNewFactor();
 
-                await PrepareNewFactor();
-
-                Kavosh.Services.AppEvents.RaiseDataChanged();   // 👈 اضافه شد
+            Kavosh.Services.AppEvents.RaiseDataChanged(); // 👈 اضافه شد
 
             ClassMessageBox.ShowMSG("فاکتور ذخیره شد.", Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
-                layInput._disableAfterSave = false;
+            layInput._disableAfterSave = false;
             //  }
             //  catch (Exception ex)
             //  {

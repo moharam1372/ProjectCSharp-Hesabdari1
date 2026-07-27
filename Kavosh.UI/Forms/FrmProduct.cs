@@ -177,7 +177,7 @@ namespace Kavosh.UI.Forms
                 layInput.AddButtonOperation();
 
                 var txtId = ClsCollect.ModelTextEdit("Id", 50, "");
-                var txtCode = ClsCollect.ModelTextEditNumber("کد محصول", 50, "", true, 13, false,"N2");
+                var txtCode = ClsCollect.ModelTextEditNumber("کد محصول", 50, "", true, 13, false,"N0");
                 //var txtCode = ClsCollect.ModelTextEditPrice("کد محصول", 50, "");
 
                 var getProductGroup = await _productGroupService.GetAllAsync();
@@ -200,6 +200,7 @@ namespace Kavosh.UI.Forms
                             DeleteData = async void (id) =>
                             {
                                 await _productGroupService.DeleteAsync(id);
+
                             },
                         }).ShowDialogAsync();
                     });
@@ -231,6 +232,7 @@ namespace Kavosh.UI.Forms
                         DeleteData = async void (id) =>
                         {
                             await _productUnitService.DeleteAsync(id);
+                            //await SetFieldDgvProduct();   // 👈 اضافه شد — هم گرید هم موجودی‌های محاسبه‌شده رفرش میشن
                         },
                     }).ShowDialogAsync();
                 });
@@ -244,11 +246,11 @@ namespace Kavosh.UI.Forms
                     new() { Grp = 1, Ctrl = txtId, Visibility = LayoutVisibility.Never},
                     new() { Grp = 1, Ctrl = txtCode, },
                     new() { Grp = 1, Ctrl = cmbGroup, SizeType = SizeConstraintsType.Custom, AutoHeight = 38 },
-                    new() { Grp = 1, Ctrl = txtName, },
-                    new() { Grp = 1, Ctrl = cmbUnit, SizeType = SizeConstraintsType.Custom, AutoHeight = 38  },
+                    new() { Grp = 1, Ctrl = txtName,AllowNull = false},
+                    new() { Grp = 1, Ctrl = cmbUnit,AllowNull = false, SizeType = SizeConstraintsType.Custom, AutoHeight = 38  },
                     new() { Grp = 1, Ctrl = txtMojidi, },
-                    new() { Grp = 1, Ctrl = txtPriceUnit, },
-                    new() { Grp = 1, Ctrl = txtPriceSell, },
+                    new() { Grp = 1, Ctrl = txtPriceUnit,AllowNull = false, },
+                    new() { Grp = 1, Ctrl = txtPriceSell,AllowNull = false, },
 
                 ]);
 
@@ -260,38 +262,41 @@ namespace Kavosh.UI.Forms
 
         private void LayInput_BtnCancelClick(object sender, EventArgs e)
         {
-
+            _selectedProductId = Guid.Empty;   // 👈 حیاتی
         }
 
         private async void LayInput_BtnSaveClick(object sender, EventArgs e)
         {
             layInput._disableAfterSave = true;
-          //  try
-         //   {
-                var dto = new ProductDto();
-                dto.Id = _selectedProductId;
-                dto.ProductCode = layInput.GetValue<long>("کد محصول");
-                dto.Title = layInput.GetValue<string>("نام محصول");
-                dto.ProductGroupId = layInput.GetValue<Guid>("گروه محصول");
-                dto.ProductUnitId = layInput.GetValue<Guid>("سنجش");
-                dto.InitialInventory = layInput.GetValue<float>("موجودی اولیه");
-                //dto.SellPrice = layInput.GetValue<decimal>("قیمت فروش").GetNum<long>();
-                dto.SellPrice = layInput.GetValue<long>("قیمت فروش");
-                dto.UnitPrice = layInput.GetValue<long>("قیمت واحد"); 
-                //dto.UnitPrice = layInput.GetValue<decimal>("قیمت واحد").GetNum<long>(); 
+            try
+            {
+                var dto = new ProductDto
+                {
+                    Id = _selectedProductId,
+                    ProductCode = layInput.GetValue<long>("کد محصول"),
+                    Title = layInput.GetValue<string>("نام محصول"),
+                    ProductGroupId = layInput.GetValue<Guid>("گروه محصول"),
+                    ProductUnitId = layInput.GetValue<Guid>("سنجش"),
+                    InitialInventory = layInput.GetValue<float>("موجودی اولیه"),
+                    SellPrice = layInput.GetValue<long>("قیمت فروش"),
+                    UnitPrice = layInput.GetValue<long>("قیمت واحد")
+                };
 
                 var savedId = await _productService.SaveProductAsync(dto);
-                _selectedProductId = savedId;
+                _selectedProductId = Guid.Empty;   // 👈 مورد بعدی هم می‌بینی چرا لازمه
 
-                await SetFieldDgvProduct(); // رفرش گرید
+                await SetFieldDgvProduct();
                 ClassMessageBox.ShowMSG("اطلاعات ذخیره شد.", Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
+            }
+            catch (Exception ex)
+            {
+                var message = ex.InnerException?.Message ?? ex.Message;
+                ClassMessageBox.ShowMSG(message, Class_Text.Msg_Name, ClassMessageBox.enumIcon.هشدار); // آیکون درست
+            }
+            finally
+            {
                 layInput._disableAfterSave = false;
-            //}
-            //catch (Exception ex)
-            //{
-            //    var message = ex.InnerException?.Message ?? ex.Message;
-            //    ClassMessageBox.ShowMSG(message, Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
-            //}
+            }
         }
 
         private void FrmProduct_Load(object sender, EventArgs e)

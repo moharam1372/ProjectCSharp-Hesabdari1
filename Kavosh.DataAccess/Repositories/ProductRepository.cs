@@ -15,11 +15,18 @@ namespace Kavosh.DataAccess.Repositories
         Task<Dictionary<Guid, (float Input, float Output)>> GetStockMovementForAllAsync();
         // IProductRepository.cs — اضافه به اینترفیس موجود
         Task<List<FactorDetail>> GetKardexAsync(Guid productId);
+        Task<bool> HasFactorDetailsAsync(Guid productId);
     }
 
     public class ProductRepository : Repository<Product>, IProductRepository
     {
         public ProductRepository(AppDbContext context) : base(context) { }
+
+        public async Task<bool> HasFactorDetailsAsync(Guid productId)
+        {
+            return await _context.Set<FactorDetail>()
+                .AnyAsync(d => d.ProductId == productId && !d.IsDeleted);
+        }
         // ProductRepository.cs
         public async Task<long> GetMaxCodeAsync()
         {

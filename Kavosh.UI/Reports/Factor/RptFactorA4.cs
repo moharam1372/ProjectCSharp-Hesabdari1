@@ -37,8 +37,7 @@ namespace Kavosh.UI.Reports.Factor
                 base.BeforeReportPrint();
                 return;
             }
-            DataSource = data.FactorDetails; // لیست محصولات در DetailReport نمایش داده میشه
-
+            DataSource = data.FactorDetails;
 
             lblHeader2.Text = data.Header;
             lblNum.Text = data.Num;
@@ -47,12 +46,13 @@ namespace Kavosh.UI.Reports.Factor
             lblBuyerMobile.Text = data.Mobile;
             lblAddress.Text = data.Address;
 
-
-            // فیلدهای GroupFooter که قبلاً متن ثابت بودن، حالا داینامیک میشن
             txtTaxes.Text = data.TaxAmount.ToString("N0");
             txtPreviousDebt.Text = data.PreviousDebt.ToString("N0");
 
-            txtSumTotal.Text = data.PreviousDebt.ToString("N0");
+            // 👇 اصلاح شد: جمع کل = مبلغ فاکتور + مالیات (بدون بدهی قبلی)
+            //txtSumTotal.Text = (data.PriceTotal + data.TaxAmount).ToString("N0");
+            txtSumTotal.Text = data.PayableAmount.ToString("N0");
+           
             xrLabel25.Text = @"مبلغ قابل پرداخت: " + data.PayableAmount.ToString("N0");
             txt.Text = $"شماره کارت: {data.CardNumber}";
             xrLabel8.Text = $"شماره شبا: {data.ShabaNumber}";
@@ -62,16 +62,6 @@ namespace Kavosh.UI.Reports.Factor
                 picLogo.Image = System.Drawing.Image.FromStream(new System.IO.MemoryStream(data.Logo));
             if (data.Mohr is { Length: > 0 })
                 picMohr.Image = System.Drawing.Image.FromStream(new System.IO.MemoryStream(data.Mohr));
-
-
-
-
-
-
-            object value = this.GetCurrentColumnValue("Count");
-    
-
-
 
             base.BeforeReportPrint();
         }

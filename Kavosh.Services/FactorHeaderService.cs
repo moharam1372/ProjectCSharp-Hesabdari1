@@ -238,9 +238,12 @@ namespace Kavosh.Services
             var storeInfo = await _storeInfoService.GetAsync();
             var taxPercent = storeInfo?.TaxPercent ?? 0;
             var taxAmount = (long)(factor.PriceTotal * taxPercent / 100);
-            var payable = factor.PreviousDebt + factor.PriceTotal + taxAmount;
 
+            // 👇 محاسبه‌ی واقعی بدهی قبلی (بدون احتساب همین فاکتور)
+            var previousDebt = await _definitiveAccountService.GetPreviousDebtAsync(factor.PersonId, factor.Code);
 
+            // مبلغ قابل پرداخت = جمع کل (این فاکتور + مالیاتش) + بدهی قبلی
+            var payable = factor.PriceTotal + taxAmount + previousDebt;
 
             return new FactorReportDto
             {
@@ -261,7 +264,7 @@ namespace Kavosh.Services
                 Discount = factor.Discount,
                 PriceTotal = factor.PriceTotal,
                 TaxAmount = taxAmount,
-                PreviousDebt = factor.PreviousDebt,
+                PreviousDebt = previousDebt,        // 👈 اصلاح شد
                 PayableAmount = payable,
                 BankName = storeInfo?.BankName,
                 AccountHolderName = storeInfo?.AccountHolderName,

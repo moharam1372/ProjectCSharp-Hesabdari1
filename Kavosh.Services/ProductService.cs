@@ -19,6 +19,20 @@ namespace Kavosh.Services
         //    var products = await _repository.GetAllWithDetailsAsync();
         //    return products.Select(ToDto).ToList();
         //}
+
+        // ============= حذف (Soft Delete) =============
+        public async Task DeleteProductAsync(Guid id)
+        {
+            var hasFactors = await _repository.HasFactorDetailsAsync(id);
+            if (hasFactors)
+                throw new InvalidOperationException("این کالا در یک یا چند فاکتور استفاده شده و قابل حذف نیست");
+
+            var entity = await _repository.GetById(id);
+            if (entity is null) return;
+
+            await _repository.Remove(entity);
+            await _repository.SaveChangesAsync();
+        }
         public async Task<List<ProductKardexRowDto>> GetKardexAsync(Guid productId)
         {
             var details = await _repository.GetKardexAsync(productId);
@@ -93,16 +107,8 @@ namespace Kavosh.Services
             return entity.Id;
         }
 
-        // ============= حذف (Soft Delete) =============
-        public async Task DeleteProductAsync(Guid id)
-        {
-            var entity = await _repository.GetById(id);
-            if (entity is null)
-                return;
+ 
 
-            await _repository.Remove(entity);
-            await _repository.SaveChangesAsync();
-        }
 
         // ============= کمکی =============
         private async Task ValidateAsync(ProductDto dto, bool isNew)

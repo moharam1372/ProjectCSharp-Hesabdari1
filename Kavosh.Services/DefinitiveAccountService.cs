@@ -12,7 +12,17 @@ namespace Kavosh.Services
         {
             _repository = repository;
         }
+        // در Kavosh.Services/DefinitiveAccountService.cs — کنار GetStatementAsync اضافه کن
 
+        public async Task<long> GetPreviousDebtAsync(Guid personId, long excludeFactorCode)
+        {
+            var items = await _repository.GetByPersonAsync(personId);
+
+            // مانده‌ی کل شخص، به‌جز ردیف‌هایی که مربوط به همین فاکتور (excludeFactorCode) هستن
+            return items
+                .Where(d => d.DocNumber != excludeFactorCode)
+                .Sum(d => d.Debtor ? d.Price : -d.Price);
+        }
         public async Task<(long TotalDebt, long CheckDebt, long OtherDebt)> GetDebtSummaryAsync()
         {
             var debtors = await GetDebtorsListAsync();   // منطق فیلتر (فقط بدهکارهای واقعی) از قبل توش هست
