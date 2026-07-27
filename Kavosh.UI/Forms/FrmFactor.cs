@@ -120,6 +120,7 @@ namespace Kavosh.UI.Forms
 
 
         // ============= خط‌های محصول (سمت چپ، قابل ویرایش) =============
+        // ============= خط‌های محصول (سمت چپ، قابل ویرایش) =============
         public async Task SetFieldDgvFactorDetail()
         {
             if (dgvFactorDetail.ColumnCount() == 0)
@@ -140,19 +141,26 @@ namespace Kavosh.UI.Forms
 
                 #region Relation - انتخاب محصول از لیست محصولات
 
-                var getProducts = (await _productService.GetAllProductsAsync()).Select(s => new { s.Id, s.Title, s.SellPrice }).ToList();
+                // 👇 UnitPrice هم اضافه شد (مبلغ خرید)
+                var getProducts = (await _productService.GetAllProductsAsync())
+                    .Select(s => new { s.Id, s.Title, s.SellPrice, s.UnitPrice }).ToList();
+
                 var cmbProduct = dgvFactorDetail.AddGridToGrid(getProducts, "محصول", "Id", "Title", select =>
                 {
                     var getCount = dgvFactorDetail.GetValue<long>("تعداد");
 
-                    var getSellPrice = getProducts.First(f => f.Id == select.Id).SellPrice;
-                    dgvFactorDetail.SetValue("قیمت واحد", getSellPrice);
-                    dgvFactorDetail.SetValue("جمع", getSellPrice * getCount);
+                    var product = getProducts.First(f => f.Id == select.Id);
 
+                    // 👇 نوع فاکتور: فروش => مبلغ فروش (SellPrice) | خرید => مبلغ خرید (UnitPrice)
+                    var isSell = layInput.GetValue<string>("نوع فاکتور") == "فروش";
+                    var getUnitPrice = isSell ? product.SellPrice : product.UnitPrice;
+
+                    dgvFactorDetail.SetValue("قیمت واحد", getUnitPrice);
+                    dgvFactorDetail.SetValue("جمع", getUnitPrice * getCount);
                 });
                 cmbProduct.HiddenColumn("Id");
                 cmbProduct.HiddenColumn("SellPrice");
-
+                cmbProduct.HiddenColumn("UnitPrice");
 
                 #endregion
 
@@ -163,8 +171,6 @@ namespace Kavosh.UI.Forms
                     if (e1.Column.FieldName != "قیمت واحد" && e1.Column.FieldName != "تعداد")
                         return;
 
-                    // مقدار ستونی که همین الان تغییر کرده رو از e1.Value بگیر
-                    // و مقدار ستون دیگه رو از خود گرید بخون
                     long getSellPrice = e1.Column.FieldName == "قیمت واحد"
                         ? e1.Value.GetNum<long>()
                         : dgvFactorDetail.GetValue<long>("قیمت واحد");
@@ -174,18 +180,12 @@ namespace Kavosh.UI.Forms
                         : dgvFactorDetail.GetValue<long>("تعداد");
 
                     dgvFactorDetail.SetValue("جمع", getSellPrice * getCount);
-
                 };
 
                 dgvFactorDetail.AddEventRowCellClick<Guid>(id =>
                 {
                     dgvFactorDetail.DeleteRow(false);
                 }, "Id", "حذف");
-
-                // TODO: پر کردن خودکار «قیمت واحد» بعد از انتخاب «محصول» + محاسبه‌ی زنده‌ی «جمع»
-                // با الگوی اختصاصی خودمون (مثلاً روی GetViewBase.CellValueChanged یا ValidatingEditor)
-                // اینجا بعداً تکمیل میشه — فعلاً «قیمت واحد» رو کاربر باید دستی وارد کنه.
-                // SetupAutoFillPriceAndTotal();
 
                 #endregion
             }
