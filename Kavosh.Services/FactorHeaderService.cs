@@ -230,6 +230,16 @@ namespace Kavosh.Services
                     PriceUnit = d.SellPrice,
                     UnitTitle = units.First(f => f.Id == d.UnitId).Title
                 }).ToList(),
+    
+                HowToPays = factor.HowToPays.Select(p => new HowToPayReportDto
+                {
+                    PaymentTypeTitle = p.PaymentTypeTitle,
+                    Price = p.Price,
+                    CheckNumber = p.CheckNumber,
+                    CheckDate = p.CheckDate,
+                    Settlement = p.Settlement,
+                    Description = p.Description
+                }).ToList(),
 
                 Discount = factor.Discount,
                 PriceTotal = factor.PriceTotal,

@@ -18,7 +18,9 @@
         public string Mobile { get; set; }
         public string Address { get; set; }
         public List<FactorReportDetailDto> FactorDetails { get; set; } = new();
-
+        // 👇 جدید — نحوه‌های پرداخت این فاکتور
+        public List<HowToPayReportDto> HowToPays { get; set; } = new();
+      
         // مبالغ
         public long Discount { get; set; }
         public long PriceTotal { get; set; }

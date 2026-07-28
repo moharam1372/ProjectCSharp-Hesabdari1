@@ -3,6 +3,7 @@ using MyCom.Class;
 using System.Globalization;
 using DevExpress.XtraPrinting;
 using DevExpress.XtraReports.UI;
+using RightToLeft = DevExpress.XtraReports.UI.RightToLeft;
 
 namespace Kavosh.UI.Reports.Factor
 {
@@ -15,35 +16,33 @@ namespace Kavosh.UI.Reports.Factor
         }
 
 
-
+        
  
 
         protected override void BeforeReportPrint()
         {
-            var gg = Pages.Count;
-            //CultureInfo customCulture = new CultureInfo("fa-IR");
-
-            //// تغییر کاراکتر اعشار به / (یا هر کاراکتر دلخواه)
-            //customCulture.NumberFormat.NumberDecimalSeparator = "/";
-            //customCulture.NumberFormat.PercentDecimalSeparator = "/";
-
-            //// اعمال به ترد فعلی
-            //Thread.CurrentThread.CurrentCulture = customCulture;
-            //Thread.CurrentThread.CurrentUICulture = customCulture;
+          
 
             CultureInfo customCulture = new CultureInfo("en-US");
             customCulture.NumberFormat.NumberDecimalSeparator = "/";
-
-            //if (xrTableCell4 != null && xrTableCell4.DataBindings.Count > 0)
-
-            
-
 
             if (Tag is not FactorReportDto data)
             {
                 base.BeforeReportPrint();
                 return;
             }
+
+
+            #region HowToPay
+
+            var subReport = new RptHowToPayList();
+            subReport.Tag = data.HowToPays;
+            subReport.RightToLeft = RightToLeft.Yes;
+            
+            xrSubreport1.ReportSource = subReport;
+
+            #endregion
+
             DataSource = data.FactorDetails;
 
             lblHeader2.Text = data.Header;
@@ -72,10 +71,13 @@ namespace Kavosh.UI.Reports.Factor
 
             base.BeforeReportPrint();
         }
-
+   
         private void lblPage_PrintOnPage(object sender, PrintOnPageEventArgs e)
         {
-            lblPage.Text = "صفحه: "+ (e.PageIndex + 1) +" از "+this.Pages.Count;
+            var ePageIndex = e.PageIndex;
+            lblPage.Text = @"صفحه: " + (ePageIndex + 1) + @" از " + this.Pages.Count;
         }
+
+ 
     }
 }
