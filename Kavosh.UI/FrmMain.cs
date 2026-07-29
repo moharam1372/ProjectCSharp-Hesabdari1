@@ -78,7 +78,7 @@ namespace Kavosh.UI
         {
             _pnlDashboard = new Panel
             {
-               // BackColor = Color.FromArgb(240, 240, 240)
+                // BackColor = Color.FromArgb(240, 240, 240)
             };
 
             _pnlDashboardBox = new Panel
@@ -371,6 +371,11 @@ namespace Kavosh.UI
         {
             var frm = Program.CreateScopedForm<FrmBackup>();
             frm.OverShowWait<FrmBackup>(this);
+        }
+
+        private void barCodeControl1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

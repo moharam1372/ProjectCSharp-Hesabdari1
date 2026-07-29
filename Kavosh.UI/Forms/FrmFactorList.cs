@@ -75,7 +75,10 @@ namespace Kavosh.UI.Forms
                 #region Event
                 dgvFactor.AddEventRowCellClick<Guid>(async id =>
                 {
-                    var rpt = new Kavosh.UI.Reports.Factor.RptFactorA4();
+                    //var rpt = new Kavosh.UI.Reports.Factor.RptFactorA5Portrait();
+
+                    //var rpt = new Kavosh.UI.Reports.Factor.RptFactorA4();
+                    var rpt = new Kavosh.UI.Reports.Factor.RptFactorA5();
                     var modelFactor = await _factorHeaderService.GetFactorReportDataAsync(id);
                     rpt.Tag = modelFactor;
 

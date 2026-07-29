@@ -1,17 +1,15 @@
 ﻿using Kavosh.Services.DTOs;
 using MyCom.Class;
 using System.Globalization;
-using System.IO;
 using DevExpress.XtraPrinting;
-using DevExpress.XtraPrinting.BarCode;
 using DevExpress.XtraReports.UI;
 using RightToLeft = DevExpress.XtraReports.UI.RightToLeft;
 
 namespace Kavosh.UI.Reports.Factor
 {
-    public partial class RptFactorA4 : DevExpress.XtraReports.UI.XtraReport
+    public partial class RptFactorA5 : DevExpress.XtraReports.UI.XtraReport
     {
-        public RptFactorA4()
+        public RptFactorA5()
         {
             InitializeComponent();
             // Format String Number Float =>            {0:#,#}
@@ -37,7 +35,7 @@ namespace Kavosh.UI.Reports.Factor
 
             #region HowToPay
 
-            var subReport = new RptHowToPayList();
+            var subReport = new RptHowToPayListA5();
             subReport.Tag = data.HowToPays;
             subReport.RightToLeft = RightToLeft.Yes;
             
@@ -80,8 +78,6 @@ namespace Kavosh.UI.Reports.Factor
             lblPage.Text = @"صفحه: " + (ePageIndex + 1) + @" از " + this.Pages.Count;
         }
 
-
-      
-
+ 
     }
 }
