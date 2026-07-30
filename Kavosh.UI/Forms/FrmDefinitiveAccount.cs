@@ -178,20 +178,24 @@ namespace Kavosh.UI.Forms
 
             if (!isCheck || !isDebtor)
             {
-                XtraMessageBox.Show("این ردیف مربوط به چک وصول‌نشده نیست.", "توجه", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ClassMessageBox.ShowMSG("این ردیف مربوط به چک وصول‌نشده نیست.", Class_Text.Msg_Name,
+                    ClassMessageBox.enumIcon.اطلاعات);
                 return;
             }
 
             if (isSettled)
             {
-                XtraMessageBox.Show("این چک قبلاً وصول شده است.", "توجه", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ClassMessageBox.ShowMSG("این چک قبلاً وصول شده است.", Class_Text.Msg_Name,
+                    ClassMessageBox.enumIcon.اطلاعات);
                 return;
             }
 
-            var confirm = XtraMessageBox.Show("این چک وصول شد؟", "تایید وصول چک",
-                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var confirm = ClassMessageBox.ShowMSGQues("این چک وصول شود؟", Class_Text.Msg_Name,
+                ClassMessageBox.enumIcon.اطلاعات);
 
-            if (confirm != DialogResult.Yes)
+        
+
+            if (!confirm)
                 return;
 
             try
@@ -200,8 +204,7 @@ namespace Kavosh.UI.Forms
 
                 if (cmbPerson.EditValue is Guid personId)
                     await RefreshGridAsync(personId);
-
-                XtraMessageBox.Show("چک با موفقیت وصول شد.", "موفق", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ClassMessageBox.ShowMSG("چک با موفقیت وصول شد.", Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
 
 
 

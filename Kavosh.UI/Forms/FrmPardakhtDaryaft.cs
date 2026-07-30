@@ -196,7 +196,9 @@ namespace Kavosh.UI.Forms
 
                 Kavosh.Services.AppEvents.RaiseDataChanged();   // رفرش داشبورد FrmMain
 
-                XtraMessageBox.Show("تراکنش با موفقیت ثبت شد.", "موفق", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                ClassMessageBox.ShowMSG("تراکنش با موفقیت ثبت شد.", Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
+              
 
                 layInput.CallNew();
                 layInput.SetValueType("تاریخ", DateTime.Now.DateTimePersian().Date);

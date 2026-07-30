@@ -354,9 +354,11 @@ namespace Kavosh.UI
             }
             catch (Exception ex)
             {
-                XtraMessageBox.Show(
-                    $"خطا در تهیه پشتیبان خودکار:\n{ex.Message}\n\nبرنامه بدون بکاپ بسته می‌شود.",
-                    "خطا", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+                ClassMessageBox.ShowMSG($"خطا در تهیه پشتیبان خودکار:\n{ex.Message}\n\nبرنامه بدون بکاپ بسته می‌شود.",
+                    "خطا",ClassMessageBox.enumIcon.هشدار);
+             
+
             }
             finally
             {

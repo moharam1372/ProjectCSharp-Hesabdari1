@@ -41,7 +41,7 @@ namespace Kavosh.UI.Forms
                 await _backupService.BackupAsync(progress, fileName);
 
                 RefreshList();
-                XtraMessageBox.Show("پشتیبان‌گیری با موفقیت انجام شد.", "موفق", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ClassMessageBox.ShowMSG("پشتیبان‌گیری با موفقیت انجام شد.", Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
             }
             catch (Exception ex)
             {
@@ -58,15 +58,19 @@ namespace Kavosh.UI.Forms
         {
             if (lstBackups.SelectedItem is not BackupFileInfo selected)
             {
-                XtraMessageBox.Show("یک نسخه‌ی پشتیبان از لیست انتخاب کنید.", "توجه", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ClassMessageBox.ShowMSG("یک نسخه‌ی پشتیبان از لیست انتخاب کنید.", Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
+
                 return;
             }
 
-            var confirm = XtraMessageBox.Show(
-                $"بازگردانی به نسخه‌ی «{selected.FileName}» انجام شود؟\n\nاطلاعات فعلی دیتابیس با این نسخه جایگزین می‌شود و این کار غیرقابل بازگشت است.",
-                "تایید بازگردانی", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            //var confirm = XtraMessageBox.Show(
+            //    $"بازگردانی به نسخه‌ی «{selected.FileName}» انجام شود؟\n\nاطلاعات فعلی دیتابیس با این نسخه جایگزین می‌شود و این کار غیرقابل بازگشت است.",
+            //    "تایید بازگردانی", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
 
-            if (confirm != DialogResult.Yes)
+            var confirm = ClassMessageBox.ShowMSGQues($"بازگردانی به نسخه‌ی «{selected.FileName}» انجام شود؟\n\nاطلاعات فعلی دیتابیس با این نسخه جایگزین می‌شود و این کار غیرقابل بازگشت است.",
+                 Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
+
+            if (!confirm)
                 return;
 
             using var progressForm = new FrmBackupProgress("در حال بازگردانی...");

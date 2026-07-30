@@ -117,7 +117,7 @@ namespace Kavosh.UI.Forms
                 };
 
                 await _storeInfoService.SaveAsync(dto);
-                XtraMessageBox.Show("اطلاعات فروشگاه ذخیره شد.", "موفق", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ClassMessageBox.ShowMSG("اطلاعات فروشگاه ذخیره شد.", Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
                 layInput._disableAfterSave = false;
                 layInput.CallNew();
                 await LoadDataAsync();

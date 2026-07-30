@@ -11,6 +11,7 @@ using System;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
+using DevExpress.Data;
 
 namespace Kavosh.UI.Forms
 {
@@ -31,7 +32,7 @@ namespace Kavosh.UI.Forms
         private DataTable _dtHowToPay;   // 👈 جدید
         public FrmFactor(FactorHeaderService factorHeaderService,
                           PersonService personService,
-                          ProductService productService, 
+                          ProductService productService,
                           PaymentTypeService paymentTypeService)
         {
             InitializeComponent();
@@ -117,13 +118,14 @@ namespace Kavosh.UI.Forms
                     new() { Name = "قیمت واحد", Type = typeof(long),PriceActive = true},   // مبلغ خرید - اطلاعاتی
                     new() { Name = "قیمت فروش", Type = typeof(long),PriceActive = true},   // 👈 جدید - قابل ویرایش، مبنای جمع و چاپ
                     new() { Name = "جمع", Type = typeof(long),PriceActive = true },
-                ], true, false, false);
+                ], true, false, true);
 
                 dgvFactorDetail.ActiveScrollGrid();
                 dgvFactorDetail.HiddenColumn("Id");
                 dgvFactorDetail.MaxMinWidth("حذف", 45, 45);
+                dgvFactorDetail.MaxMinWidth("جمع", 155, 155);
                 dgvFactorDetail.AddAllowNewRowAndType(DefaultBoolean.True, NewItemRowPosition.Top);
-
+                dgvFactorDetail.AddSummaryItem("جمع", "جمع", "", SummaryItemType.Custom);
                 #region Relation - انتخاب محصول از لیست محصولات
 
                 // 👇 UnitPrice (مبلغ خرید) هم علاوه بر SellPrice (مبلغ فروش) گرفته می‌شود
@@ -143,9 +145,17 @@ namespace Kavosh.UI.Forms
                 cmbProduct.HiddenColumn("SellPrice");
                 cmbProduct.HiddenColumn("UnitPrice");
 
+
                 #endregion
 
                 #region Event
+
+                double sumTotal = 0;
+                dgvFactorDetail.GetViewBase.CustomSummaryCalculate += (s1, e1) =>
+                {
+                    dgvFactorDetail.AutoSummaryCalculate(e1, "جمع", "جمع", ref sumTotal, "تومان");
+                };
+
 
                 dgvFactorDetail.GetViewBase.CellValueChanged += (s1, e1) =>
                 {
@@ -224,7 +234,7 @@ namespace Kavosh.UI.Forms
             {
                 _dtHowToPay.Rows.Add(
                     p.Id, "حذف", p.PaymentTypeId, p.Price, p.CheckNumber,
-                    (object)p.CheckDate ?? DBNull.Value,   // 👈 اگه null بود، DBNull میره تو ستون
+                    p.CheckDate ==null ? DBNull.Value: p.CheckDate.Value.DateTimePersian().Date,   // 👈 اگه null بود، DBNull میره تو ستون
                     p.Settlement, p.Description
                 );
             }
@@ -311,14 +321,15 @@ namespace Kavosh.UI.Forms
                     new() { Name = "تاریخ چک",Action = EventDatePanel, Object = KavoshGrid.enumObject.PnlDate, ImageValue = MyCom.Properties.Resources.adateoccuring },
                     new() { Name = "تسویه", Type = typeof(bool),Object = KavoshGrid.enumObject.Checked},
                     new() { Name = "توضیحات", Type = typeof(string) },
-                ], true, false, false);
+                ], true, false, true);
 
                 dgvHowToPay.ActiveScrollGrid();
                 dgvHowToPay.HiddenColumn("Id");
                 dgvHowToPay.MaxMinWidth("حذف", 45, 45);
+                dgvHowToPay.MaxMinWidth("مبلغ", 155, 155);
                 dgvHowToPay.MaxMinWidth("تاریخ چک", 100, 100);
                 dgvHowToPay.AddAllowNewRowAndType(DefaultBoolean.True, NewItemRowPosition.Top);
-
+                dgvHowToPay.AddSummaryItem("مبلغ", "مبلغ", "", SummaryItemType.Custom);
                 #region Relation - انتخاب نوع پرداخت
 
                 var getPaymentTypes = await _paymentTypeService.GetAllAsync();
@@ -328,6 +339,12 @@ namespace Kavosh.UI.Forms
                 #endregion
 
                 #region Event
+                double sumTotal = 0;
+                dgvHowToPay.GetViewBase.CustomSummaryCalculate += (s1, e1) =>
+                {
+                    dgvHowToPay.AutoSummaryCalculate(e1, "مبلغ", "جمع", ref sumTotal, "تومان");
+                };
+
 
                 dgvHowToPay.GetViewBase.InitNewRow += (s1, e1) =>
                 {
