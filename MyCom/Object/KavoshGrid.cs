@@ -591,9 +591,7 @@ namespace MyCom.Object
                         }
 
                         #endregion
-
-
-
+                        
                         RepositoryItems.Add(addButton);
                         DGV_Viw.Columns[nc].ColumnEdit = addButton;
 

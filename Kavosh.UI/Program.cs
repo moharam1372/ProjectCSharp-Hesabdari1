@@ -142,6 +142,7 @@ namespace Kavosh.UI
             services.AddScoped<StoreInfoService>();
 
             services.AddScoped<DatabaseBackupService>();
+          
 
             // =========================================================
             // Forms
@@ -167,6 +168,8 @@ namespace Kavosh.UI
             services.AddTransient<FrmBackup>();
 
             services.AddTransient<FrmBackupProgress>();
+
+            services.AddTransient<FrmPardakhtDaryaft>();
         }
 
         private static void InitializeDatabase()

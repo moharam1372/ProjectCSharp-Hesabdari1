@@ -373,9 +373,12 @@ namespace Kavosh.UI
             frm.OverShowWait<FrmBackup>(this);
         }
 
-        private void barCodeControl1_Click(object sender, EventArgs e)
-        {
+   
 
+        private void barBtnPardakhtDaryaft_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var frm = Program.CreateScopedForm<FrmPardakhtDaryaft>();
+            frm.OverShowWait<FrmPardakhtDaryaft>(this);
         }
     }
 }

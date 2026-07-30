@@ -31,7 +31,8 @@ namespace Kavosh.UI.Forms
         private DataTable _dtHowToPay;   // 👈 جدید
         public FrmFactor(FactorHeaderService factorHeaderService,
                           PersonService personService,
-                          ProductService productService, PaymentTypeService paymentTypeService)
+                          ProductService productService, 
+                          PaymentTypeService paymentTypeService)
         {
             InitializeComponent();
             _factorHeaderService = factorHeaderService;

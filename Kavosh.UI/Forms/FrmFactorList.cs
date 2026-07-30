@@ -110,14 +110,14 @@ namespace Kavosh.UI.Forms
                                 barManager.AllowShowToolbarsPopup = false;
                                 barManager.AllowMoveBarOnToolbar = false;
 
-              
+
 
                                 // قفل کردن تمام نوارهای ابزار موجود
                                 foreach (Bar bar in barManager.Bars)
                                 {
                                     bar.OptionsBar.AllowQuickCustomization = false;
-                                  
-                                 
+
+
                                     bar.OptionsBar.AllowRename = false;
                                     bar.OptionsBar.AllowDelete = false;
                                 }
@@ -131,7 +131,7 @@ namespace Kavosh.UI.Forms
                                 customButton.AllowHtmlText = DefaultBoolean.True;
                                 customButton.Caption = "چاپ";
                                 customButton.LargeWidth = 110;
-                               
+
                                 //customButton.Alignment = BarItemLinkAlignment.Left;
                                 // می‌توانید یک آیکون نیز تنظیم کنید
                                 // customButton.ImageOptions.Image = ...;
@@ -141,23 +141,24 @@ namespace Kavosh.UI.Forms
                                 Bar toolbar = barManager.Bars[0];
                                 if (toolbar != null)
                                 {
-                                    
+
                                     toolbar.ItemLinks.Add(customButton);
                                 }
 
                                 // 3. تعریف عملکرد دکمه
-                                customButton.ItemClick += (s, e) => {
+                                customButton.ItemClick += (s, e) =>
+                                {
                                     // کاری که می‌خواهید دکمه انجام دهد را اینجا بنویسید
                                     // مثلاً نمایش یک پیام یا باز کردن یک فرم
                                     MessageBox.Show("دکمه سفارشی کلیک شد!");
                                     rpt.PrintDialog();
-                                   // rpt.ExportToPdf("123.pdf");
+                                    // rpt.ExportToPdf("123.pdf");
                                 };
 
                                 #endregion
                             }
                         }
-                  
+
                         // نمایش پیش‌نمایش
                         printTool.ShowPreviewDialog();
                     }
@@ -210,5 +211,10 @@ namespace Kavosh.UI.Forms
         }
 
         private void FrmFactorList_Load(object sender, EventArgs e) { }
+
+        private void btnExportExcel_Click(object sender, EventArgs e)
+        {
+            dgvFactor.ExportToExcel("فاکتور فروش");
+        }
     }
 }

@@ -84,7 +84,7 @@ namespace Kavosh.Services
             var max = await _repository.GetMaxCodeAsync();
             return max + 1;
         }
-   
+
         // فراخوانی خودکار از FactorHeaderService وقتی یه HowToPay از نوع «بدهی» یا «چک» تازه ثبت میشه
         public async Task CreateDebtFromHowToPayAsync(Guid personId, Guid howToPayId, long price, long factorCode, bool isCheck)
         {
@@ -152,8 +152,46 @@ namespace Kavosh.Services
             await _repository.SaveChangesAsync();
         }
 
-  
-  
+
+        // ============= ثبت مستقیم دریافت/پرداخت (بدون فاکتور) =============
+        public async Task CreateManualTransactionAsync(ReceiptPaymentDto dto)
+        {
+            if (dto.PersonId == Guid.Empty)
+                throw new ArgumentException("انتخاب طرف حساب الزامی است");
+
+            if (dto.Price <= 0)
+                throw new ArgumentException("مبلغ باید بیشتر از صفر باشد");
+
+            if (dto.IsCheckPayment && string.IsNullOrWhiteSpace(dto.CheckNumber))
+                throw new ArgumentException("برای پرداخت چکی، شماره چک الزامی است");
+
+         
+
+            var nextCode = await GetNextCodeAsync();
+
+            var description = string.IsNullOrWhiteSpace(dto.Description)
+                ? (dto.IsReceipt ? "دریافت وجه" : "پرداخت وجه")
+                : dto.Description;
+
+            if (dto.IsCheckPayment && !string.IsNullOrWhiteSpace(dto.CheckNumber))
+                description += $" (چک شماره {dto.CheckNumber})";
+
+            var entity = new DefinitiveAccount
+            {
+                Id = Guid.NewGuid(),
+                Code = nextCode,
+                DocNumber = nextCode,      // سند مستقل — بدون فاکتور
+                PersonId = dto.PersonId,
+                DateCustom = dto.DateCustom == default ? DateTime.Now : dto.DateCustom,
+                Price = dto.Price,
+                Debtor = !dto.IsReceipt,   // دریافت => بستانکار / پرداخت => بدهکار
+                IsCheck = dto.IsCheckPayment,
+                Description = description
+            };
+
+            await _repository.Add(entity);
+            await _repository.SaveChangesAsync();
+        }
 
         private static DefinitiveAccountDto ToDto(DefinitiveAccount d, bool isSettled) => new()
         {

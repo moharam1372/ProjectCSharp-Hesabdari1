@@ -23,6 +23,7 @@
             dgvFactor = new MyCom.Object.KavoshGrid(components);
             viewFactor = new DevExpress.XtraGrid.Views.BandedGrid.BandedGridView();
             gridBand1 = new DevExpress.XtraGrid.Views.BandedGrid.GridBand();
+            btnExportExcel = new DevExpress.XtraEditors.SimpleButton();
             pnlFunction.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvFactor).BeginInit();
             ((System.ComponentModel.ISupportInitialize)viewFactor).BeginInit();
@@ -31,6 +32,7 @@
             // pnlFunction
             // 
             pnlFunction.BackColor = Color.FromArgb(255, 255, 192);
+            pnlFunction.Controls.Add(btnExportExcel);
             pnlFunction.Controls.Add(btnNew);
             pnlFunction.Dock = DockStyle.Top;
             pnlFunction.Location = new Point(0, 0);
@@ -75,6 +77,19 @@
             gridBand1.Name = "gridBand1";
             gridBand1.VisibleIndex = 0;
             // 
+            // btnExportExcel
+            // 
+            btnExportExcel.Appearance.Font = new Font("Samim FD", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnExportExcel.Appearance.Options.UseFont = true;
+            btnExportExcel.Dock = DockStyle.Left;
+            btnExportExcel.ImageOptions.SvgImage = Properties.Resources.exporttoxlsx;
+            btnExportExcel.Location = new Point(0, 0);
+            btnExportExcel.Name = "btnExportExcel";
+            btnExportExcel.Size = new Size(149, 36);
+            btnExportExcel.TabIndex = 6;
+            btnExportExcel.Text = "خروجی اکسل";
+            btnExportExcel.Click += btnExportExcel_Click;
+            // 
             // FrmFactorList
             // 
             ClientSize = new Size(1000, 598);
@@ -98,5 +113,6 @@
         private MyCom.Object.KavoshGrid dgvFactor;
         private DevExpress.XtraGrid.Views.BandedGrid.BandedGridView viewFactor;
         private DevExpress.XtraGrid.Views.BandedGrid.GridBand gridBand1;
+        private DevExpress.XtraEditors.SimpleButton btnExportExcel;
     }
 }

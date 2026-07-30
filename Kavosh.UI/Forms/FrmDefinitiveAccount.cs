@@ -219,5 +219,10 @@ namespace Kavosh.UI.Forms
         }
 
         private void FrmDefinitiveAccount_Load(object sender, EventArgs e) { }
+
+        private void btnExportExcel_Click(object sender, EventArgs e)
+        {
+            dgvStatement.ExportToExcel("صورت حساب");
+        }
     }
 }

@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DevExpress.XtraPrinting.BarCode.QRCodeGenerator qrCodeGenerator1 = new DevExpress.XtraPrinting.BarCode.QRCodeGenerator();
             ribbon = new DevExpress.XtraBars.Ribbon.RibbonControl();
             barBtnProduct = new DevExpress.XtraBars.BarButtonItem();
             barPerson = new DevExpress.XtraBars.BarButtonItem();
@@ -41,7 +40,6 @@
             ribbonPage1 = new DevExpress.XtraBars.Ribbon.RibbonPage();
             ribbonPageGroup1 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             ribbonStatusBar = new DevExpress.XtraBars.Ribbon.RibbonStatusBar();
-            barCodeControl1 = new DevExpress.XtraEditors.BarCodeControl();
             ((System.ComponentModel.ISupportInitialize)ribbon).BeginInit();
             SuspendLayout();
             // 
@@ -114,6 +112,7 @@
             barBtnPardakhtDaryaft.ImageOptions.SvgImage = Properties.Resources.accounting;
             barBtnPardakhtDaryaft.LargeWidth = 100;
             barBtnPardakhtDaryaft.Name = "barBtnPardakhtDaryaft";
+            barBtnPardakhtDaryaft.ItemClick += barBtnPardakhtDaryaft_ItemClick;
             // 
             // barBtnDebtorsList
             // 
@@ -157,26 +156,11 @@
             ribbonStatusBar.Ribbon = ribbon;
             ribbonStatusBar.Size = new Size(1218, 37);
             // 
-            // barCodeControl1
-            // 
-            barCodeControl1.AutoModule = true;
-            barCodeControl1.Location = new Point(422, 340);
-            barCodeControl1.Name = "barCodeControl1";
-            barCodeControl1.Padding = new Padding(10, 2, 10, 0);
-            barCodeControl1.Size = new Size(249, 217);
-            qrCodeGenerator1.CompactionMode = DevExpress.XtraPrinting.BarCode.QRCodeCompactionMode.Numeric;
-            qrCodeGenerator1.ErrorCorrectionLevel = DevExpress.XtraPrinting.BarCode.QRCodeErrorCorrectionLevel.H;
-            barCodeControl1.Symbology = qrCodeGenerator1;
-            barCodeControl1.TabIndex = 3;
-            barCodeControl1.Text = "09191490131";
-            barCodeControl1.Click += barCodeControl1_Click;
-            // 
             // FrmMain
             // 
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(1218, 671);
-            Controls.Add(barCodeControl1);
             Controls.Add(ribbon);
             Controls.Add(ribbonStatusBar);
             IsMdiContainer = true;
@@ -208,6 +192,5 @@
         private DevExpress.XtraBars.BarButtonItem barBtnPardakhtDaryaft;
         private DevExpress.XtraBars.BarButtonItem barBtnDebtorsList;
         private DevExpress.XtraBars.BarButtonItem barButtonItem1;
-        private DevExpress.XtraEditors.BarCodeControl barCodeControl1;
     }
 }

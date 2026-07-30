@@ -19,6 +19,7 @@
         {
             components = new System.ComponentModel.Container();
             pnlTop = new Panel();
+            btnExportExcel = new DevExpress.XtraEditors.SimpleButton();
             tablePanel1 = new DevExpress.Utils.Layout.TablePanel();
             lblBalanceValue = new Label();
             lblBalanceTitle = new Label();
@@ -36,12 +37,26 @@
             // pnlTop
             // 
             pnlTop.BackColor = Color.FromArgb(255, 255, 192);
+            pnlTop.Controls.Add(btnExportExcel);
             pnlTop.Controls.Add(tablePanel1);
             pnlTop.Dock = DockStyle.Top;
             pnlTop.Location = new Point(0, 0);
             pnlTop.Name = "pnlTop";
             pnlTop.Size = new Size(950, 38);
             pnlTop.TabIndex = 2;
+            // 
+            // btnExportExcel
+            // 
+            btnExportExcel.Appearance.Font = new Font("Samim FD", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnExportExcel.Appearance.Options.UseFont = true;
+            btnExportExcel.Dock = DockStyle.Left;
+            btnExportExcel.ImageOptions.SvgImage = Properties.Resources.exporttoxlsx;
+            btnExportExcel.Location = new Point(0, 0);
+            btnExportExcel.Name = "btnExportExcel";
+            btnExportExcel.Size = new Size(149, 38);
+            btnExportExcel.TabIndex = 5;
+            btnExportExcel.Text = "خروجی اکسل";
+            btnExportExcel.Click += btnExportExcel_Click;
             // 
             // tablePanel1
             // 
@@ -152,5 +167,6 @@
         private Label lblBalanceValue;
         private Label lblBalanceTitle;
         private Label lblPerson;
+        private DevExpress.XtraEditors.SimpleButton btnExportExcel;
     }
 }

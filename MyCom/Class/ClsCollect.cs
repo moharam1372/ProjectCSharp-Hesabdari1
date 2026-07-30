@@ -2437,9 +2437,138 @@ namespace MyCom.Class
             // ColumnView getData = gridComboEdit.Properties.PopupView;
 
 
-
+                
             return gridComboEdit;
         }
+        public static GroupControl ModelGridToDataLayoutFull<EF>(string name, List<EF> dtData, string valueMember, string displayMember, string nullText,
+            Action<object> changeValue = null, Action addBtn = null, float sizeFont = 13f)
+        {
+            GridLookUpEdit gridComboEdit = new GridLookUpEdit
+            {
+                Name = name,
+                Dock = DockStyle.Fill,
+                RightToLeft = RightToLeft.Yes,
+                Properties =
+                {
+                    NullText = nullText,
+                    ValueMember = valueMember,
+                    DisplayMember = displayMember,
+                    DataSource = dtData,
+                    //LookAndFeel = {UseDefaultLookAndFeel = false, SkinName = "Office 2013 Dark Gray"},
+                    LookAndFeel = {UseDefaultLookAndFeel = false, SkinName = "WXI"},
+                    Appearance =
+                    {
+                        BackColor = Color.White,
+                        TextOptions = {HAlignment = HorzAlignment.Center, VAlignment = VertAlignment.Center}
+                    },
+                    AppearanceFocused = {BackColor = Color.FromArgb(255, 241, 242, 154),},
+                    //AppearanceFocused = {BackColor = Color.FromArgb(255, 242, 242, 217)},
+                },
+            };
+
+            gridComboEdit.Properties.PopupView.CellValueChanged += (s, e) =>
+            {
+                if (string.IsNullOrEmpty(gridComboEdit.Text))
+                {
+                    gridComboEdit.Properties.Appearance.ForeColor = Color.FromArgb(165, 13, 13);
+                }
+                else
+                {
+                    gridComboEdit.Properties.Appearance.ForeColor = Color.Black;
+                }
+            };
+
+            _font.ChangeFont(gridComboEdit, sizeFont);
+            GridView gridView = (GridView)gridComboEdit.Properties.PopupView;
+
+            gridView.OptionsFind.AllowFindPanel = true;
+            gridView.OptionsFind.FindMode = FindMode.Always;
+            gridView.OptionsFind.AlwaysVisible = true;
+
+            gridView.OptionsView.ShowAutoFilterRow = true;
+
+            gridView.OptionsFilter.AllowFilterIncrementalSearch = true;
+            gridView.OptionsFilter.AllowFilterEditor = true;
+            gridView.OptionsFilter.DefaultFilterEditorView = FilterEditorViewMode.TextAndVisual;
+
+            gridComboEdit.Properties.PopupFilterMode = PopupFilterMode.Contains;
+            gridComboEdit.Properties.ImmediatePopup = true;
+            gridComboEdit.Properties.TextEditStyle = TextEditStyles.Standard;
+            gridComboEdit.Properties.PopulateViewColumns();
+            gridComboEdit.Properties.BestFitMode = BestFitMode.BestFitResizePopup;
+            gridComboEdit.Properties.AllowNullInput = DefaultBoolean.True;
+
+            gridComboEdit.Properties.View.RowStyle += EventRowStyle_RowStyle;
+            gridComboEdit.KeyDown += GridComboEdit_KeyDown;
+            gridComboEdit.CustomDisplayText += (s, e) =>
+            {
+                if (e.Value == null)
+                    gridComboEdit.Properties.Appearance.ForeColor = Color.FromArgb(183, 183, 183);
+                else
+                    gridComboEdit.Properties.Appearance.ForeColor = Color.FromArgb(16, 1, 1);
+            };
+
+            gridComboEdit.Properties.DoubleClick += (s, e) =>
+            {
+                gridComboEdit.SelectAll();
+            };
+
+
+            GroupControl groupControl = new GroupControl
+            {
+                Name = gridComboEdit.Name,
+                Dock = DockStyle.None,
+                ShowCaption = false,
+                BorderStyle = BorderStyles.NoBorder
+            };
+            // {Name = "GridPnl_" + gridComboEdit.Name, Dock = DockStyle.Fill,ShowCaption = false,BorderStyle = BorderStyles.NoBorder};
+
+
+            #region Button
+
+            if (changeValue != null)
+            {
+                gridComboEdit.EditValueChanged += (s1, e1) =>
+                {
+                    var getValue = gridComboEdit.EditValue;
+                    //changeValue(getValue);
+                    //changeValue?.Invoke(getValue);
+                    changeValue?.Invoke(getValue);
+                };
+            }
+
+            if (addBtn != null)
+            {
+                var font = _fontBold.ChangeFont();
+
+                SimpleButton btnFastToday = new SimpleButton
+                {
+                    Visible = true,
+                    Text = @"+",
+                    Dock = DockStyle.Left,
+                    Height = groupControl.Height - 2,
+                    Font = font,
+                    Width = 50
+                };
+                btnFastToday.LookAndFeel.UseDefaultLookAndFeel = false;
+                btnFastToday.LookAndFeel.SkinName = "Glass Oceans";
+                btnFastToday.Click += (s1, e1) => { addBtn(); };
+                //groupControl.Controls.Add(gridComboEdit);
+                groupControl.Controls.Add(btnFastToday);
+                //gridComboEdit.BringToFront();
+            }
+            groupControl.Controls.Add(gridComboEdit);
+            gridComboEdit.BringToFront();
+            //gridComboEdit.Click -= dateCalen_Click;
+            //gridComboEdit.Click += dateCalen_Click;
+
+            #endregion
+
+
+            //  groupControl.BringToFront();
+            return groupControl;
+        }
+
         public static GroupControl ModelGridToDataLayoutBtn<EF>(string name, List<EF> dtData, string valueMember, string displayMember, string nullText, Action action = null, TextEditStyles styles = TextEditStyles.Standard, float sizeFont = 13f)
         {
             GridLookUpEdit gridComboEdit = new GridLookUpEdit
@@ -3982,7 +4111,7 @@ namespace MyCom.Class
                     //{UseDefaultLookAndFeel = false, SkinName = "WXI"},
                     {UseDefaultLookAndFeel = false, SkinName = "Glass Oceans" },
 
-            }; 
+            };
             PictureEdit pictureEdit = new PictureEdit
             {
                 Name = name,
@@ -4013,7 +4142,7 @@ namespace MyCom.Class
                     pictureEdit.Image = Image.FromFile(fileDialog.FileName);
                 }
             };
-         
+
 
             panel.Controls.Add(pictureEdit);
             panel.Controls.Add(btnLoadImage);
