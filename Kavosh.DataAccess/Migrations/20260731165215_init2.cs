@@ -5,14 +5,21 @@
 namespace Kavosh.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class init6 : Migration
+    public partial class init2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<long>(
-                name: "SellPrice",
-                table: "FactorDetails",
+                name: "Malyat1",
+                table: "FactorHeaders",
+                type: "bigint",
+                nullable: false,
+                defaultValue: 0L);
+
+            migrationBuilder.AddColumn<long>(
+                name: "Malyat2",
+                table: "FactorHeaders",
                 type: "bigint",
                 nullable: false,
                 defaultValue: 0L);
@@ -22,8 +29,12 @@ namespace Kavosh.DataAccess.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "SellPrice",
-                table: "FactorDetails");
+                name: "Malyat1",
+                table: "FactorHeaders");
+
+            migrationBuilder.DropColumn(
+                name: "Malyat2",
+                table: "FactorHeaders");
         }
     }
 }

@@ -276,5 +276,50 @@ namespace MyCom.Class
             using var stream2 = response2.GetResponseStream();
             return Bitmap.FromStream(stream2);
         }
+        public static bool SaveAsJpg(this Image image, string filePath, int quality = 90)
+        {
+            try
+            {
+                if (image == null || string.IsNullOrEmpty(filePath))
+                    return false;
+
+                // ایجاد دایرکتوری در صورت نبود
+                string directory = Path.GetDirectoryName(filePath);
+                if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                    Directory.CreateDirectory(directory);
+
+                // محدود کردن کیفیت
+                quality = Math.Max(1, Math.Min(100, quality));
+
+                // تنظیم کیفیت
+                EncoderParameters encoderParams = new EncoderParameters(1);
+                encoderParams.Param[0] = new EncoderParameter(Encoder.Quality, quality);
+
+                // دریافت کدک JPEG
+                ImageCodecInfo jpegCodec = GetJpegCodec();
+
+                // ذخیره تصویر
+                if (jpegCodec != null)
+                    image.Save(filePath, jpegCodec, encoderParams);
+                else
+                    image.Save(filePath, ImageFormat.Jpeg);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"خطا: {ex.Message}");
+                return false;
+            }
+        }
+        private static ImageCodecInfo GetJpegCodec()
+        {
+            foreach (ImageCodecInfo codec in ImageCodecInfo.GetImageEncoders())
+            {
+                if (codec.MimeType == "image/jpeg")
+                    return codec;
+            }
+            return null;
+        }
     }
 }

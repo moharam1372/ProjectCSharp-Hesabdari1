@@ -5,7 +5,7 @@
         public Guid PersonId { get; set; }
         public DateTime DateCustom { get; set; } = DateTime.Now;
         public long Price { get; set; }
-
+        public DateTime? CheckDate { get; set; }   // 👈 جدید
         /// <summary>
         /// true = دریافت از مشتری (بدهی او کم می‌شود)
         /// false = پرداخت به مشتری (بدهی او زیاد می‌شود)

@@ -40,15 +40,16 @@
             ribbonPage1 = new DevExpress.XtraBars.Ribbon.RibbonPage();
             ribbonPageGroup1 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             ribbonStatusBar = new DevExpress.XtraBars.Ribbon.RibbonStatusBar();
+            barBtnCheque = new DevExpress.XtraBars.BarButtonItem();
             ((System.ComponentModel.ISupportInitialize)ribbon).BeginInit();
             SuspendLayout();
             // 
             // ribbon
             // 
             ribbon.ExpandCollapseItem.Id = 0;
-            ribbon.Items.AddRange(new DevExpress.XtraBars.BarItem[] { ribbon.ExpandCollapseItem, barBtnProduct, barPerson, barFactor, barBtnAccounting, barBtnSetting, barBtnPardakhtDaryaft, barBtnDebtorsList, barButtonItem1 });
+            ribbon.Items.AddRange(new DevExpress.XtraBars.BarItem[] { ribbon.ExpandCollapseItem, barBtnProduct, barPerson, barFactor, barBtnAccounting, barBtnSetting, barBtnPardakhtDaryaft, barBtnDebtorsList, barButtonItem1, barBtnCheque });
             ribbon.Location = new Point(0, 0);
-            ribbon.MaxItemId = 9;
+            ribbon.MaxItemId = 10;
             ribbon.Name = "ribbon";
             ribbon.PageHeaderItemLinks.Add(barButtonItem1);
             ribbon.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] { ribbonPage1 });
@@ -147,6 +148,7 @@
             ribbonPageGroup1.ItemLinks.Add(barBtnAccounting);
             ribbonPageGroup1.ItemLinks.Add(barBtnDebtorsList);
             ribbonPageGroup1.ItemLinks.Add(barBtnSetting);
+            ribbonPageGroup1.ItemLinks.Add(barBtnCheque);
             ribbonPageGroup1.Name = "ribbonPageGroup1";
             // 
             // ribbonStatusBar
@@ -155,6 +157,15 @@
             ribbonStatusBar.Name = "ribbonStatusBar";
             ribbonStatusBar.Ribbon = ribbon;
             ribbonStatusBar.Size = new Size(1218, 37);
+            // 
+            // barBtnCheque
+            // 
+            barBtnCheque.AllowHtmlText = DevExpress.Utils.DefaultBoolean.True;
+            barBtnCheque.Caption = "چک ها";
+            barBtnCheque.Id = 9;
+            barBtnCheque.LargeWidth = 60;
+            barBtnCheque.Name = "barBtnCheque";
+            barBtnCheque.ItemClick += barBtnCheque_ItemClick;
             // 
             // FrmMain
             // 
@@ -192,5 +203,6 @@
         private DevExpress.XtraBars.BarButtonItem barBtnPardakhtDaryaft;
         private DevExpress.XtraBars.BarButtonItem barBtnDebtorsList;
         private DevExpress.XtraBars.BarButtonItem barButtonItem1;
+        private DevExpress.XtraBars.BarButtonItem barBtnCheque;
     }
 }

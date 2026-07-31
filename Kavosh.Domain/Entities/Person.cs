@@ -9,6 +9,7 @@
 
         public ICollection<DefinitiveAccount> DefinitiveAccounts { get; set; } = new List<DefinitiveAccount>();
         public ICollection<FactorHeader> FactorHeaders { get; set; } = new List<FactorHeader>();
+        public ICollection<Cheque> Cheques { get; set; } = new List<Cheque>();
 
     }
 }       

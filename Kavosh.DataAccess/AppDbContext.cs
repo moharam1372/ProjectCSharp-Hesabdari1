@@ -26,7 +26,7 @@ namespace Kavosh.DataAccess
         public DbSet<HowToPay> HowToPays { get; set; }
         public DbSet<PaymentType> PaymentTypes { get; set; }
         public DbSet<StoreInfo> StoreInfos { get; set; }
-
+        public DbSet<Cheque> Cheques { get; set; }
 
         // TODO: به ازای هر یک از ۱۵ جدول، یک DbSet مشابه اینجا اضافه کنید
         // public DbSet<Order> Orders { get; set; }
@@ -40,14 +40,32 @@ namespace Kavosh.DataAccess
                 var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
 
                 // فقط برای Migration - مستقیم Connection String رو اینجا بنویس
-                optionsBuilder.UseSqlServer("Data Source=.\\Kavosh;Initial Catalog=Account1;Integrated Security=false;MultipleActiveResultSets=true;TrustServerCertificate=True;User ID=sa;Password=Moaz1370110;");
-                //optionsBuilder.UseSqlServer("Data Source=MOJTABAPC\\MOJTABA;Initial Catalog=Account1;Integrated Security=false;MultipleActiveResultSets=true;TrustServerCertificate=True;User ID=sa;Password=Moaz1370110;");
+                //optionsBuilder.UseSqlServer("Data Source=.\\Kavosh;Initial Catalog=Account1;Integrated Security=false;MultipleActiveResultSets=true;TrustServerCertificate=True;User ID=sa;Password=Moaz1370110;");
+                optionsBuilder.UseSqlServer("Data Source=MOJTABAPC\\MOJTABA;Initial Catalog=Account1;Integrated Security=false;MultipleActiveResultSets=true;TrustServerCertificate=True;User ID=sa;Password=Moaz1370110;");
 
                 return new AppDbContext(optionsBuilder.Options);
             }
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Cheque>(entity =>
+            {
+                entity.HasOne(c => c.Person)
+                    .WithMany(p => p.Cheques)
+                    .HasForeignKey(c => c.PersonId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(c => c.HowToPay)
+                    .WithMany()
+                    .HasForeignKey(c => c.HowToPayId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(c => c.DefinitiveAccount)
+                    .WithMany()
+                    .HasForeignKey(c => c.DefinitiveAccountId)
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
+
             modelBuilder.Entity<Product>(entity =>
             {
                 entity.ToTable("Products");
@@ -96,7 +114,7 @@ namespace Kavosh.DataAccess
                 entity.HasOne(d => d.Person)
                     .WithMany(p => p.DefinitiveAccounts)
                     .HasForeignKey(d => d.PersonId)
-                    .OnDelete(DeleteBehavior.Cascade);   // این مسیر Cascade باقی می‌مونه
+                    .OnDelete(DeleteBehavior.Restrict);   // این مسیر Cascade باقی می‌مونه
 
                 entity.HasOne(d => d.HowToPay)
                     .WithMany(h => h.DefinitiveAccounts)

@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(RptFactorA5));
-            DevExpress.XtraPrinting.Shape.ShapeRectangle shapeRectangle3 = new DevExpress.XtraPrinting.Shape.ShapeRectangle();
-            DevExpress.XtraPrinting.Shape.ShapeRectangle shapeRectangle4 = new DevExpress.XtraPrinting.Shape.ShapeRectangle();
+            DevExpress.XtraPrinting.Shape.ShapeRectangle shapeRectangle1 = new DevExpress.XtraPrinting.Shape.ShapeRectangle();
+            DevExpress.XtraPrinting.Shape.ShapeRectangle shapeRectangle2 = new DevExpress.XtraPrinting.Shape.ShapeRectangle();
             this.TopMargin = new DevExpress.XtraReports.UI.TopMarginBand();
             this.xrPanel1 = new DevExpress.XtraReports.UI.XRPanel();
             this.lblNum = new DevExpress.XtraReports.UI.XRLabel();
@@ -394,8 +394,8 @@
             this.xrShape2.FillColor = System.Drawing.Color.White;
             this.xrShape2.LocationFloat = new DevExpress.Utils.PointFloat(0F, 0F);
             this.xrShape2.Name = "xrShape2";
-            shapeRectangle3.Fillet = 25;
-            this.xrShape2.Shape = shapeRectangle3;
+            shapeRectangle1.Fillet = 25;
+            this.xrShape2.Shape = shapeRectangle1;
             this.xrShape2.SizeF = new System.Drawing.SizeF(123.6852F, 13.1221F);
             // 
             // xrShape1
@@ -404,8 +404,8 @@
             this.xrShape1.FillColor = System.Drawing.Color.Gray;
             this.xrShape1.LocationFloat = new DevExpress.Utils.PointFloat(0F, 0F);
             this.xrShape1.Name = "xrShape1";
-            shapeRectangle4.Fillet = 40;
-            this.xrShape1.Shape = shapeRectangle4;
+            shapeRectangle2.Fillet = 40;
+            this.xrShape1.Shape = shapeRectangle2;
             this.xrShape1.SizeF = new System.Drawing.SizeF(131.0001F, 13.1221F);
             // 
             // xrLabel2

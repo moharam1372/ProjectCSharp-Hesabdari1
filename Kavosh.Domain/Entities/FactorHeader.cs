@@ -18,6 +18,8 @@
         public DateTime DateFactor { get; set; }
         public long Discount { get; set; }
         public long PriceTotal { get; set; }
+        public long Malyat1 { get; set; } = 0;
+        public long Malyat2 { get; set; } = 0;
 
         public ICollection<FactorDetail> FactorDetails { get; set; } = new List<FactorDetail>();
         public ICollection<HowToPay> HowToPays { get; set; } = new List<HowToPay>();

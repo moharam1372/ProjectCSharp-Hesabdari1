@@ -52,12 +52,13 @@ namespace Kavosh.UI.Reports.Factor
             lblBuyerMobile.Text = data.Mobile;
             lblAddress.Text = data.Address;
 
-            txtTaxes.Text = data.TaxAmount.ToString("N0");
+            long afterMalyat1 = (data.PriceTotal * data.Malyat1 / 100);
+            txtTaxes.Text = afterMalyat1.ToString("N0");
             txtPreviousDebt.Text = data.PreviousDebt.ToString("N0");
 
             // 👇 اصلاح شد: جمع کل = مبلغ فاکتور + مالیات (بدون بدهی قبلی)
             //txtSumTotal.Text = (data.PriceTotal + data.TaxAmount).ToString("N0");
-            txtSumTotal.Text = data.PayableAmount.ToString("N0");
+            txtSumTotal.Text = (afterMalyat1 + data.PayableAmount).ToString("N0");
            
             //xrLabel25.Text = @"مبلغ قابل پرداخت: " + data.PayableAmount.ToString("N0");
             txt.Text = $"شماره کارت: {data.CardNumber}";

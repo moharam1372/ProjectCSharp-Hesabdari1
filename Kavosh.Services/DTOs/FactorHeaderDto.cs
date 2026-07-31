@@ -12,6 +12,8 @@ public class FactorHeaderDto
     public DateTime DateFactor { get; set; } = DateTime.Now;
     public long Discount { get; set; }
     public long PriceTotal { get; set; }
+    public long Malyat1 { get; set; } = 0;
+    public long Malyat2 { get; set; } = 0;
     /// <summary>
     /// جمع بدهی صورت حساب مشتری قبل از این فاکتور
     /// </summary>

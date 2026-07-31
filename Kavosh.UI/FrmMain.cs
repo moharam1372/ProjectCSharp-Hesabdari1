@@ -52,7 +52,7 @@ namespace Kavosh.UI
         {
             //ribbon.ShowPageHeadersMode = DevExpress.XtraBars.Ribbon.ShowPageHeadersMode.Hide;
             //await SetStyle();
-
+            await CheckChequeAlarmsAsync();
             await SetStyle();
 
             BuildDashboardPanel();
@@ -64,7 +64,28 @@ namespace Kavosh.UI
             _dashboardTimer.Tick += async (s, ev) => await RefreshDashboardAsync();
             _dashboardTimer.Start();
         }
+        private async Task CheckChequeAlarmsAsync()
+        {
+            using var scope = Program.ServiceProvider.CreateScope();
+            var chequeService = scope.ServiceProvider.GetRequiredService<ChequeService>();
 
+            // طبق مستندات پروژه: آلارم ۲ روز قبل، ۱ روز قبل و روز موعد چک
+            var upcoming = await chequeService.GetUpcomingAsync(2);
+            if (upcoming.Count == 0) return;
+
+            var msg = string.Join("\n", upcoming.Select(c =>
+            {
+                var days = (c.DueDate.Date - DateTime.Today).Days;
+                var when = days <= 0 ? "امروز" : days == 1 ? "فردا" : $"{days} روز دیگر";
+                var kind = c.IsReceived ? "دریافتی" : "پرداختی";
+                return $"چک {kind} شماره {c.ChequeNumber} - {c.PersonName} - {when} - مبلغ {c.Price:N0}";
+            }));
+
+            MyCom.Class.ClassMessageBox.ShowMSG(
+                $"چک‌های نزدیک به سررسید:\n\n{msg}",
+                MyCom.Class.Class_Text.Msg_Name,
+                MyCom.Class.ClassMessageBox.enumIcon.هشدار);
+        }
         #region On DAshboard
 
         private async void OnAppDataChanged()
@@ -111,11 +132,8 @@ namespace Kavosh.UI
                 table.RowStyles.Add(new RowStyle(SizeType.Percent, 100F / table.RowCount));
 
             AddDashboardRow(table, 0, "کل بدهی‌ها:", out lblTotalDebtValue, "مشاهده", (s, e) => OpenDebtorsList());
-
             AddDashboardRow(table, 1, "بدهی چک:", out lblCheckDebtValue, "مشاهده", (s, e) => OpenDebtorsList(FrmDebtorsList.DebtFilterType.CheckOnly));
-
             AddDashboardRow(table, 2, "بدهی غیرچک:", out lblOtherDebtValue, "مشاهده", (s, e) => OpenDebtorsList(FrmDebtorsList.DebtFilterType.OtherOnly));
-
             AddDashboardRow(table, 3, "آخرین فاکتور:", out lblLastFactorValue, "ویرایش", (s, e) => OpenLastFactor());
 
             _pnlDashboardBox.Controls.Add(table);
@@ -244,10 +262,30 @@ namespace Kavosh.UI
             using var scope = Program.ServiceProvider.CreateScope();
             var definitiveAccountService = scope.ServiceProvider.GetRequiredService<DefinitiveAccountService>();
             var factorHeaderService = scope.ServiceProvider.GetRequiredService<FactorHeaderService>();
+            var chequeService = scope.ServiceProvider.GetRequiredService<ChequeService>();
 
             var (total, check, other) = await definitiveAccountService.GetDebtSummaryAsync();
             lblTotalDebtValue.Text = total.ToString("N0");
             lblCheckDebtValue.Text = check.ToString("N0");
+            lblOtherDebtValue.Text = other.ToString("N0");
+
+            //var lastFactor = await factorHeaderService.GetLastFactorAsync();
+            //if (lastFactor is null)
+            //{
+            //    lblLastFactorValue.Text = "—";
+            //    _lastFactorId = null;
+            //}
+            //else
+            //{
+            //    _lastFactorId = lastFactor.Id;
+            //    lblLastFactorValue.Text = $"#{lastFactor.Code} - {lastFactor.PersonName}";
+            //}
+
+            // 👇 اصلاح شد — دیگه از GetDebtSummaryAsync (که بر مبنای بدهکار/بستانکار بود) نمیاد،
+            // بلکه مستقیم از جدول Cheque و وضعیت Pending محاسبه می‌شه (هم‌راستا با چیزی که با کلیک باز می‌شه)
+            var (pendingAmount, pendingCount) = await chequeService.GetPendingSummaryAsync();
+            lblCheckDebtValue.Text = $"{pendingAmount:N0} ({pendingCount} فقره)";
+
             lblOtherDebtValue.Text = other.ToString("N0");
 
             var lastFactor = await factorHeaderService.GetLastFactorAsync();
@@ -356,8 +394,8 @@ namespace Kavosh.UI
             {
 
                 ClassMessageBox.ShowMSG($"خطا در تهیه پشتیبان خودکار:\n{ex.Message}\n\nبرنامه بدون بکاپ بسته می‌شود.",
-                    "خطا",ClassMessageBox.enumIcon.هشدار);
-             
+                    "خطا", ClassMessageBox.enumIcon.هشدار);
+
 
             }
             finally
@@ -375,12 +413,18 @@ namespace Kavosh.UI
             frm.OverShowWait<FrmBackup>(this);
         }
 
-   
+
 
         private void barBtnPardakhtDaryaft_ItemClick(object sender, ItemClickEventArgs e)
         {
             var frm = Program.CreateScopedForm<FrmPardakhtDaryaft>();
             frm.OverShowWait<FrmPardakhtDaryaft>(this);
+        }
+
+        private void barBtnCheque_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var frm = Program.CreateScopedForm<FrmChequeList>();
+            frm.OverShowWait<FrmChequeList>(this);
         }
     }
 }

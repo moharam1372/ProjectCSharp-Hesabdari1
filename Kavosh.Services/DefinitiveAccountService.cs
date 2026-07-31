@@ -7,10 +7,12 @@ namespace Kavosh.Services
     public class DefinitiveAccountService
     {
         private readonly IDefinitiveAccountRepository _repository;
+        private readonly ChequeService _chequeService;
 
-        public DefinitiveAccountService(IDefinitiveAccountRepository repository)
+        public DefinitiveAccountService(IDefinitiveAccountRepository repository, ChequeService chequeService)
         {
             _repository = repository;
+            _chequeService = chequeService;
         }
         // در Kavosh.Services/DefinitiveAccountService.cs — کنار GetStatementAsync اضافه کن
 
@@ -188,9 +190,16 @@ namespace Kavosh.Services
                 IsCheck = dto.IsCheckPayment,
                 Description = description
             };
-
             await _repository.Add(entity);
             await _repository.SaveChangesAsync();
+
+            // 👇 جدید — اگه پرداخت/دریافت با چک بوده، در جدول چک هم ثبت بشه
+            if (dto.IsCheckPayment && dto.CheckDate.HasValue)
+            {
+                await _chequeService.CreateFromManualTransactionAsync(
+                    entity.Id, dto.PersonId, dto.CheckNumber, dto.CheckDate.Value,
+                    dto.Price, isReceived: dto.IsReceipt, description);
+            }
         }
 
         private static DefinitiveAccountDto ToDto(DefinitiveAccount d, bool isSettled) => new()

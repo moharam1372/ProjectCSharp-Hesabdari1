@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kavosh.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260721092808_init5")]
-    partial class init5
+    [Migration("20260731165215_init2")]
+    partial class init2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,62 @@ namespace Kavosh.DataAccess.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Kavosh.Domain.Entities.Cheque", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ChequeNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DefinitiveAccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("HowToPayId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsReceived")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastAlarmShownAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("PersonId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("Price")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DefinitiveAccountId");
+
+                    b.HasIndex("HowToPayId");
+
+                    b.HasIndex("PersonId");
+
+                    b.ToTable("Cheques");
+                });
 
             modelBuilder.Entity("Kavosh.Domain.Entities.Customer", b =>
                 {
@@ -151,6 +207,9 @@ namespace Kavosh.DataAccess.Migrations
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<long>("SellPrice")
+                        .HasColumnType("bigint");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -183,6 +242,12 @@ namespace Kavosh.DataAccess.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<long>("Malyat1")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("Malyat2")
+                        .HasColumnType("bigint");
 
                     b.Property<Guid>("PersonId")
                         .HasColumnType("uniqueidentifier");
@@ -453,6 +518,31 @@ namespace Kavosh.DataAccess.Migrations
                     b.ToTable("StoreInfos");
                 });
 
+            modelBuilder.Entity("Kavosh.Domain.Entities.Cheque", b =>
+                {
+                    b.HasOne("Kavosh.Domain.Entities.DefinitiveAccount", "DefinitiveAccount")
+                        .WithMany()
+                        .HasForeignKey("DefinitiveAccountId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Kavosh.Domain.Entities.HowToPay", "HowToPay")
+                        .WithMany()
+                        .HasForeignKey("HowToPayId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Kavosh.Domain.Entities.Person", "Person")
+                        .WithMany("Cheques")
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("DefinitiveAccount");
+
+                    b.Navigation("HowToPay");
+
+                    b.Navigation("Person");
+                });
+
             modelBuilder.Entity("Kavosh.Domain.Entities.DefinitiveAccount", b =>
                 {
                     b.HasOne("Kavosh.Domain.Entities.HowToPay", "HowToPay")
@@ -463,7 +553,7 @@ namespace Kavosh.DataAccess.Migrations
                     b.HasOne("Kavosh.Domain.Entities.Person", "Person")
                         .WithMany("DefinitiveAccounts")
                         .HasForeignKey("PersonId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Kavosh.Domain.Entities.DefinitiveAccount", "SettledFrom")
@@ -565,6 +655,8 @@ namespace Kavosh.DataAccess.Migrations
 
             modelBuilder.Entity("Kavosh.Domain.Entities.Person", b =>
                 {
+                    b.Navigation("Cheques");
+
                     b.Navigation("DefinitiveAccounts");
 
                     b.Navigation("FactorHeaders");

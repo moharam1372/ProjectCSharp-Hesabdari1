@@ -92,102 +92,61 @@ namespace Kavosh.UI
             // =========================================================
             // Repositories
             // =========================================================
-            services.AddScoped(
-                typeof(IRepository<>),
-                typeof(Repository<>));
-
-            services.AddScoped<
-                ICustomerRepository,
-                CustomerRepository>();
-
-            services.AddScoped<
-                IProductRepository,
-                ProductRepository>();
-
-            services.AddScoped<
-                IProductGroupRepository,
-                ProductGroupRepository>();
-
-            services.AddScoped<
-                IProductUnitRepository,
-                ProductUnitRepository>();
-
-            services.AddScoped<
-                IFactorHeaderRepository,
-                FactorHeaderRepository>();
-
-            services.AddScoped<
-                IDefinitiveAccountRepository,
-                DefinitiveAccountRepository>();
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped<ICustomerRepository, CustomerRepository>();
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IProductGroupRepository, ProductGroupRepository>();
+            services.AddScoped<IProductUnitRepository, ProductUnitRepository>();
+            services.AddScoped<IFactorHeaderRepository, FactorHeaderRepository>();
+            services.AddScoped<IDefinitiveAccountRepository, DefinitiveAccountRepository>();
+            services.AddScoped<IChequeRepository, ChequeRepository>();
+     
 
             // =========================================================
             // Services
             // =========================================================
             services.AddScoped<CustomerService>();
-
             services.AddScoped<PersonService>();
-
             services.AddScoped<ProductService>();
-
             services.AddScoped<ProductGroupService>();
-
             services.AddScoped<ProductUnitService>();
-
             services.AddScoped<FactorHeaderService>();
-
             services.AddScoped<PaymentTypeService>();
-
             services.AddScoped<DefinitiveAccountService>();
-
             services.AddScoped<StoreInfoService>();
-
             services.AddScoped<DatabaseBackupService>();
-          
+            services.AddScoped<ChequeService>();
 
             // =========================================================
             // Forms
             // =========================================================
             services.AddTransient<FrmMain>();
-
             services.AddTransient<FrmProduct>();
-
             services.AddTransient<FrmPerson>();
-
             services.AddTransient<FrmFactor>();
-
             services.AddTransient<FrmFactorList>();
-
             services.AddTransient<FrmDefinitiveAccount>();
-
             services.AddTransient<FrmDebtorsList>();
-
             services.AddTransient<FrmProductKardex>();
-
             services.AddTransient<FrmStoreInfo>();
-
             services.AddTransient<FrmBackup>();
-
             services.AddTransient<FrmBackupProgress>();
-
             services.AddTransient<FrmPardakhtDaryaft>();
+            services.AddTransient<FrmChequeList>();
         }
 
         private static void InitializeDatabase()
         {
-            using var scope =
-                ServiceProvider.CreateScope();
+            using var scope = ServiceProvider.CreateScope();
 
-            var dbContext =
-                scope.ServiceProvider
-                    .GetRequiredService<AppDbContext>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
             try
             {
                 // اجرای Migrationها
                 dbContext.Database.Migrate();
 
-                Console.WriteLine(
-                    "Database migration applied successfully!");
+                Console.WriteLine("Database migration applied successfully!");
 
                 // Seed نوع پرداخت
                 Kavosh.DataAccess.Seeders

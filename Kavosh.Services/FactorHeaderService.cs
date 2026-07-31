@@ -13,16 +13,18 @@ namespace Kavosh.Services
         private readonly DefinitiveAccountService _definitiveAccountService;
         private readonly StoreInfoService _storeInfoService;
         private readonly ProductUnitService _productUnitService;
+        private readonly ChequeService _chequeService;
 
-
-
-        public FactorHeaderService(IFactorHeaderRepository repository, IRepository<PaymentType> paymentTypeRepository, DefinitiveAccountService definitiveAccountService, StoreInfoService storeInfoService, ProductUnitService productUnitService)
+        public FactorHeaderService(IFactorHeaderRepository repository, IRepository<PaymentType> paymentTypeRepository,
+            DefinitiveAccountService definitiveAccountService, StoreInfoService storeInfoService,
+            ProductUnitService productUnitService, ChequeService chequeService)
         {
             _repository = repository;
             _paymentTypeRepository = paymentTypeRepository;
             _definitiveAccountService = definitiveAccountService;
             _storeInfoService = storeInfoService;
             _productUnitService = productUnitService;
+            _chequeService = chequeService;
         }
 
         public async Task<FactorHeaderDto> GetLastFactorAsync()
@@ -49,8 +51,11 @@ namespace Kavosh.Services
             Type = f.Type,
             DateFactor = f.DateFactor,
             Discount = f.Discount,
-            PriceTotal = f.PriceTotal
+            PriceTotal = f.PriceTotal,
+            Malyat1 = f.Malyat1,
+            Malyat2 = f.Malyat2
         };
+
         public async Task<long> GetNextCodeAsync()
         {
             var maxCode = await _repository.GetMaxCodeAsync();
@@ -84,7 +89,10 @@ namespace Kavosh.Services
                 Type = dto.Type,
                 DateFactor = dto.DateFactor,
                 Discount = dto.Discount,
-                PriceTotal = calculatedTotal
+                PriceTotal = calculatedTotal,
+                Malyat1 = dto.Malyat1,
+                Malyat2 = dto.Malyat2,
+
             };
 
             var details = dto.Details.Select(d => new FactorDetail
@@ -111,11 +119,12 @@ namespace Kavosh.Services
             await _repository.SaveChangesAsync();
 
             // 👇 حالا که HowToPayها Id واقعی گرفتن، منطق DefinitiveAccount رو اجرا می‌کنیم
-            await SyncDefinitiveAccountsAsync(dto.PersonId, dto.Code, howToPays, oldSettlements);
-
+            //await SyncDefinitiveAccountsAsync(dto.PersonId, dto.Code, howToPays, oldSettlements);
+            await SyncDefinitiveAccountsAsync(dto.PersonId, dto.Code, dto.Type, howToPays, oldSettlements);
             return savedId;
         }
-        private async Task SyncDefinitiveAccountsAsync(Guid personId, long factorCode, List<HowToPay> howToPays, Dictionary<Guid, bool> oldSettlements)
+        private async Task SyncDefinitiveAccountsAsync(Guid personId, long factorCode, bool factorType,
+            List<HowToPay> howToPays, Dictionary<Guid, bool> oldSettlements)
         {
             foreach (var hp in howToPays)
             {
@@ -123,22 +132,26 @@ namespace Kavosh.Services
                 bool isCheckType = hp.PaymentTypeId == PaymentTypeIds.Check;
 
                 if (!isDebtType && !isCheckType)
-                    continue; // نقدی/کارت به کارت → هیچ بدهی‌ای ثبت نمیشه
+                    continue;
 
                 var isNewRow = !oldSettlements.ContainsKey(hp.Id);
 
+                if (isCheckType)
+                {
+                    // 👇 جدید — ثبت/به‌روزرسانی چک در جدول اختصاصی چک
+                    // فروش (Type=true) => چک دریافتی از مشتری / خرید (Type=false) => چک صادرشده به تامین‌کننده
+                    await _chequeService.CreateOrUpdateFromHowToPayAsync(hp.Id, personId, hp.CheckNumber, hp.CheckDate, hp.Price, isReceived: factorType);
+                }
+
                 if (isNewRow)
                 {
-                    // ردیف پرداخت تازه‌ست → بدهی اولیه ثبت میشه
                     await _definitiveAccountService.CreateDebtFromHowToPayAsync(personId, hp.Id, hp.Price, factorCode, isCheckType);
 
-                    // اگه همون لحظه هم Settlement=true بود (چک از قبل تسویه علامت خورده)، فوری وصولش کن
                     if (isCheckType && hp.Settlement)
                         await _definitiveAccountService.SettleCheckByHowToPayIdAsync(hp.Id);
                 }
                 else if (isCheckType)
                 {
-                    // ردیف موجود بود؛ فقط اگه Settlement تازه از false به true تغییر کرده باشه، وصول کن
                     var wasSettled = oldSettlements[hp.Id];
                     if (!wasSettled && hp.Settlement)
                         await _definitiveAccountService.SettleCheckByHowToPayIdAsync(hp.Id);
@@ -222,6 +235,8 @@ namespace Kavosh.Services
                 Buyer = factor.PersonName,
                 Mobile = factor.PersonMobile,
                 Address = factor.PersonAddress,
+                Malyat1 = factor.Malyat1,
+                Malyat2 = factor.Malyat2,
                 FactorDetails = factor.Details.Select(d => new FactorReportDetailDto
                 {
                     ProductTitle = d.ProductTitle,
@@ -267,6 +282,10 @@ namespace Kavosh.Services
             DateFactor = f.DateFactor,
             Discount = f.Discount,
             PriceTotal = f.PriceTotal,
+            Malyat1 = f.Malyat1,
+            Malyat2 = f.Malyat2,
+
+
             Details = f.FactorDetails.Select(d => new FactorDetailDto
             {
                 Id = d.Id,

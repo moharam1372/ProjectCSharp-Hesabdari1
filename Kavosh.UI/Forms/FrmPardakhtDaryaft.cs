@@ -178,12 +178,15 @@ namespace Kavosh.UI.Forms
                     ? DateTime.Now
                     : dateText.ShamsiToMiladi() ?? DateTime.Now;
 
+                var checkDateText = layInput.GetValue<string>("تاریخ چک");
+
                 var dto = new ReceiptPaymentDto
                 {
                     PersonId = personId,
                     IsReceipt = typeText != "پرداخت به مشتری",
                     IsCheckPayment = methodText == "چک",
                     CheckNumber = checkNumber,
+                    CheckDate = string.IsNullOrWhiteSpace(checkDateText) ? null : checkDateText.ShamsiToMiladi(), // 👈 جدید
                     Price = price,
                     Description = description,
                     DateCustom = parsedDate

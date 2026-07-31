@@ -72,7 +72,10 @@ namespace Kavosh.UI.Forms
 
             var txtId = ClsCollect.ModelTextEdit("Id", 50, "");
             var txtCode = ClsCollect.ModelTextEditNumber("کد فاکتور", 50, "");
-
+            var txtMalyat1 = ClsCollect.ModelTextEditPrice("مالیات 1", 2, "", true, "درصد");
+            var txtMalyat2 = ClsCollect.ModelTextEditPrice("مالیات 2", 2, "", true, "درصد");
+            txtMalyat1.TextChanged += (s1, e1) => { dgvFactorDetail.GetViewBase.UpdateSummary(); };
+            txtMalyat2.TextChanged += (s1, e1) => { dgvFactorDetail.GetViewBase.UpdateSummary(); };
             // طرف حساب (مشتری) — همون الگوی cmbGroup توی FrmProduct
             var getPersons = (await _personService.GetAllPersonsAsync())
                 .Select(p => new { p.Id, p.FullName }).ToList();
@@ -82,7 +85,6 @@ namespace Kavosh.UI.Forms
             var cmbType = ClsCollect.ModelRadioGroup("نوع فاکتور", new List<ClsCollect.modelRadioGroup>{
                 new() { Column = 1,Field = "فروش" },
                 new() { Column = 2,Field = "خرید" },
-
             });
 
             var dtFactor = ClsCollect.ModelDateTime("تاریخ", 10, "");
@@ -95,6 +97,8 @@ namespace Kavosh.UI.Forms
                 new() { Grp = 1, Ctrl = cmbType, SizeType = SizeConstraintsType.Custom, AutoHeight = 38  },
                 new() { Grp = 1, Ctrl = dtFactor, },
                 new() { Grp = 1, Ctrl = txtDiscount, },
+                new() { Grp = 1, Ctrl = txtMalyat1, },
+                new() { Grp = 1, Ctrl = txtMalyat2, },
             ], 13);
 
             layInput.BtnCancelClick += LayInput_BtnCancelClick;
@@ -150,10 +154,19 @@ namespace Kavosh.UI.Forms
 
                 #region Event
 
-                double sumTotal = 0;
+                double sumTotal = 0, getMalyat1;
                 dgvFactorDetail.GetViewBase.CustomSummaryCalculate += (s1, e1) =>
                 {
+                    var ConE = e1.ConvertItemSummary();
                     dgvFactorDetail.AutoSummaryCalculate(e1, "جمع", "جمع", ref sumTotal, "تومان");
+                    var getMalyat1 = sumTotal * layInput.GetValue<long>("مالیات 1") / 100;
+                    var getMalyat2 = sumTotal * layInput.GetValue<long>("مالیات 2") / 100;
+                    if (ConE.FieldName == "جمع")
+                    {
+                        e1.TotalValue = "جمع کل: "+(getMalyat1 + getMalyat2 + sumTotal).ToString("N0");
+                    }
+
+                    // dgvFactorDetail.GetViewBase.UpdateSummary();
                 };
 
 
@@ -220,6 +233,8 @@ namespace Kavosh.UI.Forms
             layInput.SetValueType("نوع فاکتور", dto.Type ? "فروش" : "خرید");
             layInput.SetValueType("تاریخ", dto.DateFactor.DateTimePersian().Date);
             layInput.SetValueType("تخفیف", dto.Discount);
+            layInput.SetValueType("مالیات 1", dto.Malyat1);
+            layInput.SetValueType("مالیات 2", dto.Malyat2);
 
             _dtFactorDetail.Rows.Clear();
             foreach (var d in dto.Details)
@@ -234,7 +249,7 @@ namespace Kavosh.UI.Forms
             {
                 _dtHowToPay.Rows.Add(
                     p.Id, "حذف", p.PaymentTypeId, p.Price, p.CheckNumber,
-                    p.CheckDate ==null ? DBNull.Value: p.CheckDate.Value.DateTimePersian().Date,   // 👈 اگه null بود، DBNull میره تو ستون
+                    p.CheckDate == null ? DBNull.Value : p.CheckDate.Value.DateTimePersian().Date,   // 👈 اگه null بود، DBNull میره تو ستون
                     p.Settlement, p.Description
                 );
             }
@@ -253,6 +268,10 @@ namespace Kavosh.UI.Forms
                 Type = layInput.GetValue<string>("نوع فاکتور") == "فروش",
                 DateFactor = layInput.GetValue<string>("تاریخ").ShamsiToMiladi().Value,
                 Discount = layInput.GetValue<long>("تخفیف"),
+                Malyat1 = layInput.GetValue<long>("مالیات 1"),
+                Malyat2 = layInput.GetValue<long>("مالیات 2"),
+
+
                 Details = _dtFactorDetail.Rows
                     .Cast<DataRow>()
                     .Where(r => r.RowState != DataRowState.Deleted)
