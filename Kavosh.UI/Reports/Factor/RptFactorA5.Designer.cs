@@ -575,10 +575,11 @@
             this.xrLabel20.Borders = ((DevExpress.XtraPrinting.BorderSide)((((DevExpress.XtraPrinting.BorderSide.Left | DevExpress.XtraPrinting.BorderSide.Top) 
             | DevExpress.XtraPrinting.BorderSide.Right) 
             | DevExpress.XtraPrinting.BorderSide.Bottom)));
+            this.xrLabel20.CanGrow = false;
             this.xrLabel20.Dpi = 25.4F;
             this.xrLabel20.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Sum([Count]*[PriceUnit])")});
-            this.xrLabel20.Font = new DevExpress.Drawing.DXFont("Samim FD", 11F, DevExpress.Drawing.DXFontStyle.Bold);
+            this.xrLabel20.Font = new DevExpress.Drawing.DXFont("Samim FD", 10F, DevExpress.Drawing.DXFontStyle.Bold);
             this.xrLabel20.LocationFloat = new DevExpress.Utils.PointFloat(0F, 0F);
             this.xrLabel20.Multiline = true;
             this.xrLabel20.Name = "xrLabel20";
@@ -597,16 +598,17 @@
             this.xrLabel18.Borders = ((DevExpress.XtraPrinting.BorderSide)((((DevExpress.XtraPrinting.BorderSide.Left | DevExpress.XtraPrinting.BorderSide.Top) 
             | DevExpress.XtraPrinting.BorderSide.Right) 
             | DevExpress.XtraPrinting.BorderSide.Bottom)));
+            this.xrLabel18.CanGrow = false;
             this.xrLabel18.Dpi = 25.4F;
             this.xrLabel18.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Sum([Count])")});
-            this.xrLabel18.Font = new DevExpress.Drawing.DXFont("Samim FD", 11F, DevExpress.Drawing.DXFontStyle.Bold);
+            this.xrLabel18.Font = new DevExpress.Drawing.DXFont("Samim FD", 9F, DevExpress.Drawing.DXFontStyle.Bold);
             this.xrLabel18.LocationFloat = new DevExpress.Utils.PointFloat(52.12292F, 0F);
             this.xrLabel18.Multiline = true;
             this.xrLabel18.Name = "xrLabel18";
             this.xrLabel18.Padding = new DevExpress.XtraPrinting.PaddingInfo(0.5291666F, 0.5291666F, 0F, 0F, 25.4F);
             this.xrLabel18.RightToLeft = DevExpress.XtraReports.UI.RightToLeft.Yes;
-            this.xrLabel18.SizeF = new System.Drawing.SizeF(10.58331F, 6.720416F);
+            this.xrLabel18.SizeF = new System.Drawing.SizeF(23.01874F, 6.720416F);
             this.xrLabel18.StylePriority.UseBorders = false;
             this.xrLabel18.StylePriority.UseFont = false;
             this.xrLabel18.StylePriority.UseTextAlignment = false;
@@ -618,14 +620,15 @@
             this.xrLabel3.Borders = ((DevExpress.XtraPrinting.BorderSide)((((DevExpress.XtraPrinting.BorderSide.Left | DevExpress.XtraPrinting.BorderSide.Top) 
             | DevExpress.XtraPrinting.BorderSide.Right) 
             | DevExpress.XtraPrinting.BorderSide.Bottom)));
+            this.xrLabel3.CanGrow = false;
             this.xrLabel3.Dpi = 25.4F;
             this.xrLabel3.Font = new DevExpress.Drawing.DXFont("Samim FD", 11F, DevExpress.Drawing.DXFontStyle.Bold);
-            this.xrLabel3.LocationFloat = new DevExpress.Utils.PointFloat(62.70624F, 0F);
+            this.xrLabel3.LocationFloat = new DevExpress.Utils.PointFloat(75.14166F, 0F);
             this.xrLabel3.Multiline = true;
             this.xrLabel3.Name = "xrLabel3";
             this.xrLabel3.Padding = new DevExpress.XtraPrinting.PaddingInfo(0.5291666F, 0.5291666F, 0F, 0F, 25.4F);
             this.xrLabel3.RightToLeft = DevExpress.XtraReports.UI.RightToLeft.Yes;
-            this.xrLabel3.SizeF = new System.Drawing.SizeF(68.29381F, 6.720416F);
+            this.xrLabel3.SizeF = new System.Drawing.SizeF(55.85838F, 6.720416F);
             this.xrLabel3.StylePriority.UseBorders = false;
             this.xrLabel3.StylePriority.UseFont = false;
             this.xrLabel3.StylePriority.UseTextAlignment = false;
@@ -671,7 +674,7 @@
             this.xrTableCell2.Dpi = 25.4F;
             this.xrTableCell2.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[Count]*[PriceUnit]")});
-            this.xrTableCell2.Font = new DevExpress.Drawing.DXFont("Samim FD", 11F);
+            this.xrTableCell2.Font = new DevExpress.Drawing.DXFont("Samim FD", 10F);
             this.xrTableCell2.Multiline = true;
             this.xrTableCell2.Name = "xrTableCell2";
             this.xrTableCell2.Padding = new DevExpress.XtraPrinting.PaddingInfo(0.5291666F, 0.5291666F, 0F, 0F, 25.4F);
@@ -691,7 +694,7 @@
             this.xrTableCell3.Dpi = 25.4F;
             this.xrTableCell3.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[PriceUnit]")});
-            this.xrTableCell3.Font = new DevExpress.Drawing.DXFont("Samim FD", 11F);
+            this.xrTableCell3.Font = new DevExpress.Drawing.DXFont("Samim FD", 10F);
             this.xrTableCell3.Multiline = true;
             this.xrTableCell3.Name = "xrTableCell3";
             this.xrTableCell3.Padding = new DevExpress.XtraPrinting.PaddingInfo(0.5291666F, 0.5291666F, 0F, 0F, 25.4F);
@@ -711,7 +714,7 @@
             this.xrTableCell7.Dpi = 25.4F;
             this.xrTableCell7.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[UnitTitle]")});
-            this.xrTableCell7.Font = new DevExpress.Drawing.DXFont("Samim FD", 11F);
+            this.xrTableCell7.Font = new DevExpress.Drawing.DXFont("Samim FD", 10F);
             this.xrTableCell7.Multiline = true;
             this.xrTableCell7.Name = "xrTableCell7";
             this.xrTableCell7.Padding = new DevExpress.XtraPrinting.PaddingInfo(0.5291666F, 0.5291666F, 0F, 0F, 25.4F);
@@ -730,7 +733,7 @@
             this.xrTableCell4.Dpi = 25.4F;
             this.xrTableCell4.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[Count]")});
-            this.xrTableCell4.Font = new DevExpress.Drawing.DXFont("Samim FD", 11F);
+            this.xrTableCell4.Font = new DevExpress.Drawing.DXFont("Samim FD", 10F);
             this.xrTableCell4.Multiline = true;
             this.xrTableCell4.Name = "xrTableCell4";
             this.xrTableCell4.Padding = new DevExpress.XtraPrinting.PaddingInfo(0.5291666F, 0.5291666F, 0F, 0F, 25.4F);

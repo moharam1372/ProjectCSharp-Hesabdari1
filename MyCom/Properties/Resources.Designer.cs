@@ -341,6 +341,16 @@ namespace MyCom.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        public static byte[] cheque_Check {
+            get {
+                object obj = ResourceManager.GetObject("cheque-Check", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap Clear_1_30 {

@@ -15,22 +15,32 @@ namespace Kavosh.UI.Forms
     public partial class FrmChequeList : DevExpress.XtraEditors.XtraForm
     {
         private readonly ChequeService _chequeService;
+        private readonly DefinitiveAccountService _definitiveAccountService;   // 👈 جدید
 
         private ClsFont _clsFont = new(false);
         private ClsFont _clsFontBold = new(true);
 
         private DataTable _dtCheque;
+        private bool _pendingOnly = false;
 
-        public FrmChequeList(ChequeService chequeService)
+        //public FrmChequeList(ChequeService chequeService)
+        //{
+        //    InitializeComponent();
+        //    _chequeService = chequeService;
+        //    Shown += FrmChequeList_Shown;
+        //    Activated += FrmChequeList_Activated;
+        //}
+        public FrmChequeList(ChequeService chequeService, DefinitiveAccountService definitiveAccountService)
         {
             InitializeComponent();
             _chequeService = chequeService;
+            _definitiveAccountService = definitiveAccountService;
             Shown += FrmChequeList_Shown;
             Activated += FrmChequeList_Activated;
         }
-
         private async void FrmChequeList_Shown(object sender, EventArgs e)
         {
+            Text = _pendingOnly ? "چک‌های در جریان" : "مدیریت چک‌ها";
             await SetStyle();
             SetFieldDgvCheque();
             await RefreshGridAsync();
@@ -45,6 +55,7 @@ namespace Kavosh.UI.Forms
         public async Task SetStyle()
         {
             _clsFontBold.ChangeFont(dgvCheque);
+            _clsFontBold.ChangeFont(srcGrid,15);
             await dgvCheque.SetStyle();
         }
 
@@ -80,14 +91,30 @@ namespace Kavosh.UI.Forms
                 }, "شماره چک", "تصویر");
 
 
+                //dgvCheque.AddEventRowCellClick<Guid>(async id =>
+                //{
+                //    await SetStatus(id, ChequeStatus.Cleared);
+                //}, "Id", "پاس شد");
                 dgvCheque.AddEventRowCellClick<Guid>(async id =>
                 {
-                    await SetStatus(id, ChequeStatus.Cleared);
-                }, "Id", "پاس شد");
+                    var confirm = ClassMessageBox.ShowMSGQues("این چک پاس/وصول شود؟", Class_Text.Msg_Name, ClassMessageBox.enumIcon.اطلاعات);
+                    if (!confirm)
+                        return;
 
+                    await _definitiveAccountService.SettleCheckByChequeIdAsync(id);
+                    await RefreshGridAsync();
+
+                    Kavosh.Services.AppEvents.RaiseDataChanged();   // 👈 رفرش داشبورد FrmMain
+                }, "Id", "پاس شد");
                 dgvCheque.AddEventRowCellClick<Guid>(async id =>
                 {
-                    await SetStatus(id, ChequeStatus.Bounced);
+                    var confirm = ClassMessageBox.ShowMSGQues("این چک برگشت بخورد؟", Class_Text.Msg_Name, ClassMessageBox.enumIcon.اطلاعات);
+                    if (!confirm) return;
+
+                    await _definitiveAccountService.BounceChequeAsync(id);
+                    await RefreshGridAsync();
+
+                    Kavosh.Services.AppEvents.RaiseDataChanged();
                 }, "Id", "برگشت خورد");
             }
         }
@@ -156,5 +183,10 @@ namespace Kavosh.UI.Forms
         }
 
         private void FrmChequeList_Load(object sender, EventArgs e) { }
+
+        private void btnExportExcel_Click(object sender, EventArgs e)
+        {
+            dgvCheque.ExportToExcel("چک ها");
+        }
     }
 }

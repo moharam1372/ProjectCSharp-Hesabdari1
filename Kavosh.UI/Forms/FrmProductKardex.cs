@@ -4,6 +4,7 @@ using MyCom.Object;
 using System;
 using System.Data;
 using System.Linq;
+using DevExpress.Utils;
 
 namespace Kavosh.UI.Forms
 {
@@ -49,7 +50,7 @@ namespace Kavosh.UI.Forms
                     new() { Name = "نوع", Type = typeof(string) },
                     new() { Name = "ورودی", Type = typeof(float) },
                     new() { Name = "خروجی", Type = typeof(float) },
-                    new() { Name = "مانده", Type = typeof(float) },
+                    new() { Name = "مانده", Type = typeof(float),FormatType = FormatType.Custom,FormatString = ClsCollect.FormatStringNegativeNumber(1)},
                 ], false, true, true);
 
                 dgvKardex.ActiveScrollGrid();
@@ -79,11 +80,12 @@ namespace Kavosh.UI.Forms
                     row.Input,
                     row.Output,
                     runningBalance
+                    //runningBalance.ToString("#,##0;#,##0-")
                 );
             }
 
             dgvKardex.SetFieldSizeColumn();
-            lblStockValue.Text = runningBalance.ToString("N0");
+            lblStockValue.Text = runningBalance.ToString(ClsCollect.FormatStringNegativeNumber(1));
         }
 
         private void FrmProductKardex_Load(object sender, EventArgs e) { }

@@ -63,6 +63,7 @@ namespace Kavosh.UI.Forms
         public async Task SetStyle()
         {
             _clsFontBold.ChangeFont(dgvDebtors);
+            _clsFontBold.ChangeFont(srcGrid,15);
             await dgvDebtors.SetStyle();
         }
 

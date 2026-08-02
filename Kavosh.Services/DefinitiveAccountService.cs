@@ -1,5 +1,7 @@
 ﻿using Kavosh.DataAccess.Repositories;
 using Kavosh.Domain.Entities;
+using Kavosh.Domain.Enums;
+using Kavosh.Domain.Interfaces;
 using Kavosh.Services.DTOs;
 
 namespace Kavosh.Services
@@ -8,33 +10,31 @@ namespace Kavosh.Services
     {
         private readonly IDefinitiveAccountRepository _repository;
         private readonly ChequeService _chequeService;
+        private readonly IRepository<HowToPay> _howToPayRepository;   // 👈 جدید
 
-        public DefinitiveAccountService(IDefinitiveAccountRepository repository, ChequeService chequeService)
+        public DefinitiveAccountService(IDefinitiveAccountRepository repository, ChequeService chequeService,
+            IRepository<HowToPay> howToPayRepository)
         {
             _repository = repository;
             _chequeService = chequeService;
+            _howToPayRepository = howToPayRepository;
         }
-        // در Kavosh.Services/DefinitiveAccountService.cs — کنار GetStatementAsync اضافه کن
 
         public async Task<long> GetPreviousDebtAsync(Guid personId, long excludeFactorCode)
         {
             var items = await _repository.GetByPersonAsync(personId);
-
-            // مانده‌ی کل شخص، به‌جز ردیف‌هایی که مربوط به همین فاکتور (excludeFactorCode) هستن
             return items
                 .Where(d => d.DocNumber != excludeFactorCode)
                 .Sum(d => d.Debtor ? d.Price : -d.Price);
         }
+
         public async Task<(long TotalDebt, long CheckDebt, long OtherDebt)> GetDebtSummaryAsync()
         {
-            var debtors = await GetDebtorsListAsync();   // منطق فیلتر (فقط بدهکارهای واقعی) از قبل توش هست
-
+            var debtors = await GetDebtorsListAsync();
             var checkDebt = debtors.Sum(d => d.CheckDebt);
             var otherDebt = debtors.Sum(d => d.OtherDebt);
-
             return (checkDebt + otherDebt, checkDebt, otherDebt);
         }
-
 
         public async Task<List<DebtorSummaryDto>> GetDebtorsListAsync()
         {
@@ -44,8 +44,6 @@ namespace Kavosh.Services
                 .GroupBy(d => d.PersonId)
                 .Select(g =>
                 {
-                    // چون چک وصول‌شده خودش یه رکورد بستانکار خنثی‌کننده داره،
-                    // جمع‌زدن ساده‌ی این گروه خودکار مانده‌ی واقعی چک رو میده (وصول‌شده = صفر)
                     var checkDebt = g.Where(x => x.IsCheck).Sum(x => x.Debtor ? x.Price : -x.Price);
                     var otherDebt = g.Where(x => !x.IsCheck).Sum(x => x.Debtor ? x.Price : -x.Price);
 
@@ -64,15 +62,15 @@ namespace Kavosh.Services
                         OtherDebt = otherDebt
                     };
                 })
-                .Where(x => x.TotalDebt > 0)              // فقط کسایی که واقعاً هنوز بدهکارن
-                .OrderByDescending(x => x.TotalDebt)       // بدهکارترین‌ها اول (اولویت پیگیری)
+                .Where(x => x.TotalDebt > 0)
+                .OrderByDescending(x => x.TotalDebt)
                 .ToList();
         }
+
         public async Task<List<DefinitiveAccountDto>> GetStatementAsync(Guid personId)
         {
             var items = await _repository.GetByPersonAsync(personId);
 
-            // هر رکوردی که یه رکورد دیگه با SettledFromId بهش اشاره کرده باشه، یعنی قبلاً وصول شده
             var settledFromIds = items
                 .Where(x => x.SettledFromId.HasValue)
                 .Select(x => x.SettledFromId!.Value)
@@ -88,7 +86,8 @@ namespace Kavosh.Services
         }
 
         // فراخوانی خودکار از FactorHeaderService وقتی یه HowToPay از نوع «بدهی» یا «چک» تازه ثبت میشه
-        public async Task CreateDebtFromHowToPayAsync(Guid personId, Guid howToPayId, long price, long factorCode, bool isCheck)
+        public async Task CreateDebtFromHowToPayAsync(Guid personId, Guid howToPayId, long price, long factorCode,
+            bool isCheck, bool factorType)
         {
             var nextCode = await GetNextCodeAsync();
 
@@ -100,60 +99,112 @@ namespace Kavosh.Services
                 PersonId = personId,
                 DateCustom = DateTime.Now,
                 Price = price,
-                Debtor = true,
+                Debtor = factorType,   // فروش => شخص بدهکار / خرید => ما بدهکاریم (شخص بستانکار)
                 IsCheck = isCheck,
                 HowToPayId = howToPayId,
-                Description = isCheck ? "بدهی بابت چک" : $"بدهی بابت فاکتور"
+                Description = isCheck
+                    ? "بدهی بابت چک"
+                    : (factorType ? "بدهی بابت فاکتور فروش" : "بستانکاری بابت فاکتور خرید")
             };
 
             await _repository.Add(entity);
             await _repository.SaveChangesAsync();
         }
 
-        // وصول چک — چه از FrmFactor چه بعداً از صورت‌حساب مستقیم صدا زده بشه
+        // فراخوانی از FactorHeaderService — وقتی چک‌باکس «تسویه» در فاکتور علامت خورده
         public async Task SettleCheckByHowToPayIdAsync(Guid howToPayId)
         {
             var debtEntry = await _repository.GetDebtByHowToPayIdAsync(howToPayId);
             if (debtEntry is null)
-                return; // بدهی‌ای برای این پرداخت ثبت نشده بود (مثلاً پرداخت نقدی)
+                return;
 
             await SettleCheckAsync(debtEntry.Id);
         }
 
+        // 👇 جدید — فراخوانی از FrmChequeList (دکمه‌ی «پاس شد») — از روی خودِ چک شروع می‌کنه
+        public async Task SettleCheckByChequeIdAsync(Guid chequeId)
+        {
+            var cheque = await _chequeService.GetEntityByIdAsync(chequeId);
+            if (cheque is null) return;
+
+            DefinitiveAccount debtEntry = null;
+
+            if (cheque.HowToPayId.HasValue)
+                debtEntry = await _repository.GetDebtByHowToPayIdAsync(cheque.HowToPayId.Value);
+            else if (cheque.DefinitiveAccountId.HasValue)
+                debtEntry = await _repository.GetById(cheque.DefinitiveAccountId.Value);
+
+            if (debtEntry is not null)
+            {
+                await SettleCheckAsync(debtEntry.Id);   // خودش Cheque و HowToPay رو هم سینک می‌کنه
+            }
+            else
+            {
+                // حالت نادر: بدهی مرتبط پیدا نشد — فقط وضعیت خودِ چک آپدیت بشه
+                await _chequeService.SyncStatusAsync(cheque.HowToPayId, cheque.DefinitiveAccountId, ChequeStatus.Cleared);
+            }
+        }
+
+        // 👇 جدید — چک برگشت خورد. بدهی دست‌نخورده می‌مونه چون پولی دریافت/پرداخت نشده
+        public async Task BounceChequeAsync(Guid chequeId)
+        {
+            var cheque = await _chequeService.GetEntityByIdAsync(chequeId);
+            if (cheque is null) return;
+
+            await _chequeService.SyncStatusAsync(cheque.HowToPayId, cheque.DefinitiveAccountId, ChequeStatus.Bounced);
+        }
+
+        // ============= مرکز اصلی وصول چک =============
+        // از هر جا صدا زده بشه (FrmDefinitiveAccount, FrmPerson, ذخیره‌ی فاکتور، یا FrmChequeList)
+        // همزمان: 1) رکورد خنثی‌کننده در DefinitiveAccounts   2) HowToPay.Settlement = true   3) Cheque.Status = Cleared
         public async Task SettleCheckAsync(Guid definitiveAccountId)
         {
             var original = await _repository.GetById(definitiveAccountId);
             if (original is null)
                 throw new InvalidOperationException("رکورد بدهی یافت نشد");
 
-            if (!original.IsCheck || !original.Debtor)
+            if (!original.IsCheck)
                 throw new InvalidOperationException("این رکورد بدهیِ چک نیست");
 
             var alreadySettled = await _repository.IsAlreadySettledAsync(definitiveAccountId);
-            if (alreadySettled)
-                return; // قبلاً وصول شده، دوباره خنثی‌کننده نسازیم
-
-            var nextCode = await GetNextCodeAsync();
-
-            var offsetting = new DefinitiveAccount
+            if (!alreadySettled)
             {
-                Id = Guid.NewGuid(),
-                Code = nextCode,
-                DocNumber = original.DocNumber,
-                PersonId = original.PersonId,
-                DateCustom = DateTime.Now,
-                Price = original.Price,
-                Debtor = false,                 // بستانکار — خنثی‌کننده‌ی بدهی چک
-                IsCheck = true,
-                SettledFromId = original.Id,
-                HowToPayId = original.HowToPayId,
-                Description = "وصول چک"
-            };
+                var nextCode = await GetNextCodeAsync();
 
-            await _repository.Add(offsetting);
-            await _repository.SaveChangesAsync();
+                var offsetting = new DefinitiveAccount
+                {
+                    Id = Guid.NewGuid(),
+                    Code = nextCode,
+                    DocNumber = original.DocNumber,
+                    PersonId = original.PersonId,
+                    DateCustom = DateTime.Now,
+                    Price = original.Price,
+                    Debtor = !original.Debtor,   // عکسِ رکورد اصلی (چه بدهکار چه بستانکار)
+                    IsCheck = true,
+                    SettledFromId = original.Id,
+                    HowToPayId = original.HowToPayId,
+                    Description = original.Debtor ? "وصول چک دریافتی" : "پرداخت چک صادرشده"
+                };
+
+                await _repository.Add(offsetting);
+                await _repository.SaveChangesAsync();
+            }
+
+            // 👇 جدید — هماهنگ‌سازی با HowToPay.Settlement و Cheque.Status
+            // این بخش idempotent هست، حتی اگه از قبل تسویه شده باشه، اجرا میشه تا مطمئن بشیم همه‌جا سینکه
+            if (original.HowToPayId.HasValue)
+            {
+                var howToPay = await _howToPayRepository.GetById(original.HowToPayId.Value);
+                if (howToPay is not null && !howToPay.Settlement)
+                {
+                    howToPay.Settlement = true;
+                    await _howToPayRepository.Update(howToPay);
+                    await _howToPayRepository.SaveChangesAsync();
+                }
+            }
+
+            await _chequeService.SyncStatusAsync(original.HowToPayId, original.Id, ChequeStatus.Cleared);
         }
-
 
         // ============= ثبت مستقیم دریافت/پرداخت (بدون فاکتور) =============
         public async Task CreateManualTransactionAsync(ReceiptPaymentDto dto)
@@ -166,8 +217,6 @@ namespace Kavosh.Services
 
             if (dto.IsCheckPayment && string.IsNullOrWhiteSpace(dto.CheckNumber))
                 throw new ArgumentException("برای پرداخت چکی، شماره چک الزامی است");
-
-         
 
             var nextCode = await GetNextCodeAsync();
 
@@ -182,18 +231,17 @@ namespace Kavosh.Services
             {
                 Id = Guid.NewGuid(),
                 Code = nextCode,
-                DocNumber = nextCode,      // سند مستقل — بدون فاکتور
+                DocNumber = nextCode,
                 PersonId = dto.PersonId,
                 DateCustom = dto.DateCustom == default ? DateTime.Now : dto.DateCustom,
                 Price = dto.Price,
-                Debtor = !dto.IsReceipt,   // دریافت => بستانکار / پرداخت => بدهکار
+                Debtor = !dto.IsReceipt,
                 IsCheck = dto.IsCheckPayment,
                 Description = description
             };
             await _repository.Add(entity);
             await _repository.SaveChangesAsync();
 
-            // 👇 جدید — اگه پرداخت/دریافت با چک بوده، در جدول چک هم ثبت بشه
             if (dto.IsCheckPayment && dto.CheckDate.HasValue)
             {
                 await _chequeService.CreateFromManualTransactionAsync(

@@ -43,6 +43,8 @@ namespace Kavosh.UI
 
         public async Task SetStyle()
         {
+            barBtnCheque.ImageOptions.SvgImage = MyCom.Properties.Resources.cheque_Check;
+            barBtnCheque.ImageOptions.SvgImageSize = new Size(128, 128);
             _clsFontBold.ChangeFont(ribbon);
             ribbon.CustomizeReborn();
         }

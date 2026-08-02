@@ -1,6 +1,9 @@
-﻿using DevExpress.Utils.Html.Internal;
+﻿using DevExpress.Utils;
+using DevExpress.Utils.Html.Internal;
 using DevExpress.XtraEditors;
 using DevExpress.XtraLayout;
+using DevExpress.XtraLayout.Utils;
+using Kavosh.Domain.Entities;
 using Kavosh.Services;
 using Kavosh.Services.DTOs;
 using MyCom.Class;
@@ -14,8 +17,6 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using DevExpress.XtraLayout.Utils;
-using Kavosh.Domain.Entities;
 using static MyCom.Form_Portable.FrmPortable;
 
 namespace Kavosh.UI.Forms
@@ -63,6 +64,7 @@ namespace Kavosh.UI.Forms
         public async Task SetStyle()
         {
             _clsFontBold.ChangeFont(dgvProduct);
+            _clsFontBold.ChangeFont(srcGrid, 15);
             await dgvProduct.SetStyle();
         }
 
@@ -84,10 +86,10 @@ namespace Kavosh.UI.Forms
                         new() { Name = "کد محصول", Type = typeof(long) },
                         new() { Name = "گروه محصول", Type = typeof(Guid) },
                         new() { Name = "نام محصول", Type = typeof(string) },
-                        new() { Name = "اولیه", Type = typeof(float) },
-                        new() { Name = "ورودی", Type = typeof(float) },
-                        new() { Name = "خروجی", Type = typeof(float) },
-                        new() { Name = "فعلی", Type = typeof(float) },
+                        new() { Name = "اولیه", Type = typeof(float) ,FormatType = FormatType.Custom,FormatString = ClsCollect.FormatStringNegativeNumber(1)},
+                        new() { Name = "ورودی", Type = typeof(float) ,FormatType = FormatType.Custom,FormatString = ClsCollect.FormatStringNegativeNumber(1)},
+                        new() { Name = "خروجی", Type = typeof(float),FormatType = FormatType.Custom,FormatString = ClsCollect.FormatStringNegativeNumber(1) },
+                        new() { Name = "فعلی", Type = typeof(float),FormatType = FormatType.Custom,FormatString = ClsCollect.FormatStringNegativeNumber(1) },
                     ], false, true, true);
 
                     dgvProduct.ActiveScrollGrid();

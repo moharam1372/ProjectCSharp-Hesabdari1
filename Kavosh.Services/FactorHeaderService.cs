@@ -138,14 +138,16 @@ namespace Kavosh.Services
 
                 if (isCheckType)
                 {
-                    // 👇 جدید — ثبت/به‌روزرسانی چک در جدول اختصاصی چک
-                    // فروش (Type=true) => چک دریافتی از مشتری / خرید (Type=false) => چک صادرشده به تامین‌کننده
+                    // فروش (factorType=true) => چک دریافتی از مشتری / خرید (factorType=false) => چک صادرشده به تامین‌کننده
                     await _chequeService.CreateOrUpdateFromHowToPayAsync(hp.Id, personId, hp.CheckNumber, hp.CheckDate, hp.Price, isReceived: factorType);
                 }
 
                 if (isNewRow)
                 {
-                    await _definitiveAccountService.CreateDebtFromHowToPayAsync(personId, hp.Id, hp.Price, factorCode, isCheckType);
+                    // 👇 اصلاح شد — پارامتر factorType اضافه شد
+                    // فروش (factorType=true) => شخص بدهکار است
+                    // خرید (factorType=false) => ما بدهکاریم (شخص بستانکار است)
+                    await _definitiveAccountService.CreateDebtFromHowToPayAsync(personId, hp.Id, hp.Price, factorCode, isCheckType, factorType);
 
                     if (isCheckType && hp.Settlement)
                         await _definitiveAccountService.SettleCheckByHowToPayIdAsync(hp.Id);

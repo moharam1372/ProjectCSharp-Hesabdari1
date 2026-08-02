@@ -30,14 +30,17 @@
             dgvDebtors = new MyCom.Object.KavoshGrid(components);
             viewDebtors = new DevExpress.XtraGrid.Views.BandedGrid.BandedGridView();
             gridBand1 = new DevExpress.XtraGrid.Views.BandedGrid.GridBand();
+            srcGrid = new DevExpress.XtraEditors.SearchControl();
             pnlSummary.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvDebtors).BeginInit();
             ((System.ComponentModel.ISupportInitialize)viewDebtors).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)srcGrid.Properties).BeginInit();
             SuspendLayout();
             // 
             // pnlSummary
             // 
             pnlSummary.BackColor = Color.FromArgb(255, 255, 192);
+            pnlSummary.Controls.Add(srcGrid);
             pnlSummary.Controls.Add(lblCountValue);
             pnlSummary.Controls.Add(lblCountTitle);
             pnlSummary.Controls.Add(lblOtherDebtValue);
@@ -49,7 +52,7 @@
             pnlSummary.Dock = DockStyle.Top;
             pnlSummary.Location = new Point(0, 0);
             pnlSummary.Name = "pnlSummary";
-            pnlSummary.Size = new Size(1012, 36);
+            pnlSummary.Size = new Size(1012, 76);
             pnlSummary.TabIndex = 2;
             pnlSummary.Paint += pnlSummary_Paint;
             // 
@@ -151,11 +154,11 @@
             // dgvDebtors
             // 
             dgvDebtors.Dock = DockStyle.Fill;
-            dgvDebtors.Location = new Point(0, 36);
+            dgvDebtors.Location = new Point(0, 76);
             dgvDebtors.MainView = viewDebtors;
             dgvDebtors.Name = "dgvDebtors";
             dgvDebtors.RightToLeft = RightToLeft.Yes;
-            dgvDebtors.Size = new Size(1012, 553);
+            dgvDebtors.Size = new Size(1012, 513);
             dgvDebtors.TabIndex = 1;
             dgvDebtors.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { viewDebtors });
             // 
@@ -172,6 +175,28 @@
             gridBand1.Name = "gridBand1";
             gridBand1.VisibleIndex = 0;
             // 
+            // srcGrid
+            // 
+            srcGrid.Anchor = AnchorStyles.None;
+            srcGrid.Client = dgvDebtors;
+            srcGrid.EditValue = "";
+            srcGrid.Location = new Point(384, 41);
+            srcGrid.Name = "srcGrid";
+            srcGrid.Properties.AllowHtmlDraw = DevExpress.Utils.DefaultBoolean.True;
+            srcGrid.Properties.Appearance.Options.UseTextOptions = true;
+            srcGrid.Properties.Appearance.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
+            srcGrid.Properties.Appearance.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center;
+            srcGrid.Properties.AppearanceItemHighlight.BackColor = Color.FromArgb(255, 255, 128);
+            srcGrid.Properties.AppearanceItemHighlight.Options.UseBackColor = true;
+            srcGrid.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] { new DevExpress.XtraEditors.Repository.ClearButton(), new DevExpress.XtraEditors.Repository.SearchButton() });
+            srcGrid.Properties.Client = dgvDebtors;
+            srcGrid.Properties.FilterCondition = DevExpress.Data.Filtering.FilterCondition.Contains;
+            srcGrid.Properties.FindDelay = 200;
+            srcGrid.Properties.HighlightedItemStyle = DevExpress.XtraEditors.HighlightStyle.Skinned;
+            srcGrid.RightToLeft = RightToLeft.Yes;
+            srcGrid.Size = new Size(245, 28);
+            srcGrid.TabIndex = 9;
+            // 
             // FrmDebtorsList
             // 
             ClientSize = new Size(1012, 589);
@@ -186,6 +211,7 @@
             pnlSummary.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvDebtors).EndInit();
             ((System.ComponentModel.ISupportInitialize)viewDebtors).EndInit();
+            ((System.ComponentModel.ISupportInitialize)srcGrid.Properties).EndInit();
             ResumeLayout(false);
         }
 
@@ -203,5 +229,6 @@
         private MyCom.Object.KavoshGrid dgvDebtors;
         private DevExpress.XtraGrid.Views.BandedGrid.BandedGridView viewDebtors;
         private DevExpress.XtraGrid.Views.BandedGrid.GridBand gridBand1;
+        private DevExpress.XtraEditors.SearchControl srcGrid;
     }
 }

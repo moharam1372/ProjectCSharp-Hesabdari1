@@ -37,10 +37,10 @@
             barBtnPardakhtDaryaft = new DevExpress.XtraBars.BarButtonItem();
             barBtnDebtorsList = new DevExpress.XtraBars.BarButtonItem();
             barButtonItem1 = new DevExpress.XtraBars.BarButtonItem();
+            barBtnCheque = new DevExpress.XtraBars.BarButtonItem();
             ribbonPage1 = new DevExpress.XtraBars.Ribbon.RibbonPage();
             ribbonPageGroup1 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             ribbonStatusBar = new DevExpress.XtraBars.Ribbon.RibbonStatusBar();
-            barBtnCheque = new DevExpress.XtraBars.BarButtonItem();
             ((System.ComponentModel.ISupportInitialize)ribbon).BeginInit();
             SuspendLayout();
             // 
@@ -133,6 +133,15 @@
             barButtonItem1.Name = "barButtonItem1";
             barButtonItem1.ItemClick += barButtonItem1_ItemClick;
             // 
+            // barBtnCheque
+            // 
+            barBtnCheque.AllowHtmlText = DevExpress.Utils.DefaultBoolean.True;
+            barBtnCheque.Caption = "چک ها";
+            barBtnCheque.Id = 9;
+            barBtnCheque.LargeWidth = 60;
+            barBtnCheque.Name = "barBtnCheque";
+            barBtnCheque.ItemClick += barBtnCheque_ItemClick;
+            // 
             // ribbonPage1
             // 
             ribbonPage1.Groups.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPageGroup[] { ribbonPageGroup1 });
@@ -147,8 +156,8 @@
             ribbonPageGroup1.ItemLinks.Add(barBtnPardakhtDaryaft);
             ribbonPageGroup1.ItemLinks.Add(barBtnAccounting);
             ribbonPageGroup1.ItemLinks.Add(barBtnDebtorsList);
-            ribbonPageGroup1.ItemLinks.Add(barBtnSetting);
             ribbonPageGroup1.ItemLinks.Add(barBtnCheque);
+            ribbonPageGroup1.ItemLinks.Add(barBtnSetting);
             ribbonPageGroup1.Name = "ribbonPageGroup1";
             // 
             // ribbonStatusBar
@@ -157,15 +166,6 @@
             ribbonStatusBar.Name = "ribbonStatusBar";
             ribbonStatusBar.Ribbon = ribbon;
             ribbonStatusBar.Size = new Size(1218, 37);
-            // 
-            // barBtnCheque
-            // 
-            barBtnCheque.AllowHtmlText = DevExpress.Utils.DefaultBoolean.True;
-            barBtnCheque.Caption = "چک ها";
-            barBtnCheque.Id = 9;
-            barBtnCheque.LargeWidth = 60;
-            barBtnCheque.Name = "barBtnCheque";
-            barBtnCheque.ItemClick += barBtnCheque_ItemClick;
             // 
             // FrmMain
             // 

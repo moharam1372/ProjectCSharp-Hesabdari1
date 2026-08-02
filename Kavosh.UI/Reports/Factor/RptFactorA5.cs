@@ -16,12 +16,12 @@ namespace Kavosh.UI.Reports.Factor
         }
 
 
-        
- 
+
+
 
         protected override void BeforeReportPrint()
         {
-          
+
 
             CultureInfo customCulture = new CultureInfo("en-US");
             customCulture.NumberFormat.NumberDecimalSeparator = "/";
@@ -38,7 +38,7 @@ namespace Kavosh.UI.Reports.Factor
             var subReport = new RptHowToPayListA5();
             subReport.Tag = data.HowToPays;
             subReport.RightToLeft = RightToLeft.Yes;
-            
+
             xrSubreport1.ReportSource = subReport;
 
             #endregion
@@ -54,12 +54,26 @@ namespace Kavosh.UI.Reports.Factor
 
             long afterMalyat1 = (data.PriceTotal * data.Malyat1 / 100);
             txtTaxes.Text = afterMalyat1.ToString("N0");
-            txtPreviousDebt.Text = data.PreviousDebt.ToString("N0");
+            var dataPreviousDebt = data.PreviousDebt; // جهت بررسی
+            txtPreviousDebt.Text = Math.Abs(dataPreviousDebt).ToString(ClsCollect.FormatStringNegativeNumber(0));
+            //txtPreviousDebt.Text = data.PreviousDebt.ToString("N0");
+            if (dataPreviousDebt < 0)
+            {
+                xrLabel23.Text = "مانده حساب (بستانکار)";
+            }
+            else if (dataPreviousDebt > 0)
+            {
+                xrLabel23.Text = "مانده حساب (بدهکار)";
+            }
+            else
+            {
+                xrLabel23.Text = "مانده حساب (تسویه)";
+            }
 
             // 👇 اصلاح شد: جمع کل = مبلغ فاکتور + مالیات (بدون بدهی قبلی)
             //txtSumTotal.Text = (data.PriceTotal + data.TaxAmount).ToString("N0");
             txtSumTotal.Text = (afterMalyat1 + data.PayableAmount).ToString("N0");
-           
+
             //xrLabel25.Text = @"مبلغ قابل پرداخت: " + data.PayableAmount.ToString("N0");
             txt.Text = $"شماره کارت: {data.CardNumber}";
             xrLabel8.Text = $"شماره شبا: {data.ShabaNumber}";
@@ -72,13 +86,13 @@ namespace Kavosh.UI.Reports.Factor
 
             base.BeforeReportPrint();
         }
-   
+
         private void lblPage_PrintOnPage(object sender, PrintOnPageEventArgs e)
         {
             var ePageIndex = e.PageIndex;
             lblPage.Text = @"صفحه: " + (ePageIndex + 1) + @" از " + this.Pages.Count;
         }
 
- 
+
     }
 }

@@ -39,7 +39,7 @@
             pnlTop.Dock = DockStyle.Top;
             pnlTop.Location = new Point(0, 0);
             pnlTop.Name = "pnlTop";
-            pnlTop.Size = new Size(800, 33);
+            pnlTop.Size = new Size(995, 33);
             pnlTop.TabIndex = 2;
             // 
             // lblStockValue
@@ -47,7 +47,7 @@
             lblStockValue.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             lblStockValue.Appearance.Font = new Font("Samim FD", 9.75F, FontStyle.Bold);
             lblStockValue.Appearance.Options.UseFont = true;
-            lblStockValue.Location = new Point(298, 6);
+            lblStockValue.Location = new Point(493, 6);
             lblStockValue.Name = "lblStockValue";
             lblStockValue.Size = new Size(6, 20);
             lblStockValue.TabIndex = 0;
@@ -58,7 +58,7 @@
             lblStockTitle.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             lblStockTitle.Appearance.Font = new Font("Samim FD", 9.75F, FontStyle.Bold);
             lblStockTitle.Appearance.Options.UseFont = true;
-            lblStockTitle.Location = new Point(355, 6);
+            lblStockTitle.Location = new Point(550, 6);
             lblStockTitle.Name = "lblStockTitle";
             lblStockTitle.Size = new Size(76, 20);
             lblStockTitle.TabIndex = 1;
@@ -70,7 +70,7 @@
             lblProductTitle.Appearance.Font = new Font("Samim FD", 9.75F, FontStyle.Bold);
             lblProductTitle.Appearance.Options.UseFont = true;
             lblProductTitle.AutoSizeMode = DevExpress.XtraEditors.LabelAutoSizeMode.None;
-            lblProductTitle.Location = new Point(437, 6);
+            lblProductTitle.Location = new Point(632, 6);
             lblProductTitle.Name = "lblProductTitle";
             lblProductTitle.Size = new Size(355, 20);
             lblProductTitle.TabIndex = 2;
@@ -83,7 +83,7 @@
             dgvKardex.MainView = viewKardex;
             dgvKardex.Name = "dgvKardex";
             dgvKardex.RightToLeft = RightToLeft.Yes;
-            dgvKardex.Size = new Size(800, 517);
+            dgvKardex.Size = new Size(995, 544);
             dgvKardex.TabIndex = 1;
             dgvKardex.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { viewKardex });
             // 
@@ -102,7 +102,7 @@
             // 
             // FrmProductKardex
             // 
-            ClientSize = new Size(800, 550);
+            ClientSize = new Size(995, 577);
             Controls.Add(dgvKardex);
             Controls.Add(pnlTop);
             Name = "FrmProductKardex";

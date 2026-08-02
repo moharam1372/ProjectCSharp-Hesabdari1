@@ -112,7 +112,27 @@ namespace Kavosh.Services
             await _repository.Remove(entity);
             await _repository.SaveChangesAsync();
         }
+        public async Task<Cheque> GetEntityByIdAsync(Guid id)
+        {
+            return await _repository.GetById(id);
+        }
+        public async Task SyncStatusAsync(Guid? howToPayId, Guid? definitiveAccountId, ChequeStatus status)
+        {
+            Cheque cheque = null;
 
+            if (howToPayId.HasValue)
+                cheque = await _repository.GetByHowToPayIdAsync(howToPayId.Value);
+
+            if (cheque is null && definitiveAccountId.HasValue)
+                cheque = await _repository.GetByDefinitiveAccountIdAsync(definitiveAccountId.Value);
+
+            if (cheque is null || cheque.Status == status)
+                return;   // چکی پیدا نشد یا از قبل همین وضعیت رو داشت
+
+            cheque.Status = status;
+            await _repository.Update(cheque);
+            await _repository.SaveChangesAsync();
+        }
         private static ChequeDto ToDto(Cheque c) => new()
         {
             Id = c.Id,

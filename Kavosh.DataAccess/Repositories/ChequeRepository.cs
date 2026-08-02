@@ -10,13 +10,21 @@ namespace Kavosh.DataAccess.Repositories
         Task<List<Cheque>> GetAllWithPersonAsync();
         Task<List<Cheque>> GetUpcomingAsync(int days);
         Task<Cheque> GetByHowToPayIdAsync(Guid howToPayId);
-        Task<(long TotalAmount, int Count)> GetPendingSummaryAsync();   // 👈 جدید
+        Task<(long TotalAmount, int Count)> GetPendingSummaryAsync();
+        Task<Cheque> GetByDefinitiveAccountIdAsync(Guid definitiveAccountId);   // 👈 جدید
+
 
     }
 
     public class ChequeRepository : Repository<Cheque>, IChequeRepository
     {
         public ChequeRepository(AppDbContext context) : base(context) { }
+
+        // 👇 جدید — برای چک‌های ثبت‌شده به‌صورت دستی (بدون فاکتور)
+        public async Task<Cheque> GetByDefinitiveAccountIdAsync(Guid definitiveAccountId)
+        {
+            return await _dbSet.FirstOrDefaultAsync(c => c.DefinitiveAccountId == definitiveAccountId && !c.IsDeleted);
+        }
 
         public async Task<(long TotalAmount, int Count)> GetPendingSummaryAsync()
         {
@@ -27,6 +35,7 @@ namespace Kavosh.DataAccess.Repositories
 
             return (pending.Sum(c => c.Price), pending.Count);
         }
+
         public async Task<List<Cheque>> GetAllWithPersonAsync()
         {
             return await _dbSet

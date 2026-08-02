@@ -46,6 +46,7 @@ namespace Kavosh.UI.Forms
         public async Task SetStyle()
         {
             _clsFontBold.ChangeFont(dgvStatement);
+            _clsFontBold.ChangeFont(srcGrid, 15);
             await dgvStatement.SetStyle();
         }
         GridLookUpEdit cmbPerson;
@@ -106,7 +107,7 @@ namespace Kavosh.UI.Forms
                     }
                     else if (getClm == "بستانکار")
                     {
-                        e1.Appearance.ForeColor = Color.FromArgb(255, 70, 243, 91);
+                        e1.Appearance.ForeColor = Color.FromArgb(0, 150, 0); // بستانکار = سبز
                     }
                     else if (getClm == "مانده" || getClm == "وضعیت")
                     {

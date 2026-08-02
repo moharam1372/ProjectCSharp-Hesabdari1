@@ -32,19 +32,20 @@ namespace Kavosh.UI.Forms
 
         private async void FrmPerson_Shown(object sender, EventArgs e)
         {
-            await Task.WhenAll(
-                SetStyle(),
-                SetFieldLayInput(),
-                SetFieldDgvPerson());
+            //await Task.WhenAll(
+            //    SetStyle(),
+            //    SetFieldLayInput(),
+            //    SetFieldDgvPerson());
 
 
-            //await SetStyle();
-            //await SetFieldLayInput();
-            //await SetFieldDgvPerson();
+            await SetStyle();
+            await SetFieldLayInput();
+            await SetFieldDgvPerson();
         }
 
         public async Task SetStyle()
         {
+            _clsFontBold.ChangeFont(srcGrid, 15);
             _clsFontBold.ChangeFont(dgvPerson);
             await dgvPerson.SetStyle();
         }

@@ -996,7 +996,13 @@ namespace MyCom.Object
                 //GV_Viw.ExportToXlsx(xxx, new  {ExportType = ExportType.DataAware});
 
                 DGV_Viw.ExportToXlsx(sfd.FileName, setExcel);
-                Process.Start(sfd.FileName);
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = sfd.FileName,
+                    UseShellExecute = true
+                };
+                Process.Start(psi);
+                //Process.Start(sfd.FileName);
                 //dgvRequest.DGV_Viw.ShowPrintPreview();
             }
 
