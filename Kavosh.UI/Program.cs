@@ -3,6 +3,7 @@ using DevExpress.UserSkins;
 using DevExpress.XtraEditors;
 using Kavosh.DataAccess;
 using Kavosh.DataAccess.Repositories;
+using Kavosh.Domain.Entities;
 using Kavosh.Domain.Interfaces;
 using Kavosh.Services;
 using Kavosh.UI.Forms;
@@ -53,12 +54,9 @@ namespace Kavosh.UI
             // =========================================================
             var services = new ServiceCollection();
 
-            ConfigureServices(
-                services,
-                configuration);
+            ConfigureServices(services, configuration);
 
-            ServiceProvider =
-                services.BuildServiceProvider();
+            ServiceProvider = services.BuildServiceProvider();
 
             // =========================================================
             // راه‌اندازی دیتابیس
@@ -68,26 +66,19 @@ namespace Kavosh.UI
             // =========================================================
             // اجرای فرم اصلی
             // =========================================================
-            var mainForm =
-                ServiceProvider.GetRequiredService<FrmMain>();
+            var mainForm = ServiceProvider.GetRequiredService<FrmMain>();
 
             Application.Run(mainForm);
         }
 
-        private static void ConfigureServices(
-            IServiceCollection services,
-            IConfiguration configuration)
+        private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            string connectionString =
-                configuration.GetConnectionString(
-                    "DefaultConnection");
+            string connectionString = configuration.GetConnectionString("DefaultConnection");
 
             // =========================================================
             // Database
             // =========================================================
-            services.AddDbContext<AppDbContext>(
-                options =>
-                    options.UseSqlServer(connectionString));
+            services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
 
             // =========================================================
             // Repositories
@@ -100,6 +91,7 @@ namespace Kavosh.UI
             services.AddScoped<IFactorHeaderRepository, FactorHeaderRepository>();
             services.AddScoped<IDefinitiveAccountRepository, DefinitiveAccountRepository>();
             services.AddScoped<IChequeRepository, ChequeRepository>();
+            services.AddScoped<ILoginUserRepository, LoginUserRepository>();
      
 
             // =========================================================
@@ -116,6 +108,7 @@ namespace Kavosh.UI
             services.AddScoped<StoreInfoService>();
             services.AddScoped<DatabaseBackupService>();
             services.AddScoped<ChequeService>();
+            services.AddScoped<LoginUserService>();
 
             // =========================================================
             // Forms
@@ -133,6 +126,7 @@ namespace Kavosh.UI
             services.AddTransient<FrmBackupProgress>();
             services.AddTransient<FrmPardakhtDaryaft>();
             services.AddTransient<FrmChequeList>();
+            services.AddTransient<FrmLogin>();
         }
 
         private static void InitializeDatabase()
@@ -146,7 +140,7 @@ namespace Kavosh.UI
                 // اجرای Migrationها
                 dbContext.Database.Migrate();
 
-                Console.WriteLine("Database migration applied successfully!");
+                Console.WriteLine(@"Database migration applied successfully!");
 
                 // Seed نوع پرداخت
                 Kavosh.DataAccess.Seeders
@@ -154,9 +148,15 @@ namespace Kavosh.UI
                     .SeedAsync(dbContext)
                     .GetAwaiter()
                     .GetResult();
+                Kavosh.DataAccess.Seeders
+                    .LoginUserSeeder
+                    .SeedAsync(dbContext)
+                    .GetAwaiter()
+                    .GetResult();
 
-                Console.WriteLine(
-                    "PaymentType seed check completed!");
+
+
+                Console.WriteLine(@"PaymentType seed check completed!");
             }
             catch (Exception ex)
             {
@@ -170,23 +170,11 @@ namespace Kavosh.UI
             }
         }
 
-        public static T CreateScopedForm<T>()
-            where T : Form
+        public static T CreateScopedForm<T>() where T : XtraForm
         {
-           
-            var scope =
-                ServiceProvider.CreateScope();
-
-            var form =
-                scope.ServiceProvider
-                    .GetRequiredService<T>();
-
-            form.FormClosed +=
-                (s, e) =>
-                {
-                    scope.Dispose();
-                };
-
+            var scope = ServiceProvider.CreateScope();
+            var form = scope.ServiceProvider.GetRequiredService<T>();
+            form.FormClosed += (s, e) => { scope.Dispose(); };
             return form;
         }
     }

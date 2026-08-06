@@ -38,6 +38,7 @@
             barBtnDebtorsList = new DevExpress.XtraBars.BarButtonItem();
             barButtonItem1 = new DevExpress.XtraBars.BarButtonItem();
             barBtnCheque = new DevExpress.XtraBars.BarButtonItem();
+            btnBarLock = new DevExpress.XtraBars.BarButtonItem();
             ribbonPage1 = new DevExpress.XtraBars.Ribbon.RibbonPage();
             ribbonPageGroup1 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             ribbonStatusBar = new DevExpress.XtraBars.Ribbon.RibbonStatusBar();
@@ -47,10 +48,11 @@
             // ribbon
             // 
             ribbon.ExpandCollapseItem.Id = 0;
-            ribbon.Items.AddRange(new DevExpress.XtraBars.BarItem[] { ribbon.ExpandCollapseItem, barBtnProduct, barPerson, barFactor, barBtnAccounting, barBtnSetting, barBtnPardakhtDaryaft, barBtnDebtorsList, barButtonItem1, barBtnCheque });
+            ribbon.Items.AddRange(new DevExpress.XtraBars.BarItem[] { ribbon.ExpandCollapseItem, barBtnProduct, barPerson, barFactor, barBtnAccounting, barBtnSetting, barBtnPardakhtDaryaft, barBtnDebtorsList, barButtonItem1, barBtnCheque, btnBarLock });
             ribbon.Location = new Point(0, 0);
-            ribbon.MaxItemId = 10;
+            ribbon.MaxItemId = 11;
             ribbon.Name = "ribbon";
+            ribbon.PageHeaderItemLinks.Add(btnBarLock);
             ribbon.PageHeaderItemLinks.Add(barButtonItem1);
             ribbon.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] { ribbonPage1 });
             ribbon.Size = new Size(1218, 201);
@@ -142,6 +144,14 @@
             barBtnCheque.Name = "barBtnCheque";
             barBtnCheque.ItemClick += barBtnCheque_ItemClick;
             // 
+            // btnBarLock
+            // 
+            btnBarLock.Caption = "barButtonItem2";
+            btnBarLock.Id = 10;
+            btnBarLock.ImageOptions.SvgImage = Properties.Resources.bo_user;
+            btnBarLock.Name = "btnBarLock";
+            btnBarLock.ItemClick += btnBarLock_ItemClick;
+            // 
             // ribbonPage1
             // 
             ribbonPage1.Groups.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPageGroup[] { ribbonPageGroup1 });
@@ -204,5 +214,6 @@
         private DevExpress.XtraBars.BarButtonItem barBtnDebtorsList;
         private DevExpress.XtraBars.BarButtonItem barButtonItem1;
         private DevExpress.XtraBars.BarButtonItem barBtnCheque;
+        private DevExpress.XtraBars.BarButtonItem btnBarLock;
     }
 }

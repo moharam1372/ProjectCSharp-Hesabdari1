@@ -15,14 +15,8 @@ namespace Kavosh.UI.Reports.Factor
             // Format String Number Float =>            {0:#,#}
         }
 
-
-
-
-
         protected override void BeforeReportPrint()
         {
-
-
             CultureInfo customCulture = new CultureInfo("en-US");
             customCulture.NumberFormat.NumberDecimalSeparator = "/";
 
@@ -78,7 +72,7 @@ namespace Kavosh.UI.Reports.Factor
             txt.Text = $"شماره کارت: {data.CardNumber}";
             xrLabel8.Text = $"شماره شبا: {data.ShabaNumber}";
             xrLabel9.Text = $"{data.BankName} - {data.AccountHolderName}";
-
+            lblAddressSeller.Text = data.AddressSeller+" -  "+data.PhoneSeller;
             if (data.Logo is { Length: > 0 })
                 picLogo.Image = System.Drawing.Image.FromStream(new System.IO.MemoryStream(data.Logo));
             if (data.Mohr is { Length: > 0 })
@@ -92,7 +86,6 @@ namespace Kavosh.UI.Reports.Factor
             var ePageIndex = e.PageIndex;
             lblPage.Text = @"صفحه: " + (ePageIndex + 1) + @" از " + this.Pages.Count;
         }
-
 
     }
 }

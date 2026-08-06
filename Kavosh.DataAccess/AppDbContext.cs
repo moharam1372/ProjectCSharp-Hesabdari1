@@ -12,6 +12,7 @@ namespace Kavosh.DataAccess
            
         }
         //[Table(name: "DefinitiveAccount", Schema = "Account")]
+        public DbSet<LoginUser> LoginUsers { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<DefinitiveAccount> DefinitiveAccounts { get; set; }
         public DbSet<Person> Persons { get; set; }

@@ -93,9 +93,9 @@ namespace Kavosh.UI.Forms
             layInput.SetFieldColumnDataLayout(true, 1, [
                 new() { Grp = 1, Ctrl = txtId, Visibility = LayoutVisibility.Never },
                 new() { Grp = 1, Ctrl = txtCode, },
-                new() { Grp = 1, Ctrl = cmbPerson, SizeType = SizeConstraintsType.Custom, AutoHeight = 38 },
-                new() { Grp = 1, Ctrl = cmbType, SizeType = SizeConstraintsType.Custom, AutoHeight = 38  },
-                new() { Grp = 1, Ctrl = dtFactor, },
+                new() { Grp = 1, Ctrl = cmbPerson,AllowNull = false, SizeType = SizeConstraintsType.Custom, AutoHeight = 38 },
+                new() { Grp = 1, Ctrl = cmbType,AllowNull = false, SizeType = SizeConstraintsType.Custom, AutoHeight = 38  },
+                new() { Grp = 1, Ctrl = dtFactor,AllowNull = false},
                 new() { Grp = 1, Ctrl = txtDiscount, },
                 new() { Grp = 1, Ctrl = txtMalyat1, },
                 new() { Grp = 1, Ctrl = txtMalyat2, },
@@ -105,9 +105,7 @@ namespace Kavosh.UI.Forms
             layInput.BtnSaveClick += LayInput_BtnSaveClick;
             layInput.BtnNewClick += LayInput_BtnNewClick; ;
         }
-
-
-
+        
 
         // ============= خط‌های محصول (سمت چپ، قابل ویرایش) =============
         public async Task SetFieldDgvFactorDetail()
@@ -130,6 +128,7 @@ namespace Kavosh.UI.Forms
                 dgvFactorDetail.MaxMinWidth("جمع", 155, 155);
                 dgvFactorDetail.AddAllowNewRowAndType(DefaultBoolean.True, NewItemRowPosition.Top);
                 dgvFactorDetail.AddSummaryItem("جمع", "جمع", "", SummaryItemType.Custom);
+
                 #region Relation - انتخاب محصول از لیست محصولات
 
                 // 👇 UnitPrice (مبلغ خرید) هم علاوه بر SellPrice (مبلغ فروش) گرفته می‌شود
@@ -149,7 +148,6 @@ namespace Kavosh.UI.Forms
                 cmbProduct.HiddenColumn("SellPrice");
                 cmbProduct.HiddenColumn("UnitPrice");
 
-
                 #endregion
 
                 #region Event
@@ -163,7 +161,7 @@ namespace Kavosh.UI.Forms
                     var getMalyat2 = sumTotal * layInput.GetValue<long>("مالیات 2") / 100;
                     if (ConE.FieldName == "جمع")
                     {
-                        e1.TotalValue = "جمع کل: "+(getMalyat1 + getMalyat2 + sumTotal).ToString("N0");
+                        e1.TotalValue = "جمع کل: " + (getMalyat1 + getMalyat2 + sumTotal).ToString("N0");
                     }
 
                     // dgvFactorDetail.GetViewBase.UpdateSummary();
@@ -259,7 +257,7 @@ namespace Kavosh.UI.Forms
         // ============= ذخیره (هدر + کالا + پرداخت با هم) =============
         private async void LayInput_BtnSaveClick(object sender, EventArgs e)
         {
-            layInput._disableAfterSave = true;
+            layInput._disableAfterSave = false;
             var dto = new FactorHeaderDto
             {
                 Id = _selectedFactorId,
@@ -282,10 +280,10 @@ namespace Kavosh.UI.Forms
                         ProductId = (Guid)r["محصول"],
                         Count = Convert.ToSingle(r["تعداد"]),
                         PriceUnit = Convert.ToInt64(r["قیمت واحد"]),
-                        SellPrice = Convert.ToInt64(r["قیمت فروش"])   // 👈 جدید
+                        SellPrice = Convert.ToInt64(r["قیمت فروش"])
                     }).ToList(),
 
-                // 👇 جدید: همون فیلتر ردیف خالی، این‌بار برای گرید پرداخت
+
                 HowToPays = _dtHowToPay.Rows
                     .Cast<DataRow>()
                     .Where(r => r.RowState != DataRowState.Deleted)
@@ -293,11 +291,13 @@ namespace Kavosh.UI.Forms
                     .Select(r =>
                     {
                         var checkDate = r["تاریخ چک"].ToString().ShamsiToMiladi();
+                        var int64 = Convert.ToInt64(r["مبلغ"]);
+
                         return new HowToPayDto
                         {
                             Id = r["Id"] is Guid gid ? gid : Guid.Empty,
                             PaymentTypeId = (Guid)r["نوع پرداخت"],
-                            Price = Convert.ToInt64(r["مبلغ"]),
+                            Price = int64,
                             CheckNumber = r["شماره چک"] as string,
                             CheckDate = checkDate, // 👈 اصلاح شد
                             Settlement = r["تسویه"] != DBNull.Value && Convert.ToBoolean(r["تسویه"]),
@@ -305,7 +305,16 @@ namespace Kavosh.UI.Forms
                         };
                     }).ToList()
             };
-
+            if (dto.Details.Count == 0)
+            {
+                ClassMessageBox.ShowMSG("فاکتور خالی می باشد", Class_Text.Msg_Name, ClassMessageBox.enumIcon.هشدار);
+                return;
+            }
+            if (dto.HowToPays.Count == 0)
+            {
+                ClassMessageBox.ShowMSG("وضعیت پرداخت را مشخص کنید", Class_Text.Msg_Name, ClassMessageBox.enumIcon.هشدار);
+                return;
+            }
             var savedId = await _factorHeaderService.SaveFactorAsync(dto);
             _selectedFactorId = savedId;
 
@@ -314,7 +323,7 @@ namespace Kavosh.UI.Forms
             Kavosh.Services.AppEvents.RaiseDataChanged(); // 👈 اضافه شد
 
             ClassMessageBox.ShowMSG("فاکتور ذخیره شد.", Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
-            layInput._disableAfterSave = false;
+            layInput._disableAfterSave = true;
         }
 
         private async void LayInput_BtnCancelClick(object sender, EventArgs e)
@@ -387,7 +396,5 @@ namespace Kavosh.UI.Forms
             dgvHowToPay.SetValue("تاریخ چک", dt);
 
         }
-
-
     }
 }

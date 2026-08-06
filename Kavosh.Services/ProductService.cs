@@ -13,12 +13,7 @@ namespace Kavosh.Services
             _repository = repository;
         }
 
-        // ============= خواندن =============
-        //public async Task<List<ProductDto>> GetAllProductsAsync()
-        //{
-        //    var products = await _repository.GetAllWithDetailsAsync();
-        //    return products.Select(ToDto).ToList();
-        //}
+
 
         // ============= حذف (Soft Delete) =============
         public async Task DeleteProductAsync(Guid id)
@@ -88,7 +83,6 @@ namespace Kavosh.Services
 
             await ValidateAsync(dto, isNew);
 
-
             entity.ProductCode = dto.ProductCode;
             entity.ProductGroupId = dto.ProductGroupId;
             entity.Title = dto.Title;
@@ -132,24 +126,24 @@ namespace Kavosh.Services
                 throw new ArgumentException("این کد کالا قبلاً ثبت شده است");
         }
 
-        private static ProductDto ToDto(Product p) => new()
-        {
-            Id = p.Id,
-            ProductCode = p.ProductCode,
-            ProductGroupId = p.ProductGroupId,
-            ProductGroupTitle = p.ProductGroup?.Title,
-            Title = p.Title,
-            ProductUnitId = p.ProductUnitId,
-            ProductUnitTitle = p.ProductUnit?.Title,
-            InitialInventory = p.InitialInventory,
-            UnitPrice = p.UnitPrice,
-            SellPrice = p.SellPrice,
-            Description = p.Description,
+        //private static ProductDto ToDto(Product p) => new()
+        //{
+        //    Id = p.Id,
+        //    ProductCode = p.ProductCode,
+        //    ProductGroupId = p.ProductGroupId,
+        //    ProductGroupTitle = p.ProductGroup?.Title,
+        //    Title = p.Title,
+        //    ProductUnitId = p.ProductUnitId,
+        //    ProductUnitTitle = p.ProductUnit?.Title,
+        //    InitialInventory = p.InitialInventory,
+        //    UnitPrice = p.UnitPrice,
+        //    SellPrice = p.SellPrice,
+        //    Description = p.Description,
 
-            InputStock = 0,
-            OutputStock = 0,
-            CurrentStock = p.InitialInventory
-        };
+        //    InputStock = 0,
+        //    OutputStock = 0,
+        //    CurrentStock = p.InitialInventory
+        //};
         private static ProductDto ToDto(Product p, float input, float output) => new()
         {
             Id = p.Id,

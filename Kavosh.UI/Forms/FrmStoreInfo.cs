@@ -4,6 +4,7 @@ using DevExpress.XtraLayout.Utils;
 using Kavosh.Services;
 using Kavosh.Services.DTOs;
 using MyCom.Class;
+using MyCom.Object;
 using System;
 using System.Drawing;
 using System.IO;
@@ -14,6 +15,7 @@ namespace Kavosh.UI.Forms
     public partial class FrmStoreInfo : DevExpress.XtraEditors.XtraForm
     {
         private readonly StoreInfoService _storeInfoService;
+        private readonly LoginUserService _loginUserService;
 
         private ClsFont _clsFont = new(false);
         private ClsFont _clsFontBold = new(true);
@@ -21,57 +23,106 @@ namespace Kavosh.UI.Forms
         private TextEdit txtStoreName, txtPhone, txtBankName, txtAccountHolderName, txtCardNumber, txtShabaNumber, txtTaxPercent;
         private MemoEdit txtAddress;
 
-        public FrmStoreInfo(StoreInfoService storeInfoService)
+        public FrmStoreInfo(StoreInfoService storeInfoService, LoginUserService loginUserService)
         {
             InitializeComponent();
             _storeInfoService = storeInfoService;
+            _loginUserService = loginUserService;
             Shown += FrmStoreInfo_Shown;
+            layInput.BtnSaveClick += LayInput_BtnSaveClick;
+            kavoshLayout1.BtnSaveClick += KavoshLayout1_BtnSaveClick;
+
+            pnlFunction.Controls.Add(layInput.ShowPanelOperation());
+            layInput.AddButtonOperation();
+
+
+            pnlPass.Controls.Add(kavoshLayout1.ShowPanelOperation());
+            kavoshLayout1.AddButtonOperation();
         }
 
         private async void FrmStoreInfo_Shown(object sender, EventArgs e)
         {
+            _clsFontBold.ChangeFont(tabPane1);
             await SetFieldLayInput();
 
-            await LoadDataAsync();
+
+            tabPane1.SelectedPageChanged += async (s1, e1) =>
+            {
+                if (e1.Page == tabNavigationPage2)
+                {
+                    await Task.Delay(500);
+                    await SetFieldLayPass();
+                }
+                else if (e1.Page == tabNavigationPage1)
+                {
+                    await Task.Delay(500);
+                    await SetFieldLayInput();
+                }
+            };
+
+
+        }
+
+        private async void KavoshLayout1_BtnSaveClick(object sender, EventArgs e)
+        {
+            var getPassOld = kavoshLayout1.GetValue<string>("کلمه عبور فعلی");
+            var getPass1 = kavoshLayout1.GetValue<string>("کلمه عبور جدید");
+            var getPass2 = kavoshLayout1.GetValue<string>("تایید کلمه عبور");
+
+            var enter = await _loginUserService.Enter(new LoginUserDto { Password = getPassOld, Username = "admin" });
+
+            if (enter.TryGetValue(true, out var userInfo) && getPass1 == getPass2)
+            {
+                await _loginUserService.UpdateAsync(new LoginUserDto { Username = "admin", Password = getPass1 });
+                ClassMessageBox.ShowMSG("کلمه عبور تغییر یافت", Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
+                Close();
+            }
+            else
+                ClassMessageBox.ShowMSG("ورودی ها بررسی کنید", Class_Text.Msg_Name, ClassMessageBox.enumIcon.بستن_مربع);
         }
 
         public async Task SetFieldLayInput()
         {
-            layInput.RightToLeft = RightToLeft.Yes;
-            pnlFunction.Controls.Add(layInput.ShowPanelOperation());
-            layInput.AddButtonOperation();
-            layInput._btnCancel.Enabled = false;
+            //kavoshLayout1.Dispose();
 
-            txtStoreName = ClsCollect.ModelTextEdit("نام فروشگاه", 150, "");
-            txtPhone = ClsCollect.ModelTextEditNumber("تلفن", 15, "");
+            tabNavigationPage1.WaitDownPage(async () =>
+            {
+                layInput.RightToLeft = RightToLeft.Yes;
 
-            txtBankName = ClsCollect.ModelTextEdit("نام بانک", 100, "");
-            txtAccountHolderName = ClsCollect.ModelTextEdit("نام صاحب حساب", 100, "");
-            txtCardNumber = ClsCollect.ModelTextEditNumber("شماره کارت", 16, "");
-            txtShabaNumber = ClsCollect.ModelTextEditNumber("شماره شبا", 24, "");
-            // توجه: اگه درصد مالیات نیاز به اعشار داره (مثلاً 9.5)، این کنترل رو با الگوی خودتون برای اعداد اعشاری هماهنگ کنید
-            txtTaxPercent = ClsCollect.ModelTextEditNumber("درصد مالیات", 5, "");
-            txtAddress = ClsCollect.ModelLayoutMemoEdit("آدرس", 300, "");
+                layInput._btnCancel.Enabled = false;
 
-            var imgLogo = ClsCollect.ModelPicture2("لوگو");
-            var imgMohr = ClsCollect.ModelPicture2("مهر|امضا");
+                txtStoreName = ClsCollect.ModelTextEdit("نام فروشگاه", 150, "");
+                txtPhone = ClsCollect.ModelTextEditNumber("تلفن", 15, "");
 
-            layInput.SetFieldColumnDataLayout(true, 2, [
-                new() { Grp = 1, Ctrl = txtStoreName, },
-                new() { Grp = 1, Ctrl = txtPhone, },
-                new() { Grp = 1, Ctrl = txtBankName, },
-                new() { Grp = 1, Ctrl = txtAccountHolderName, },
-                new() { Grp = 1, Ctrl = txtCardNumber, },
-                new() { Grp = 1, Ctrl = txtShabaNumber, },
-                new() { Grp = 1, Ctrl = txtTaxPercent, },
-                new() { Grp = 1, Ctrl = txtAddress, SizeType = SizeConstraintsType.Custom, AutoHeight = 80 },
+                txtBankName = ClsCollect.ModelTextEdit("نام بانک", 100, "");
+                txtAccountHolderName = ClsCollect.ModelTextEdit("نام صاحب حساب", 100, "");
+                txtCardNumber = ClsCollect.ModelTextEditNumber("شماره کارت", 16, "");
+                txtShabaNumber = ClsCollect.ModelTextEditNumber("شماره شبا", 24, "");
+                // توجه: اگه درصد مالیات نیاز به اعشار داره (مثلاً 9.5)، این کنترل رو با الگوی خودتون برای اعداد اعشاری هماهنگ کنید
+                txtTaxPercent = ClsCollect.ModelTextEditNumber("درصد مالیات", 5, "");
+                txtAddress = ClsCollect.ModelLayoutMemoEdit("آدرس", 300, "");
 
-                new() { Grp = 2, Ctrl = imgLogo, SizeType = SizeConstraintsType.Custom, AutoHeight = 200 },
-                new() { Grp = 2, Ctrl = imgMohr, SizeType = SizeConstraintsType.Custom, AutoHeight = 200 },
-            ]);
+                var imgLogo = ClsCollect.ModelPicture2("لوگو");
+                var imgMohr = ClsCollect.ModelPicture2("مهر|امضا");
 
-            layInput.BtnSaveClick += LayInput_BtnSaveClick;
-            layInput.CallNew();
+                layInput.SetFieldColumnDataLayout(true, 2, [
+                    new() { Grp = 1, Ctrl = txtStoreName, },
+                    new() { Grp = 1, Ctrl = txtPhone, },
+                    new() { Grp = 1, Ctrl = txtBankName, },
+                    new() { Grp = 1, Ctrl = txtAccountHolderName, },
+                    new() { Grp = 1, Ctrl = txtCardNumber, },
+                    new() { Grp = 1, Ctrl = txtShabaNumber, },
+                    new() { Grp = 1, Ctrl = txtTaxPercent, },
+                    new() { Grp = 1, Ctrl = txtAddress, SizeType = SizeConstraintsType.Custom, AutoHeight = 80 },
+
+                    new() { Grp = 2, Ctrl = imgLogo, SizeType = SizeConstraintsType.Custom, AutoHeight = 200 },
+                    new() { Grp = 2, Ctrl = imgMohr, SizeType = SizeConstraintsType.Custom, AutoHeight = 200 },
+                ]);
+
+
+                layInput.CallNew();
+                await LoadDataAsync();
+            });
             //layInput.SetNull();
         }
 
@@ -155,11 +206,38 @@ namespace Kavosh.UI.Forms
             return Image.FromStream(ms);
         }
 
+        #region Password
+        KavoshLayout kavoshLayout1 = new KavoshLayout { RightToLeft = RightToLeft.Yes, Dock = DockStyle.Fill };
+        public async Task SetFieldLayPass()
+        {
+            tabNavigationPage2.WaitDownPage(async () =>
+            {
+                await Task.Delay(500);
+                //layInput.Dispose();
+
+                PanelPass.Controls.Add(kavoshLayout1);
+
+                kavoshLayout1._btnCancel.Enabled = false;
+
+                var getOldPass = ClsCollect.ModelTextEditPassword("کلمه عبور فعلی", 1, 12, "");
+                var getPass1 = ClsCollect.ModelTextEditPassword("کلمه عبور جدید", 6, 12, "");
+                var getPass2 = ClsCollect.ModelTextEditPassword("تایید کلمه عبور", 6, 12, "");
+
+                kavoshLayout1.SetFieldColumnDataLayout(true, 1, [
+                    new ClsCollect.modelControlDataLayout { Grp = 1, Ctrl = getOldPass, AllowNull = false },
+                    new ClsCollect.modelControlDataLayout { Grp = 1, Ctrl = getPass1, AllowNull = false },
+                    new ClsCollect.modelControlDataLayout { Grp = 1, Ctrl = getPass2, AllowNull = false }
+                ], 13);
+                kavoshLayout1.CallNew();
+            });
+
+
+            //await Task.Delay(500);
+        }
+
+        #endregion
         private void FrmStoreInfo_Load(object sender, EventArgs e) { }
 
-        private void simpleButton1_Click(object sender, EventArgs e)
-        {
-            
-        }
+
     }
 }

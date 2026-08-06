@@ -55,7 +55,6 @@
             this.xrShape1 = new DevExpress.XtraReports.UI.XRShape();
             this.xrLabel2 = new DevExpress.XtraReports.UI.XRLabel();
             this.BottomMargin = new DevExpress.XtraReports.UI.BottomMarginBand();
-            this.txt = new DevExpress.XtraReports.UI.XRLabel();
             this.txtSumTotal = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabel25 = new DevExpress.XtraReports.UI.XRLabel();
             this.txtPreviousDebt = new DevExpress.XtraReports.UI.XRLabel();
@@ -77,14 +76,17 @@
             this.xrTableCell6 = new DevExpress.XtraReports.UI.XRTableCell();
             this.GroupFooter1 = new DevExpress.XtraReports.UI.GroupFooterBand();
             this.xrSubreport1 = new DevExpress.XtraReports.UI.XRSubreport();
-            this.picMohr = new DevExpress.XtraReports.UI.XRPictureBox();
-            this.xrLabel9 = new DevExpress.XtraReports.UI.XRLabel();
-            this.xrLabel8 = new DevExpress.XtraReports.UI.XRLabel();
             this.PageFooter = new DevExpress.XtraReports.UI.PageFooterBand();
             this.lblPage = new DevExpress.XtraReports.UI.XRLabel();
-            this.GroupFooter2 = new DevExpress.XtraReports.UI.GroupFooterBand();
             this.ReportHeader = new DevExpress.XtraReports.UI.ReportHeaderBand();
             this.GroupHeader1 = new DevExpress.XtraReports.UI.GroupHeaderBand();
+            this.GroupFooter2 = new DevExpress.XtraReports.UI.GroupFooterBand();
+            this.picMohr = new DevExpress.XtraReports.UI.XRPictureBox();
+            this.xrLabel8 = new DevExpress.XtraReports.UI.XRLabel();
+            this.xrLabel9 = new DevExpress.XtraReports.UI.XRLabel();
+            this.txt = new DevExpress.XtraReports.UI.XRLabel();
+            this.lblAddressSeller = new DevExpress.XtraReports.UI.XRLabel();
+            this.GroupFooter3 = new DevExpress.XtraReports.UI.GroupFooterBand();
             ((System.ComponentModel.ISupportInitialize)(this.xrTable1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
             // 
@@ -446,24 +448,6 @@
             this.BottomMargin.HeightF = 4.982092F;
             this.BottomMargin.Name = "BottomMargin";
             // 
-            // txt
-            // 
-            this.txt.Borders = ((DevExpress.XtraPrinting.BorderSide)(((DevExpress.XtraPrinting.BorderSide.Left | DevExpress.XtraPrinting.BorderSide.Top) 
-            | DevExpress.XtraPrinting.BorderSide.Right)));
-            this.txt.Dpi = 25.4F;
-            this.txt.Font = new DevExpress.Drawing.DXFont("Samim FD", 14F, DevExpress.Drawing.DXFontStyle.Bold);
-            this.txt.LocationFloat = new DevExpress.Utils.PointFloat(0.0001372655F, 0F);
-            this.txt.Multiline = true;
-            this.txt.Name = "txt";
-            this.txt.Padding = new DevExpress.XtraPrinting.PaddingInfo(0.5291666F, 0.5291666F, 0F, 0F, 25.4F);
-            this.txt.RightToLeft = DevExpress.XtraReports.UI.RightToLeft.Yes;
-            this.txt.SizeF = new System.Drawing.SizeF(190.9999F, 11.59631F);
-            this.txt.StylePriority.UseBorders = false;
-            this.txt.StylePriority.UseFont = false;
-            this.txt.StylePriority.UseTextAlignment = false;
-            this.txt.Text = "شماره کارت: 1373 3842 8510 5057";
-            this.txt.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
-            // 
             // txtSumTotal
             // 
             this.txtSumTotal.Borders = ((DevExpress.XtraPrinting.BorderSide)((((DevExpress.XtraPrinting.BorderSide.Left | DevExpress.XtraPrinting.BorderSide.Top) 
@@ -818,51 +802,6 @@
             this.xrSubreport1.Name = "xrSubreport1";
             this.xrSubreport1.SizeF = new System.Drawing.SizeF(190.9999F, 7.958662F);
             // 
-            // picMohr
-            // 
-            this.picMohr.Dpi = 25.4F;
-            this.picMohr.ImageSource = new DevExpress.XtraPrinting.Drawing.ImageSource("img", resources.GetString("picMohr.ImageSource"));
-            this.picMohr.LocationFloat = new DevExpress.Utils.PointFloat(5.820833F, 11.5963F);
-            this.picMohr.Name = "picMohr";
-            this.picMohr.SizeF = new System.Drawing.SizeF(38.89373F, 32.385F);
-            this.picMohr.Sizing = DevExpress.XtraPrinting.ImageSizeMode.ZoomImage;
-            this.picMohr.Visible = false;
-            // 
-            // xrLabel9
-            // 
-            this.xrLabel9.Borders = ((DevExpress.XtraPrinting.BorderSide)(((DevExpress.XtraPrinting.BorderSide.Left | DevExpress.XtraPrinting.BorderSide.Right) 
-            | DevExpress.XtraPrinting.BorderSide.Bottom)));
-            this.xrLabel9.Dpi = 25.4F;
-            this.xrLabel9.Font = new DevExpress.Drawing.DXFont("Samim FD", 14F, DevExpress.Drawing.DXFontStyle.Bold);
-            this.xrLabel9.LocationFloat = new DevExpress.Utils.PointFloat(0.0001372655F, 23.72181F);
-            this.xrLabel9.Multiline = true;
-            this.xrLabel9.Name = "xrLabel9";
-            this.xrLabel9.Padding = new DevExpress.XtraPrinting.PaddingInfo(0.5291666F, 0.5291666F, 0F, 0F, 25.4F);
-            this.xrLabel9.RightToLeft = DevExpress.XtraReports.UI.RightToLeft.Yes;
-            this.xrLabel9.SizeF = new System.Drawing.SizeF(190.9999F, 10.27338F);
-            this.xrLabel9.StylePriority.UseBorders = false;
-            this.xrLabel9.StylePriority.UseFont = false;
-            this.xrLabel9.StylePriority.UseTextAlignment = false;
-            this.xrLabel9.Text = "بانک ایران زمین - احمد محسن بیگی";
-            this.xrLabel9.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
-            // 
-            // xrLabel8
-            // 
-            this.xrLabel8.Borders = ((DevExpress.XtraPrinting.BorderSide)((DevExpress.XtraPrinting.BorderSide.Left | DevExpress.XtraPrinting.BorderSide.Right)));
-            this.xrLabel8.Dpi = 25.4F;
-            this.xrLabel8.Font = new DevExpress.Drawing.DXFont("Samim FD", 14F, DevExpress.Drawing.DXFontStyle.Bold);
-            this.xrLabel8.LocationFloat = new DevExpress.Utils.PointFloat(0.0001372655F, 11.5963F);
-            this.xrLabel8.Multiline = true;
-            this.xrLabel8.Name = "xrLabel8";
-            this.xrLabel8.Padding = new DevExpress.XtraPrinting.PaddingInfo(0.5291666F, 0.5291666F, 0F, 0F, 25.4F);
-            this.xrLabel8.RightToLeft = DevExpress.XtraReports.UI.RightToLeft.Yes;
-            this.xrLabel8.SizeF = new System.Drawing.SizeF(190.9999F, 12.12548F);
-            this.xrLabel8.StylePriority.UseBorders = false;
-            this.xrLabel8.StylePriority.UseFont = false;
-            this.xrLabel8.StylePriority.UseTextAlignment = false;
-            this.xrLabel8.Text = "شماره شبا: IR900690020080902929207001";
-            this.xrLabel8.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
-            // 
             // PageFooter
             // 
             this.PageFooter.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
@@ -890,18 +829,6 @@
             this.lblPage.Text = "شماره صفحه";
             this.lblPage.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             this.lblPage.PrintOnPage += new DevExpress.XtraReports.UI.PrintOnPageEventHandler(this.lblPage_PrintOnPage);
-            // 
-            // GroupFooter2
-            // 
-            this.GroupFooter2.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
-            this.picMohr,
-            this.xrLabel9,
-            this.xrLabel8,
-            this.txt});
-            this.GroupFooter2.Dpi = 25.4F;
-            this.GroupFooter2.HeightF = 49.44309F;
-            this.GroupFooter2.Level = 1;
-            this.GroupFooter2.Name = "GroupFooter2";
             // 
             // ReportHeader
             // 
@@ -932,6 +859,114 @@
             this.GroupHeader1.Name = "GroupHeader1";
             this.GroupHeader1.RepeatEveryPage = true;
             // 
+            // GroupFooter2
+            // 
+            this.GroupFooter2.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
+            this.picMohr,
+            this.xrLabel8,
+            this.xrLabel9,
+            this.txt});
+            this.GroupFooter2.Dpi = 25.4F;
+            this.GroupFooter2.HeightF = 49.4431F;
+            this.GroupFooter2.Level = 1;
+            this.GroupFooter2.Name = "GroupFooter2";
+            // 
+            // picMohr
+            // 
+            this.picMohr.Dpi = 25.4F;
+            this.picMohr.ImageSource = new DevExpress.XtraPrinting.Drawing.ImageSource("img", resources.GetString("picMohr.ImageSource"));
+            this.picMohr.LocationFloat = new DevExpress.Utils.PointFloat(16.11487F, 26.3185F);
+            this.picMohr.Name = "picMohr";
+            this.picMohr.SizeF = new System.Drawing.SizeF(23.45969F, 20.5846F);
+            this.picMohr.Sizing = DevExpress.XtraPrinting.ImageSizeMode.ZoomImage;
+            this.picMohr.Visible = false;
+            // 
+            // xrLabel8
+            // 
+            this.xrLabel8.Borders = ((DevExpress.XtraPrinting.BorderSide)(((DevExpress.XtraPrinting.BorderSide.Left | DevExpress.XtraPrinting.BorderSide.Right) 
+            | DevExpress.XtraPrinting.BorderSide.Bottom)));
+            this.xrLabel8.Dpi = 25.4F;
+            this.xrLabel8.Font = new DevExpress.Drawing.DXFont("Samim FD", 10F, DevExpress.Drawing.DXFontStyle.Bold);
+            this.xrLabel8.LocationFloat = new DevExpress.Utils.PointFloat(30F, 4.650994F);
+            this.xrLabel8.Multiline = true;
+            this.xrLabel8.Name = "xrLabel8";
+            this.xrLabel8.Padding = new DevExpress.XtraPrinting.PaddingInfo(0.5291666F, 0.5291666F, 0F, 0F, 25.4F);
+            this.xrLabel8.RightToLeft = DevExpress.XtraReports.UI.RightToLeft.Yes;
+            this.xrLabel8.SizeF = new System.Drawing.SizeF(131F, 4.628952F);
+            this.xrLabel8.StylePriority.UseBorders = false;
+            this.xrLabel8.StylePriority.UseFont = false;
+            this.xrLabel8.StylePriority.UseTextAlignment = false;
+            this.xrLabel8.Text = "شماره شبا: IR900690020080902929207001";
+            this.xrLabel8.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
+            // 
+            // xrLabel9
+            // 
+            this.xrLabel9.Borders = ((DevExpress.XtraPrinting.BorderSide)((((DevExpress.XtraPrinting.BorderSide.Left | DevExpress.XtraPrinting.BorderSide.Top) 
+            | DevExpress.XtraPrinting.BorderSide.Right) 
+            | DevExpress.XtraPrinting.BorderSide.Bottom)));
+            this.xrLabel9.CanGrow = false;
+            this.xrLabel9.Dpi = 25.4F;
+            this.xrLabel9.Font = new DevExpress.Drawing.DXFont("Samim FD", 10F, DevExpress.Drawing.DXFontStyle.Bold);
+            this.xrLabel9.LocationFloat = new DevExpress.Utils.PointFloat(30F, 0F);
+            this.xrLabel9.Multiline = true;
+            this.xrLabel9.Name = "xrLabel9";
+            this.xrLabel9.Padding = new DevExpress.XtraPrinting.PaddingInfo(0.5291666F, 0.5291666F, 0F, 0F, 25.4F);
+            this.xrLabel9.RightToLeft = DevExpress.XtraReports.UI.RightToLeft.Yes;
+            this.xrLabel9.SizeF = new System.Drawing.SizeF(69.1744F, 4.650997F);
+            this.xrLabel9.StylePriority.UseBorders = false;
+            this.xrLabel9.StylePriority.UseFont = false;
+            this.xrLabel9.StylePriority.UseTextAlignment = false;
+            this.xrLabel9.Text = "بانک ایران زمین - احمد محسن بیگی";
+            this.xrLabel9.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
+            // 
+            // txt
+            // 
+            this.txt.Borders = ((DevExpress.XtraPrinting.BorderSide)(((DevExpress.XtraPrinting.BorderSide.Top | DevExpress.XtraPrinting.BorderSide.Right) 
+            | DevExpress.XtraPrinting.BorderSide.Bottom)));
+            this.txt.CanGrow = false;
+            this.txt.Dpi = 25.4F;
+            this.txt.Font = new DevExpress.Drawing.DXFont("Samim FD", 10F, DevExpress.Drawing.DXFontStyle.Bold);
+            this.txt.LocationFloat = new DevExpress.Utils.PointFloat(99.17429F, 0F);
+            this.txt.Multiline = true;
+            this.txt.Name = "txt";
+            this.txt.Padding = new DevExpress.XtraPrinting.PaddingInfo(0.5291666F, 0.5291666F, 0F, 0F, 25.4F);
+            this.txt.RightToLeft = DevExpress.XtraReports.UI.RightToLeft.Yes;
+            this.txt.SizeF = new System.Drawing.SizeF(61.82571F, 4.650997F);
+            this.txt.StylePriority.UseBorders = false;
+            this.txt.StylePriority.UseFont = false;
+            this.txt.StylePriority.UseTextAlignment = false;
+            this.txt.Text = "شماره کارت: 1373 3842 8510 5057";
+            this.txt.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
+            // 
+            // lblAddressSeller
+            // 
+            this.lblAddressSeller.Borders = ((DevExpress.XtraPrinting.BorderSide)((((DevExpress.XtraPrinting.BorderSide.Left | DevExpress.XtraPrinting.BorderSide.Top) 
+            | DevExpress.XtraPrinting.BorderSide.Right) 
+            | DevExpress.XtraPrinting.BorderSide.Bottom)));
+            this.lblAddressSeller.Dpi = 25.4F;
+            this.lblAddressSeller.Font = new DevExpress.Drawing.DXFont("Samim FD", 10F, DevExpress.Drawing.DXFontStyle.Bold);
+            this.lblAddressSeller.LocationFloat = new DevExpress.Utils.PointFloat(30F, 0F);
+            this.lblAddressSeller.Multiline = true;
+            this.lblAddressSeller.Name = "lblAddressSeller";
+            this.lblAddressSeller.Padding = new DevExpress.XtraPrinting.PaddingInfo(0.5291666F, 0.5291666F, 0F, 0F, 25.4F);
+            this.lblAddressSeller.RightToLeft = DevExpress.XtraReports.UI.RightToLeft.Yes;
+            this.lblAddressSeller.SizeF = new System.Drawing.SizeF(131F, 4.628952F);
+            this.lblAddressSeller.StylePriority.UseBorders = false;
+            this.lblAddressSeller.StylePriority.UseFont = false;
+            this.lblAddressSeller.StylePriority.UseTextAlignment = false;
+            this.lblAddressSeller.Text = "---";
+            this.lblAddressSeller.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
+            // 
+            // GroupFooter3
+            // 
+            this.GroupFooter3.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
+            this.lblAddressSeller});
+            this.GroupFooter3.Dpi = 25.4F;
+            this.GroupFooter3.HeightF = 4.628952F;
+            this.GroupFooter3.Level = 2;
+            this.GroupFooter3.Name = "GroupFooter3";
+            this.GroupFooter3.PrintAtBottom = true;
+            // 
             // RptFactorA4
             // 
             this.Bands.AddRange(new DevExpress.XtraReports.UI.Band[] {
@@ -942,7 +977,8 @@
             this.PageFooter,
             this.GroupFooter2,
             this.ReportHeader,
-            this.GroupHeader1});
+            this.GroupHeader1,
+            this.GroupFooter3});
             this.Dpi = 25.4F;
             this.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F);
             this.Margins = new DevExpress.Drawing.DXMargins(10F, 9F, 43.28584F, 4.982092F);
@@ -992,7 +1028,6 @@
         private DevExpress.XtraReports.UI.XRLabel txtTaxes;
         private DevExpress.XtraReports.UI.XRLabel txtSumTotal;
         private DevExpress.XtraReports.UI.XRLabel xrLabel25;
-        private DevExpress.XtraReports.UI.XRLabel txt;
         private DevExpress.XtraReports.UI.GroupFooterBand GroupFooter1;
         private DevExpress.XtraReports.UI.XRTable xrTable1;
         private DevExpress.XtraReports.UI.XRTableRow xrTableRow1;
@@ -1002,16 +1037,19 @@
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell4;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell5;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell6;
-        private DevExpress.XtraReports.UI.XRLabel xrLabel9;
-        private DevExpress.XtraReports.UI.XRLabel xrLabel8;
-        private DevExpress.XtraReports.UI.XRPictureBox picMohr;
         private DevExpress.XtraReports.UI.XRLabel xrLabel11;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell7;
         private DevExpress.XtraReports.UI.PageFooterBand PageFooter;
         private DevExpress.XtraReports.UI.XRLabel lblPage;
         private DevExpress.XtraReports.UI.XRSubreport xrSubreport1;
-        private DevExpress.XtraReports.UI.GroupFooterBand GroupFooter2;
         private DevExpress.XtraReports.UI.ReportHeaderBand ReportHeader;
         private DevExpress.XtraReports.UI.GroupHeaderBand GroupHeader1;
+        private DevExpress.XtraReports.UI.GroupFooterBand GroupFooter2;
+        private DevExpress.XtraReports.UI.XRLabel xrLabel8;
+        private DevExpress.XtraReports.UI.XRLabel xrLabel9;
+        private DevExpress.XtraReports.UI.XRLabel txt;
+        private DevExpress.XtraReports.UI.XRLabel lblAddressSeller;
+        private DevExpress.XtraReports.UI.XRPictureBox picMohr;
+        private DevExpress.XtraReports.UI.GroupFooterBand GroupFooter3;
     }
 }

@@ -15,7 +15,7 @@ namespace Kavosh.UI.Forms
     public partial class FrmChequeList : DevExpress.XtraEditors.XtraForm
     {
         private readonly ChequeService _chequeService;
-        private readonly DefinitiveAccountService _definitiveAccountService;   // 👈 جدید
+        private readonly DefinitiveAccountService _definitiveAccountService;   
 
         private ClsFont _clsFont = new(false);
         private ClsFont _clsFontBold = new(true);

@@ -17,6 +17,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Windows.Input;
 using static MyCom.Form_Portable.FrmPortable;
 
 namespace Kavosh.UI.Forms
@@ -179,18 +180,18 @@ namespace Kavosh.UI.Forms
                 layInput.AddButtonOperation();
 
                 var txtId = ClsCollect.ModelTextEdit("Id", 50, "");
-                var txtCode = ClsCollect.ModelTextEditNumber("کد محصول", 50, "", true, 13, false,"N0");
+                var txtCode = ClsCollect.ModelTextEditNumber("کد محصول", 50, "", true, 13, false, "N0");
                 //var txtCode = ClsCollect.ModelTextEditPrice("کد محصول", 50, "");
-         
 
-              var getProductGroup = await _productGroupService.GetAllAsync();
+
+                var getProductGroup = await _productGroupService.GetAllAsync();
                 GroupControl cmbGroup = null;
                 cmbGroup = ClsCollect.ModelGridToDataLayoutBtn("گروه محصول", getProductGroup, "Id", "Title", "", async () =>
                 {
-                    var getData = (await _productGroupService.GetAllAsync())
-                        .Select(s => new ModelPortableData { Id = s.Id, Title = s.Title }).ToList();
-                    await new FrmPortable("گروه محصول",getData, new ModelAction
+                    var getData = (await _productGroupService.GetAllAsync()).Select(s => new ModelPortableData { Id = s.Id, Title = s.Title }).ToList();
+                    var frmPortable = new FrmPortable("گروه محصول", getData, new ModelAction
                     {
+
                         SaveData = async void (getData) =>
                         {
                             var get = getData;
@@ -213,7 +214,13 @@ namespace Kavosh.UI.Forms
                             getCmbGroup.UpdateGridLookUpEdit(getProductGroup);
 
                         },
-                    }).ShowDialogAsync();
+                    });
+                    frmPortable.FormClosing += async (s1, e1) =>
+                    {
+                        SendKeys.SendWait("{Enter}");
+                        // await Task.Delay(1000);
+                    };
+                    await frmPortable.ShowDialogAsync();
                 });
 
                 cmbGroup.Controls.Add(new SimpleButton { Width = 50, Left = 0 });
@@ -222,13 +229,12 @@ namespace Kavosh.UI.Forms
                 var txtName = ClsCollect.ModelTextEdit("نام محصول", 100, "");
 
                 var getProductUnit = await _productUnitService.GetAllAsync();
-                //var cmbUnit = ClsCollect.ModelGridToDataLayoutBtn("سنجش", getProductUnit, "Id", "Title", "");
+       
                 GroupControl cmbUnit = null;
                 cmbUnit = ClsCollect.ModelGridToDataLayoutBtn("سنجش", getProductUnit, "Id", "Title", "", async () =>
                 {
-                    var getData = (await _productUnitService.GetAllAsync())
-                        .Select(s => new ModelPortableData { Id = s.Id, Title = s.Title }).ToList();
-                    await new FrmPortable("سنجش",getData, new ModelAction
+                    var getData = (await _productUnitService.GetAllAsync()).Select(s => new ModelPortableData { Id = s.Id, Title = s.Title }).ToList();
+                    var frmPortable = new FrmPortable("سنجش", getData, new ModelAction
                     {
                         SaveData = async void (getData) =>
                         {
@@ -239,20 +245,29 @@ namespace Kavosh.UI.Forms
                                 Title = get.Title
                             };
                             await _productUnitService.SaveAsync(productUnitDto);
-                            var cmbUnit = cmbGroup.Controls.OfType<GridLookUpEdit>().First();
+                            var getCmbUnit = cmbUnit.Controls.OfType<GridLookUpEdit>().First();
                             getProductUnit = await _productUnitService.GetAllAsync();
-                            cmbUnit.UpdateGridLookUpEdit(getProductUnit);
+                            getCmbUnit.UpdateGridLookUpEdit(getProductUnit);
                         },
 
                         DeleteData = async void (id) =>
                         {
                             await _productUnitService.DeleteAsync(id);
-                            var getcmbUnit = cmbUnit.Controls.OfType<GridLookUpEdit>().First();
+                            var getCmbUnit = cmbUnit.Controls.OfType<GridLookUpEdit>().First();
                             getProductUnit = await _productUnitService.GetAllAsync();
-                            getcmbUnit.UpdateGridLookUpEdit(getProductUnit);
+                            getCmbUnit.UpdateGridLookUpEdit(getProductUnit);
                             //await SetFieldDgvProduct();   // 👈 اضافه شد — هم گرید هم موجودی‌های محاسبه‌شده رفرش میشن
                         },
-                    }).ShowDialogAsync();
+
+                    });
+                    frmPortable.FormClosing += async (s1, e1) =>
+                    {
+                        SendKeys.SendWait("{Enter}");
+                        // await Task.Delay(1000);
+                    };
+                    await frmPortable.ShowDialogAsync();
+
+                 
                 });
                 cmbUnit.ConvertGroupToGrid().HiddenColumn("Id");
 

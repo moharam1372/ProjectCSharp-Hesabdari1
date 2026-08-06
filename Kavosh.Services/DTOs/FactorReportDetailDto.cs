@@ -31,6 +31,8 @@
         public long PayableAmount { get; set; }
 
         // اطلاعات فروشگاه
+        public string AddressSeller { get; set; }
+        public string PhoneSeller { get; set; }
         public string BankName { get; set; }
         public string AccountHolderName { get; set; }
         public string CardNumber { get; set; }

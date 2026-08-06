@@ -264,6 +264,8 @@ namespace Kavosh.Services
                 PreviousDebt = previousDebt,        // 👈 اصلاح شد
                 PayableAmount = payable,
                 BankName = storeInfo?.BankName,
+                AddressSeller = storeInfo?.Address,
+                PhoneSeller = storeInfo?.Phone,
                 AccountHolderName = storeInfo?.AccountHolderName,
                 CardNumber = storeInfo?.CardNumber,
                 ShabaNumber = storeInfo?.ShabaNumber,

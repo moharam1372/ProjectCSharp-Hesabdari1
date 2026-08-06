@@ -336,8 +336,11 @@ namespace MyCom.Object
                                 {
                                     Frm_MSG frmMsg = new Frm_MSG("فیلد: (" + gText + ") " + "اجباری می باشد.", "ایران کاوش", 1, false, Color.Red);
                                     frmMsg.ShowDialog();
-                                    layoutControlItem.Control.Focus();
-                                    layoutControlItem.Control.Select();
+                                    if (layoutControlItem.Control != null)
+                                    {
+                                        layoutControlItem.Control.Focus();
+                                        layoutControlItem.Control.Select();
+                                    }
                                 }
                                 return false;
                             }

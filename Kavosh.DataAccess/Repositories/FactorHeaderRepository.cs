@@ -110,7 +110,7 @@ namespace Kavosh.DataAccess.Repositories
                     match.ProductId = incoming.ProductId;
                     match.Count = incoming.Count;
                     match.PriceUnit = incoming.PriceUnit;
-                    match.SellPrice = incoming.SellPrice;   // 👈 جدید
+                    match.SellPrice = incoming.SellPrice;   
                     match.UpdatedAt = DateTime.UtcNow;
                 }
                 else

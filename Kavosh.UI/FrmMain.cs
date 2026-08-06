@@ -52,6 +52,10 @@ namespace Kavosh.UI
 
         private async void FrmMain_Load(object sender, EventArgs e)
         {
+            this.Enabled = false;
+            FrmLogin frm = Program.CreateScopedForm<FrmLogin>();
+            await frm.ShowDialogAsync();
+            this.Enabled = true;
             //ribbon.ShowPageHeadersMode = DevExpress.XtraBars.Ribbon.ShowPageHeadersMode.Hide;
             //await SetStyle();
             await CheckChequeAlarmsAsync();
@@ -427,6 +431,14 @@ namespace Kavosh.UI
         {
             var frm = Program.CreateScopedForm<FrmChequeList>();
             frm.OverShowWait<FrmChequeList>(this);
+        }
+
+        private async void btnBarLock_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            this.Enabled = false;
+            FrmLogin frm = Program.CreateScopedForm<FrmLogin>();
+            await frm.ShowDialogAsync();
+            this.Enabled = true;
         }
     }
 }

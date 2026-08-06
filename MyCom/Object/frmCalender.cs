@@ -230,7 +230,8 @@ namespace MyCom.Object
 
 
 
-            if (e.CellValue != null && !string.IsNullOrEmpty(_setDate))
+          //  if (e.CellValue != null && !string.IsNullOrEmpty(_setDate))
+            if (e.CellValue != null)
             {
                 if ((string)e.CellValue != "")
                 {
@@ -245,6 +246,7 @@ namespace MyCom.Object
                     else if (getHoliday)
                         e.Appearance.BackColor = Color.FromArgb(181, 255, 116, 116);
 
+                    //else if (!string.IsNullOrEmpty(_setDate) && Convert.ToInt32(valueDay) == getSelDay && _setDate.Substring(5, 2) == getSelMonth)
                     else if (Convert.ToInt32(valueDay) == getSelDay && _setDate.Substring(5, 2) == getSelMonth)
                         e.Appearance.BackColor = Color.FromArgb(181, 191, 193, 40);
 
@@ -342,7 +344,7 @@ namespace MyCom.Object
             }
 
             Temp_Date = Com_Date.Cmb_Year.Text + "/" + Com_Date.Cmb_Month.Text + "/01";
-            Temp_DateMiladi = Temp_Date.ShamsiToMiladi().Value.ToString("yyyy/MM/dd");
+            Temp_DateMiladi = Temp_Date.ShamsiToMiladi()?.ToString("yyyy/MM/dd");
             int startDay = Convert.ToInt32(CC1.Shamsi2Miladi(Temp_Date, "day", false));
             SetDayShamsi(startDay);
             var getBetWeen1 = ClsDateTime.ModelDateTimePersianFunction.BetweenDateTime(DateTime.Now, SelDateEnglish);
@@ -561,13 +563,13 @@ namespace MyCom.Object
             var _dateConToMilad = ClassDateTime.ShamsiToMiladi(
                 Com_Date.Cmb_Year.Text + "/" +
                 Com_Date.Cmb_Month.Text + "/" +
-                Com_Date.Cmb_Day.Text).Value;
+                Com_Date.Cmb_Day.Text);
             //  Com_Date.Cmb_Day.Text);
 
 
-            _dateConToMilad = _dateConToMilad.AddDays(-(_dateConToMilad.Day - 1));
+            _dateConToMilad = _dateConToMilad?.AddDays(-(_dateConToMilad.Value.Day - 1));
             var _dayOfw = 0;
-            switch (_dateConToMilad.DayOfWeek)
+            switch (_dateConToMilad?.DayOfWeek)
             {
                 case DayOfWeek.Saturday:
                     _dayOfw = 0;
