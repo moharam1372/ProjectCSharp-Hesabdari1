@@ -145,13 +145,14 @@ namespace Kavosh.UI.Forms
             {
                 var daysRemaining = (c.DueDate.Date - DateTime.Today).Days;
 
+                var value = c.DueDate.DateTimePersian().Date;
                 _dtCheque.Rows.Add(
                     "",
                     c.Id,
                     c.ChequeNumber,
                     c.PersonName,
                     c.IsReceived ? "دریافتی" : "پرداختی",
-                    c.DueDate.DateTimePersian().Date,
+                    value,
                     daysRemaining,
                     c.Price,
                     StatusText(c.Status),

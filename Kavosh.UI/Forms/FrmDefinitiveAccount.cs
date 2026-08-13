@@ -156,7 +156,7 @@ namespace Kavosh.UI.Forms
                     d.Id,
                     d.IsCheck,
                     d.IsSettled,
-                    d.DateCustom,
+                    d.DateCustom.DateTimePersian().Date,
                     d.DocNumber,
                     d.Description,
                     d.Debtor ? d.Price : 0,      // بدهکار

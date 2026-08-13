@@ -247,7 +247,7 @@ namespace MyCom.Object
                         e.Appearance.BackColor = Color.FromArgb(181, 255, 116, 116);
 
                     //else if (!string.IsNullOrEmpty(_setDate) && Convert.ToInt32(valueDay) == getSelDay && _setDate.Substring(5, 2) == getSelMonth)
-                    else if (Convert.ToInt32(valueDay) == getSelDay && _setDate.Substring(5, 2) == getSelMonth)
+                    else if (Convert.ToInt32(valueDay) == getSelDay && _setDate != null && _setDate.Substring(5, 2) == getSelMonth)
                         e.Appearance.BackColor = Color.FromArgb(181, 191, 193, 40);
 
                     else
