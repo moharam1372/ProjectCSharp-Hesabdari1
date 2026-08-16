@@ -11,6 +11,7 @@ namespace Kavosh.DataAccess.Repositories
         Task<Guid> SaveWithDetailsAsync(FactorHeader header, List<FactorDetail> details, List<HowToPay> howToPays);
         Task<List<FactorHeader>> GetAllWithPersonAsync();
         Task<Dictionary<Guid, bool>> GetHowToPaySettlementSnapshotAsync(Guid factorHeaderId);
+        Task<List<FactorHeader>> GetAllWithPersonAndMarketerAsync();
     }
 
     public class FactorHeaderRepository : Repository<FactorHeader>, IFactorHeaderRepository
@@ -22,8 +23,18 @@ namespace Kavosh.DataAccess.Repositories
             return await _dbSet
                 .AsNoTracking()   // 👈 جدید
                 .Include(f => f.Person)
+                .Include(f => f.Marketer)   // 👈 جدید
                 .Where(f => !f.IsDeleted)
                 .OrderByDescending(f => f.Code)
+                .ToListAsync();
+        }
+        public async Task<List<FactorHeader>> GetAllWithPersonAndMarketerAsync()
+        {
+            return await _dbSet
+                .AsNoTracking()
+                .Include(f => f.Person)
+                .Include(f => f.Marketer)
+                .Where(f => !f.IsDeleted && f.MarketerId != null)
                 .ToListAsync();
         }
         public async Task<FactorHeader> GetByIdWithDetailsAsync(Guid id)
@@ -90,6 +101,7 @@ namespace Kavosh.DataAccess.Repositories
             existing.Discount = header.Discount;
             existing.PriceTotal = header.PriceTotal;
             existing.UpdatedAt = DateTime.UtcNow;
+            existing.MarketerId = header.MarketerId;  
 
             // Sync خط‌های کالا (بدون تغییر نسبت به قبل)
             var incomingIds = details.Where(d => d.Id != Guid.Empty).Select(d => d.Id).ToHashSet();

@@ -42,15 +42,16 @@
             ribbonPage1 = new DevExpress.XtraBars.Ribbon.RibbonPage();
             ribbonPageGroup1 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             ribbonStatusBar = new DevExpress.XtraBars.Ribbon.RibbonStatusBar();
+            barBtnMarketer = new DevExpress.XtraBars.BarButtonItem();
             ((System.ComponentModel.ISupportInitialize)ribbon).BeginInit();
             SuspendLayout();
             // 
             // ribbon
             // 
             ribbon.ExpandCollapseItem.Id = 0;
-            ribbon.Items.AddRange(new DevExpress.XtraBars.BarItem[] { ribbon.ExpandCollapseItem, barBtnProduct, barPerson, barFactor, barBtnAccounting, barBtnSetting, barBtnPardakhtDaryaft, barBtnDebtorsList, barButtonItem1, barBtnCheque, btnBarLock });
+            ribbon.Items.AddRange(new DevExpress.XtraBars.BarItem[] { ribbon.ExpandCollapseItem, barBtnProduct, barPerson, barFactor, barBtnAccounting, barBtnSetting, barBtnPardakhtDaryaft, barBtnDebtorsList, barButtonItem1, barBtnCheque, btnBarLock, barBtnMarketer });
             ribbon.Location = new Point(0, 0);
-            ribbon.MaxItemId = 11;
+            ribbon.MaxItemId = 13;
             ribbon.Name = "ribbon";
             ribbon.PageHeaderItemLinks.Add(btnBarLock);
             ribbon.PageHeaderItemLinks.Add(barButtonItem1);
@@ -168,6 +169,7 @@
             ribbonPageGroup1.ItemLinks.Add(barBtnDebtorsList);
             ribbonPageGroup1.ItemLinks.Add(barBtnCheque);
             ribbonPageGroup1.ItemLinks.Add(barBtnSetting);
+            ribbonPageGroup1.ItemLinks.Add(barBtnMarketer);
             ribbonPageGroup1.Name = "ribbonPageGroup1";
             // 
             // ribbonStatusBar
@@ -176,6 +178,16 @@
             ribbonStatusBar.Name = "ribbonStatusBar";
             ribbonStatusBar.Ribbon = ribbon;
             ribbonStatusBar.Size = new Size(1218, 37);
+            // 
+            // barBtnMarketer
+            // 
+            barBtnMarketer.AllowHtmlText = DevExpress.Utils.DefaultBoolean.True;
+            barBtnMarketer.Caption = "بازاریاب";
+            barBtnMarketer.Id = 12;
+            barBtnMarketer.ImageOptions.SvgImage = Properties.Resources.bo_person;
+            barBtnMarketer.LargeWidth = 90;
+            barBtnMarketer.Name = "barBtnMarketer";
+            barBtnMarketer.ItemClick += barBtnMarketer_ItemClick;
             // 
             // FrmMain
             // 
@@ -215,5 +227,6 @@
         private DevExpress.XtraBars.BarButtonItem barButtonItem1;
         private DevExpress.XtraBars.BarButtonItem barBtnCheque;
         private DevExpress.XtraBars.BarButtonItem btnBarLock;
+        private DevExpress.XtraBars.BarButtonItem barBtnMarketer;
     }
 }

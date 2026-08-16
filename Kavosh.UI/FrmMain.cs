@@ -440,5 +440,11 @@ namespace Kavosh.UI
             await frm.ShowDialogAsync();
             this.Enabled = true;
         }
+
+        private void barBtnMarketer_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var frm = Program.CreateScopedForm<FrmMarketer>();
+            frm.OverShowWait<FrmMarketer>(this);
+        }
     }
 }

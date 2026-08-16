@@ -86,6 +86,7 @@ namespace Kavosh.Services
                 Id = dto.Id,
                 Code = dto.Code,
                 PersonId = dto.PersonId,
+                MarketerId = dto.MarketerId,   
                 Type = dto.Type,
                 DateFactor = dto.DateFactor,
                 Discount = dto.Discount,
@@ -239,6 +240,7 @@ namespace Kavosh.Services
                 Address = factor.PersonAddress,
                 Malyat1 = factor.Malyat1,
                 Malyat2 = factor.Malyat2,
+
                 FactorDetails = factor.Details.Select(d => new FactorReportDetailDto
                 {
                     ProductTitle = d.ProductTitle,
@@ -288,7 +290,8 @@ namespace Kavosh.Services
             PriceTotal = f.PriceTotal,
             Malyat1 = f.Malyat1,
             Malyat2 = f.Malyat2,
-
+            MarketerId = f.MarketerId,
+            MarketerFullName = f.Marketer?.FullName,
 
             Details = f.FactorDetails.Select(d => new FactorDetailDto
             {

@@ -103,6 +103,16 @@ namespace Kavosh.UI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type DevExpress.Utils.Svg.SvgImage.
         /// </summary>
+        internal static DevExpress.Utils.Svg.SvgImage bo_person {
+            get {
+                object obj = ResourceManager.GetObject("bo_person", resourceCulture);
+                return ((DevExpress.Utils.Svg.SvgImage)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type DevExpress.Utils.Svg.SvgImage.
+        /// </summary>
         internal static DevExpress.Utils.Svg.SvgImage bo_product_group {
             get {
                 object obj = ResourceManager.GetObject("bo_product_group", resourceCulture);

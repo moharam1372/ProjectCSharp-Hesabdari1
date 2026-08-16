@@ -20,8 +20,8 @@ namespace Kavosh.UI.Forms
         private readonly FactorHeaderService _factorHeaderService;
         private readonly PersonService _personService;
         private readonly ProductService _productService;
-        private readonly PaymentTypeService _paymentTypeService;   // 👈 جدید
-
+        private readonly PaymentTypeService _paymentTypeService;   
+        private readonly MarketerService _marketerService;   
         public Guid? FactorIdToEdit;   // 👈 این خط رو اضافه کنید
 
         private ClsFont _clsFont = new(false);
@@ -33,13 +33,14 @@ namespace Kavosh.UI.Forms
         public FrmFactor(FactorHeaderService factorHeaderService,
                           PersonService personService,
                           ProductService productService,
-                          PaymentTypeService paymentTypeService)
+                          PaymentTypeService paymentTypeService, MarketerService marketerService)
         {
             InitializeComponent();
             _factorHeaderService = factorHeaderService;
             _personService = personService;
             _productService = productService;
             _paymentTypeService = paymentTypeService;
+            _marketerService = marketerService;
             Shown += FrmFactor_Shown;
         }
 
@@ -70,6 +71,15 @@ namespace Kavosh.UI.Forms
             pnlFunction.Controls.Add(layInput.ShowPanelOperation());
             layInput.AddButtonOperation();
 
+            #region بازاریاب
+
+            var getMarketers = (await _marketerService.GetAllAsync())
+                .Select(m => new { m.Id, m.FullName }).ToList();
+            var cmbMarketer = ClsCollect.ModelGridToDataLayoutFull("بازاریاب", getMarketers, "Id", "FullName", "", async id => { });
+            cmbMarketer.ConvertGroupToGrid().HiddenColumn("Id");
+
+            #endregion
+
             var txtId = ClsCollect.ModelTextEdit("Id", 50, "");
             var txtCode = ClsCollect.ModelTextEditNumber("کد فاکتور", 50, "");
             var txtMalyat1 = ClsCollect.ModelTextEditPrice("مالیات 1", 2, "", true, "درصد");
@@ -96,6 +106,7 @@ namespace Kavosh.UI.Forms
                 new() { Grp = 1, Ctrl = cmbPerson,AllowNull = false, SizeType = SizeConstraintsType.Custom, AutoHeight = 38 },
                 new() { Grp = 1, Ctrl = cmbType,AllowNull = false, SizeType = SizeConstraintsType.Custom, AutoHeight = 38  },
                 new() { Grp = 1, Ctrl = dtFactor,AllowNull = false},
+                new() { Grp = 1, Ctrl = cmbMarketer, AllowNull = true, SizeType = SizeConstraintsType.Custom, AutoHeight = 38 },
                 new() { Grp = 1, Ctrl = txtDiscount, },
                 new() { Grp = 1, Ctrl = txtMalyat1, },
                 new() { Grp = 1, Ctrl = txtMalyat2, },
@@ -233,6 +244,8 @@ namespace Kavosh.UI.Forms
             layInput.SetValueType("تخفیف", dto.Discount);
             layInput.SetValueType("مالیات 1", dto.Malyat1);
             layInput.SetValueType("مالیات 2", dto.Malyat2);
+            if (dto.MarketerId.HasValue)
+                layInput.SetValueType("بازاریاب", dto.MarketerId.Value);
 
             _dtFactorDetail.Rows.Clear();
             foreach (var d in dto.Details)
@@ -258,6 +271,7 @@ namespace Kavosh.UI.Forms
         private async void LayInput_BtnSaveClick(object sender, EventArgs e)
         {
             layInput._disableAfterSave = false;
+            var marketerIdRaw = layInput.GetValue<Guid>("بازاریاب");
             var dto = new FactorHeaderDto
             {
                 Id = _selectedFactorId,
@@ -268,7 +282,8 @@ namespace Kavosh.UI.Forms
                 Discount = layInput.GetValue<long>("تخفیف"),
                 Malyat1 = layInput.GetValue<long>("مالیات 1"),
                 Malyat2 = layInput.GetValue<long>("مالیات 2"),
-
+                
+                MarketerId = marketerIdRaw == Guid.Empty ? (Guid?)null : marketerIdRaw,
 
                 Details = _dtFactorDetail.Rows
                     .Cast<DataRow>()

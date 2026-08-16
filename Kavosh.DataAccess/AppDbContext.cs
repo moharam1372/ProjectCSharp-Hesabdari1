@@ -28,7 +28,7 @@ namespace Kavosh.DataAccess
         public DbSet<PaymentType> PaymentTypes { get; set; }
         public DbSet<StoreInfo> StoreInfos { get; set; }
         public DbSet<Cheque> Cheques { get; set; }
-
+        public DbSet<Marketer> Marketers { get; set; }
         // TODO: به ازای هر یک از ۱۵ جدول، یک DbSet مشابه اینجا اضافه کنید
         // public DbSet<Order> Orders { get; set; }
         // public DbSet<Product> Products { get; set; }
@@ -49,6 +49,14 @@ namespace Kavosh.DataAccess
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<FactorHeader>(entity =>
+            {
+                entity.HasOne(f => f.Marketer)
+                    .WithMany(m => m.FactorHeaders)
+                    .HasForeignKey(f => f.MarketerId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
             modelBuilder.Entity<Cheque>(entity =>
             {
                 entity.HasOne(c => c.Person)

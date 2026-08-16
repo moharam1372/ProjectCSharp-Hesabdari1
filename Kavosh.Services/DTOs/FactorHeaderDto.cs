@@ -14,8 +14,11 @@ public class FactorHeaderDto
     public long PriceTotal { get; set; }
     public long Malyat1 { get; set; } = 0;
     public long Malyat2 { get; set; } = 0;
+
+    public Guid? MarketerId { get; set; }
+    public string MarketerFullName { get; set; }
     /// <summary>
-    /// جمع بدهی صورت حساب مشتری قبل از این فاکتور
+    /// جمع بدهی صورت حساب مشتری قبل از این فاکتور  
     /// </summary>
     public long PreviousDebt { get; set; }      
     public List<FactorDetailDto> Details { get; set; } = new();
