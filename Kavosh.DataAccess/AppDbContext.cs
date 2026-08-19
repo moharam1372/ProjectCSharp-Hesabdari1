@@ -29,6 +29,8 @@ namespace Kavosh.DataAccess
         public DbSet<StoreInfo> StoreInfos { get; set; }
         public DbSet<Cheque> Cheques { get; set; }
         public DbSet<Marketer> Marketers { get; set; }
+
+        public DbSet<AppSetting> AppSettings { get; set; }
         // TODO: به ازای هر یک از ۱۵ جدول، یک DbSet مشابه اینجا اضافه کنید
         // public DbSet<Order> Orders { get; set; }
         // public DbSet<Product> Products { get; set; }

@@ -15,9 +15,11 @@ namespace Kavosh.Services
         private readonly ProductUnitService _productUnitService;
         private readonly ChequeService _chequeService;
 
+        private readonly IProductRepository _productRepository;   // 👈 جدید
+        private readonly AppSettingService _appSettingService;     // 👈 جدید
         public FactorHeaderService(IFactorHeaderRepository repository, IRepository<PaymentType> paymentTypeRepository,
             DefinitiveAccountService definitiveAccountService, StoreInfoService storeInfoService,
-            ProductUnitService productUnitService, ChequeService chequeService)
+            ProductUnitService productUnitService, ChequeService chequeService, IProductRepository productRepository, AppSettingService appSettingService)
         {
             _repository = repository;
             _paymentTypeRepository = paymentTypeRepository;
@@ -25,6 +27,8 @@ namespace Kavosh.Services
             _storeInfoService = storeInfoService;
             _productUnitService = productUnitService;
             _chequeService = chequeService;
+            _productRepository = productRepository;
+            _appSettingService = appSettingService;
         }
 
         public async Task<FactorHeaderDto> GetLastFactorAsync()
@@ -72,7 +76,7 @@ namespace Kavosh.Services
         {
             Validate(dto);
             ValidateHowToPays(dto.HowToPays);
-
+            await ValidateStockAsync(dto);   // 👈 جدید   بررسی موجودی منفی
             // 👇 Snapshot از وضعیت «قبل از ذخیره» برای تشخیص تغییرات (فقط اگه ویرایشه)
             var oldSettlements = dto.Id != Guid.Empty
                 ? await _repository.GetHowToPaySettlementSnapshotAsync(dto.Id)
@@ -316,5 +320,46 @@ namespace Kavosh.Services
                 Description = p.Description
             }).ToList()
         };
+        // ============= بررسی موجودی =============
+        private async Task ValidateStockAsync(FactorHeaderDto dto)
+        {
+            if (!dto.Type)
+                return;   // فقط برای فاکتور فروش بررسی می‌شود
+
+            var setting = await _appSettingService.GetAsync();
+            if (!setting.PreventNegativeInventory)
+                return;
+
+            // اگر فاکتور ویرایش می‌شود، مقدار قبلی هر کالا باید به موجودی برگردد
+            // چون قراره جایگزین بشه (نه اضافه بشه)
+            var oldCounts = new Dictionary<Guid, float>();
+            if (dto.Id != Guid.Empty)
+            {
+                var existingHeader = await _repository.GetByIdWithDetailsAsync(dto.Id);
+                if (existingHeader is not null)
+                {
+                    oldCounts = existingHeader.FactorDetails
+                        .GroupBy(d => d.ProductId)
+                        .ToDictionary(g => g.Key, g => g.Sum(d => d.Count));
+                }
+            }
+
+            foreach (var detail in dto.Details)
+            {
+                var product = await _productRepository.GetById(detail.ProductId);
+                if (product is null) continue;
+
+                var (input, output) = await _productRepository.GetStockMovementAsync(detail.ProductId);
+                var currentStock = product.InitialInventory + input - output;
+
+                if (oldCounts.TryGetValue(detail.ProductId, out var oldCount))
+                    currentStock += oldCount;   // مقدار قبلیِ همین فاکتور رو برگردون به موجودی
+
+                if (currentStock < detail.Count)
+                    throw new ArgumentException(
+                        $"موجودی کالای «{product.Title}» کافی نیست (موجودی فعلی: {currentStock:N0})");
+            }
+        }
     }
+
 }

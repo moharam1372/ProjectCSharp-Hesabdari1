@@ -110,6 +110,7 @@ namespace Kavosh.UI
             services.AddScoped<ChequeService>();
             services.AddScoped<LoginUserService>();
             services.AddScoped<MarketerService>();
+            services.AddScoped<AppSettingService>();
 
             // =========================================================
             // Forms

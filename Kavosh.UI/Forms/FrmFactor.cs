@@ -20,8 +20,8 @@ namespace Kavosh.UI.Forms
         private readonly FactorHeaderService _factorHeaderService;
         private readonly PersonService _personService;
         private readonly ProductService _productService;
-        private readonly PaymentTypeService _paymentTypeService;   
-        private readonly MarketerService _marketerService;   
+        private readonly PaymentTypeService _paymentTypeService;
+        private readonly MarketerService _marketerService;
         public Guid? FactorIdToEdit;   // 👈 این خط رو اضافه کنید
 
         private ClsFont _clsFont = new(false);
@@ -116,7 +116,7 @@ namespace Kavosh.UI.Forms
             layInput.BtnSaveClick += LayInput_BtnSaveClick;
             layInput.BtnNewClick += LayInput_BtnNewClick; ;
         }
-        
+
 
         // ============= خط‌های محصول (سمت چپ، قابل ویرایش) =============
         public async Task SetFieldDgvFactorDetail()
@@ -282,7 +282,7 @@ namespace Kavosh.UI.Forms
                 Discount = layInput.GetValue<long>("تخفیف"),
                 Malyat1 = layInput.GetValue<long>("مالیات 1"),
                 Malyat2 = layInput.GetValue<long>("مالیات 2"),
-                
+
                 MarketerId = marketerIdRaw == Guid.Empty ? (Guid?)null : marketerIdRaw,
 
                 Details = _dtFactorDetail.Rows
@@ -330,15 +330,37 @@ namespace Kavosh.UI.Forms
                 ClassMessageBox.ShowMSG("وضعیت پرداخت را مشخص کنید", Class_Text.Msg_Name, ClassMessageBox.enumIcon.هشدار);
                 return;
             }
-            var savedId = await _factorHeaderService.SaveFactorAsync(dto);
-            _selectedFactorId = savedId;
 
-            await PrepareNewFactor();
+            #region کنترل موجودی
 
-            Kavosh.Services.AppEvents.RaiseDataChanged(); // 👈 اضافه شد
+            try   // 👈 جدید
+            {
+                var savedId = await _factorHeaderService.SaveFactorAsync(dto);
+                _selectedFactorId = savedId;
 
-            ClassMessageBox.ShowMSG("فاکتور ذخیره شد.", Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
-            layInput._disableAfterSave = true;
+                await PrepareNewFactor();
+
+                Kavosh.Services.AppEvents.RaiseDataChanged();
+
+                ClassMessageBox.ShowMSG("فاکتور ذخیره شد.", Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
+                layInput._disableAfterSave = true;
+            }
+            catch (Exception ex)   // 👈 جدید — مثلاً پیام «موجودی کالا کافی نیست»
+            {
+                ClassMessageBox.ShowMSG(ex.Message, Class_Text.Msg_Name, ClassMessageBox.enumIcon.هشدار);
+            }
+
+            #endregion
+
+            //    var savedId = await _factorHeaderService.SaveFactorAsync(dto);
+            //    _selectedFactorId = savedId;
+
+            //    await PrepareNewFactor();
+
+            //    Kavosh.Services.AppEvents.RaiseDataChanged(); 
+
+            //    ClassMessageBox.ShowMSG("فاکتور ذخیره شد.", Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
+            //    layInput._disableAfterSave = true;
         }
 
         private async void LayInput_BtnCancelClick(object sender, EventArgs e)

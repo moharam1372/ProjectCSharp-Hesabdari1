@@ -16,6 +16,8 @@ namespace Kavosh.UI.Forms
     {
         private readonly StoreInfoService _storeInfoService;
         private readonly LoginUserService _loginUserService;
+        private readonly AppSettingService _appSettingService;   // 👈 جدید
+
 
         private ClsFont _clsFont = new(false);
         private ClsFont _clsFontBold = new(true);
@@ -23,11 +25,12 @@ namespace Kavosh.UI.Forms
         private TextEdit txtStoreName, txtPhone, txtBankName, txtAccountHolderName, txtCardNumber, txtShabaNumber, txtTaxPercent;
         private MemoEdit txtAddress;
 
-        public FrmStoreInfo(StoreInfoService storeInfoService, LoginUserService loginUserService)
+        public FrmStoreInfo(StoreInfoService storeInfoService, LoginUserService loginUserService, AppSettingService appSettingService)
         {
             InitializeComponent();
             _storeInfoService = storeInfoService;
             _loginUserService = loginUserService;
+            _appSettingService = appSettingService;
             Shown += FrmStoreInfo_Shown;
             layInput.BtnSaveClick += LayInput_BtnSaveClick;
             kavoshLayout1.BtnSaveClick += KavoshLayout1_BtnSaveClick;
@@ -58,11 +61,79 @@ namespace Kavosh.UI.Forms
                     await Task.Delay(500);
                     await SetFieldLayInput();
                 }
+                else if (e1.Page == tab3)
+                {
+                    await SetFieldLaySettingApp();
+                }
             };
 
 
         }
 
+
+
+        #region Setting App
+        KavoshLayout _layInputSettings;
+        public async Task SetFieldLaySettingApp()
+        {
+            tab3.WaitDownPage(async () =>
+            {
+                var chkBox = ClsCollect.ModelCheckEdit("موجودی منفی", CheckState.Unchecked, true);
+
+          
+                _layInputSettings = new KavoshLayout { RightToLeft = RightToLeft.Yes, Dock = DockStyle.Fill  };
+                _layInputSettings._btnCancel.Enabled = false;
+                _layInputSettings.SetFieldColumnDataLayout(true, 1,
+                    [new ClsCollect.modelControlDataLayout { Grp = 1, Ctrl = chkBox, AllowNull = false }]);
+
+                pnlSettingApp.Controls.Add(_layInputSettings.ShowPanelOperation());
+                _layInputSettings.AddButtonOperation();
+
+                pnlLayApp.Controls.Add(_layInputSettings);
+                await Task.Delay(400);
+                 _layInputSettings.CallNew();
+                 await LoadDataSettingAsync();
+
+                _layInputSettings.BtnSaveClick += async (s1, e1) =>
+                {
+                    _layInputSettings._disableAfterSave = true;
+                    try
+                    {
+                        var dto = new AppSettingDto
+                        {
+                            PreventNegativeInventory = _layInputSettings.GetValue<bool>("موجودی منفی")
+                        };
+
+                        await _appSettingService.SaveAsync(dto);
+                        ClassMessageBox.ShowMSG("تنظیمات ذخیره شد.", Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
+                        _layInputSettings.CallNew();
+                        await LoadDataSettingAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        ClassMessageBox.ShowMSG(ex.Message, Class_Text.Msg_Name, ClassMessageBox.enumIcon.هشدار);
+                    }
+                    finally
+                    {
+                        _layInputSettings._disableAfterSave = false;
+                    }
+                };
+            });
+        }
+
+        private async Task LoadDataSettingAsync()
+        {
+            var dto = await _appSettingService.GetAsync();
+            if (dto is null) return;
+
+           var getInver = dto.PreventNegativeInventory;
+
+           _layInputSettings.SetValueType("موجودی منفی", getInver);
+
+            //picLogo.Image = BytesToImage(dto.Logo);
+            //picMohr.Image = BytesToImage(dto.Mohr);
+        }
+        #endregion
         private async void KavoshLayout1_BtnSaveClick(object sender, EventArgs e)
         {
             var getPassOld = kavoshLayout1.GetValue<string>("کلمه عبور فعلی");
