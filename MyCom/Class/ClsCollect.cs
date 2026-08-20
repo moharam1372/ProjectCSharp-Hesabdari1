@@ -2440,7 +2440,7 @@ namespace MyCom.Class
                 
             return gridComboEdit;
         }
-        public static GroupControl ModelGridToDataLayoutFull<EF>(string name, List<EF> dtData, string valueMember, string displayMember, string nullText,
+        public static Panel ModelGridToDataLayoutFull<EF>(string name, List<EF> dtData, string valueMember, string displayMember, string nullText,
             Action<object> changeValue = null, Action addBtn = null, float sizeFont = 13f)
         {
             GridLookUpEdit gridComboEdit = new GridLookUpEdit
@@ -2514,12 +2514,14 @@ namespace MyCom.Class
             };
 
 
-            GroupControl groupControl = new GroupControl
+            //GroupControl groupControl = new GroupControl
+            Panel groupControl = new Panel
             {
                 Name = gridComboEdit.Name,
                 Dock = DockStyle.None,
-                ShowCaption = false,
-                BorderStyle = BorderStyles.NoBorder
+                //ShowCaption = false,
+                //BorderStyle = BorderStyles.NoBorder
+                BorderStyle = BorderStyle.None
             };
             // {Name = "GridPnl_" + gridComboEdit.Name, Dock = DockStyle.Fill,ShowCaption = false,BorderStyle = BorderStyles.NoBorder};
 
@@ -2569,7 +2571,8 @@ namespace MyCom.Class
             return groupControl;
         }
 
-        public static GroupControl ModelGridToDataLayoutBtn<EF>(string name, List<EF> dtData, string valueMember, string displayMember, string nullText, Action action = null, TextEditStyles styles = TextEditStyles.Standard, float sizeFont = 13f)
+        //public static GroupControl ModelGridToDataLayoutBtn<EF>(string name, List<EF> dtData, string valueMember, string displayMember, string nullText, Action action = null, TextEditStyles styles = TextEditStyles.Standard, float sizeFont = 13f)
+        public static Panel ModelGridToDataLayoutBtn<EF>(string name, List<EF> dtData, string valueMember, string displayMember, string nullText, Action action = null, TextEditStyles styles = TextEditStyles.Standard, float sizeFont = 13f)
         {
             GridLookUpEdit gridComboEdit = new GridLookUpEdit
             {
@@ -2642,12 +2645,14 @@ namespace MyCom.Class
             };
 
 
-            GroupControl groupControl = new GroupControl
+            //GroupControl groupControl = new GroupControl
+            Panel groupControl = new Panel
             {
                 Name = gridComboEdit.Name,
                 Dock = DockStyle.None,
-                ShowCaption = false,
-                BorderStyle = BorderStyles.NoBorder
+                //ShowCaption = false,
+                BorderStyle = BorderStyle.None
+                //BorderStyle = BorderStyles.NoBorder
             };
             // {Name = "GridPnl_" + gridComboEdit.Name, Dock = DockStyle.Fill,ShowCaption = false,BorderStyle = BorderStyles.NoBorder};
 
@@ -5255,7 +5260,7 @@ namespace MyCom.Class
 
             layout.baseLayout.EndUpdate();
         }
-        public static GridLookUpEdit ConvertGroupToGrid(this GroupControl ctrl)
+        public static GridLookUpEdit ConvertGroupToGrid(this Panel ctrl)
         {
             try
             {

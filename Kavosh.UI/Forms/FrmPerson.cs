@@ -62,7 +62,9 @@ namespace Kavosh.UI.Forms
                         new() { Name = "ویرایش", Object = KavoshGrid.enumObject.Button, ImageValue = MyCom.Properties.Resources.edit },
                         new() { Name = "حذف", Object = KavoshGrid.enumObject.Button, ImageValue = MyCom.Properties.Resources.delete },
                         new() { Name = "نام و نام‌خانوادگی", Type = typeof(string) },
+                        new() { Name = "فروشگاه", Type = typeof(string) },
                         new() { Name = "موبایل", Type = typeof(string) },
+                        new() { Name = "تلفن", Type = typeof(string) },
                         new() { Name = "کد ملی", Type = typeof(string) },
                         new() { Name = "آدرس", Type = typeof(string) },
                         new() { Name = "صورت‌حساب", Object = KavoshGrid.enumObject.Button, ImageValue = MyCom.Properties.Resources.view },   // 👈 جدید
@@ -111,13 +113,13 @@ namespace Kavosh.UI.Forms
             _dtPerson.Rows.Clear();
             foreach (var p in persons)
             {
-                _dtPerson.Rows.Add(p.Id, "ویرایش", "حذف", p.FullName, p.Mobile, p.CodeMelli, p.Address);
+                _dtPerson.Rows.Add(p.Id, "ویرایش", "حذف", p.FullName, p.Store,p.Mobile,p.Phone, p.CodeMelli, p.Address);
             }
             dgvPerson.SetFieldSizeColumn();
         }
 
         // ============= فرم ورودی =============
-        private TextEdit txtId, txtFullName, txtMobile, txtCodeMelli, txtAddress;
+        private TextEdit txtId, txtFullName, txtStore, txtMobile, txtPhone, txtCodeMelli, txtAddress;
 
         public async Task SetFieldLayInput()
         {
@@ -129,14 +131,18 @@ namespace Kavosh.UI.Forms
 
                 txtId = ClsCollect.ModelTextEdit("Id", 50, "");
                 txtFullName = ClsCollect.ModelTextEdit("نام و نام‌خانوادگی", 60, "");
+                txtStore = ClsCollect.ModelTextEdit("فروشگاه", 60, "");
                 txtMobile = ClsCollect.ModelTextEditNumber("موبایل", 11, "", true, 13, false);
+                txtPhone = ClsCollect.ModelTextEditNumber("تلفن", 11, "", true, 13, false);
                 txtCodeMelli = ClsCollect.ModelCodeMelli("کد ملی", "");
                 txtAddress = ClsCollect.ModelLayoutMemoEdit("آدرس", 100, "");
 
                 layInput.SetFieldColumnDataLayout(true, 1, [
                     new() { Grp = 1, Ctrl = txtId, Visibility = LayoutVisibility.Never},
                     new() { Grp = 1, Ctrl = txtFullName, },
+                    new() { Grp = 1, Ctrl = txtStore, },
                     new() { Grp = 1, Ctrl = txtMobile, },
+                    new() { Grp = 1, Ctrl = txtPhone, },
                     new() { Grp = 1, Ctrl = txtCodeMelli, },
                     new() { Grp = 1, Ctrl = txtAddress,SizeType = SizeConstraintsType.Custom,AutoHeight = 80},
                 ]);
@@ -157,7 +163,9 @@ namespace Kavosh.UI.Forms
             _selectedPersonId = dto.Id;
             txtId.Text = dto.Id.ToString();
             txtFullName.Text = dto.FullName;
+            txtStore.Text = dto.Store;
             txtMobile.Text = dto.Mobile;
+            txtPhone.Text = dto.Phone;
             txtCodeMelli.Text = dto.CodeMelli;
             txtAddress.Text = dto.Address;
         }
@@ -170,6 +178,8 @@ namespace Kavosh.UI.Forms
             txtMobile.Text = string.Empty;
             txtCodeMelli.Text = string.Empty;
             txtAddress.Text = string.Empty;
+            txtPhone.Text = string.Empty;
+            txtStore.Text = string.Empty;
         }
 
         private void LayInput_BtnCancelClick(object sender, EventArgs e)
@@ -186,7 +196,9 @@ namespace Kavosh.UI.Forms
                 {
                     Id = _selectedPersonId,
                     FullName = txtFullName.Text,
+                    Store= txtStore.Text,
                     Mobile = txtMobile.Text,
+                    Phone = txtPhone.Text,
                     CodeMelli = txtCodeMelli.Text,
                     Address = txtAddress.Text
                 };

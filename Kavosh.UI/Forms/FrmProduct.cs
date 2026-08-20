@@ -185,13 +185,13 @@ namespace Kavosh.UI.Forms
 
 
                 var getProductGroup = await _productGroupService.GetAllAsync();
-                GroupControl cmbGroup = null;
+                //GroupControl cmbGroup = null;
+                Panel cmbGroup = null;
                 cmbGroup = ClsCollect.ModelGridToDataLayoutBtn("گروه محصول", getProductGroup, "Id", "Title", "", async () =>
                 {
                     var getData = (await _productGroupService.GetAllAsync()).Select(s => new ModelPortableData { Id = s.Id, Title = s.Title }).ToList();
                     var frmPortable = new FrmPortable("گروه محصول", getData, new ModelAction
                     {
-
                         SaveData = async void (getData) =>
                         {
                             var get = getData;
@@ -229,8 +229,8 @@ namespace Kavosh.UI.Forms
                 var txtName = ClsCollect.ModelTextEdit("نام محصول", 100, "");
 
                 var getProductUnit = await _productUnitService.GetAllAsync();
-       
-                GroupControl cmbUnit = null;
+
+                Panel cmbUnit = null;
                 cmbUnit = ClsCollect.ModelGridToDataLayoutBtn("سنجش", getProductUnit, "Id", "Title", "", async () =>
                 {
                     var getData = (await _productUnitService.GetAllAsync()).Select(s => new ModelPortableData { Id = s.Id, Title = s.Title }).ToList();

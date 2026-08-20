@@ -46,7 +46,7 @@ namespace Kavosh.Services
             var products = await _repository.GetAllWithDetailsAsync();
             var movements = await _repository.GetStockMovementForAllAsync();
 
-            return products.Select(p =>
+            return products.OrderByDescending(o=>o.ProductCode).Select(p =>
             {
                 var (input, output) = movements.TryGetValue(p.Id, out var m) ? m : (0f, 0f);
                 return ToDto(p, input, output);

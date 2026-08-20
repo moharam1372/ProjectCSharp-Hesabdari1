@@ -34,7 +34,9 @@ namespace Kavosh.Services
             await ValidateAsync(dto, isNew);
 
             entity.FullName = dto.FullName;
+            entity.Store = dto.Store;
             entity.Mobile = dto.Mobile;
+            entity.Phone = dto.Phone;
             entity.CodeMelli = dto.CodeMelli;
             entity.Address = dto.Address;
 
@@ -82,8 +84,10 @@ namespace Kavosh.Services
             Id = p.Id,
             FullName = p.FullName,
             Mobile = p.Mobile,
+            Phone = p.Phone,
             CodeMelli = p.CodeMelli,
-            Address = p.Address
+            Address = p.Address,
+            Store=p.Store
         };
     }
 }

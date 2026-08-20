@@ -834,6 +834,21 @@ namespace MyCom.Object
                             ? ""
                             : pnlTextEdit.Text.Trim();
                     }
+                    if (control is GridLookUpEdit gridLookUpEdit)
+                    {
+                        var getBaseValue = gridLookUpEdit.EditValue;
+                        if (getBaseValue != null)
+                        {
+                            if (gridLookUpEdit.Text == gridLookUpEdit.Properties.NullText)
+                                getValue = "";
+                            else
+                                getValue = value
+                                    ? gridLookUpEdit.EditValue
+                                    : gridLookUpEdit.Text;
+                        }
+                        else
+                            getValue = "";
+                    }
                 }
             }
             else if (getCtrl is PanelControl panelControl)
@@ -972,7 +987,12 @@ namespace MyCom.Object
         {
             if (!(c is GroupControl) && !(c is SimpleButton) && !(c is LabelControl))
             {
+                var get = c.Name;
                 c.Text = null;
+            }
+            if (c is GroupControl groupControl)
+            {
+                //timeEdit.EditValue = null;
             }
             if (c is TimeEdit timeEdit)
             {

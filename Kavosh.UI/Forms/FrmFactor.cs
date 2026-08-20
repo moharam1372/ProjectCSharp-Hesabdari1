@@ -29,7 +29,7 @@ namespace Kavosh.UI.Forms
 
         private Guid _selectedFactorId = Guid.Empty;
         private DataTable _dtFactorDetail;
-        private DataTable _dtHowToPay;   // 👈 جدید
+        private DataTable _dtHowToPay;   // 👈 جدید123
         public FrmFactor(FactorHeaderService factorHeaderService,
                           PersonService personService,
                           ProductService productService,
@@ -84,21 +84,25 @@ namespace Kavosh.UI.Forms
             var txtCode = ClsCollect.ModelTextEditNumber("کد فاکتور", 50, "");
             var txtMalyat1 = ClsCollect.ModelTextEditPrice("مالیات 1", 2, "", true, "درصد");
             var txtMalyat2 = ClsCollect.ModelTextEditPrice("مالیات 2", 2, "", true, "درصد");
+            var txtDiscount = ClsCollect.ModelTextEditPrice("تخفیف", 10, "");
+
             txtMalyat1.TextChanged += (s1, e1) => { dgvFactorDetail.GetViewBase.UpdateSummary(); };
             txtMalyat2.TextChanged += (s1, e1) => { dgvFactorDetail.GetViewBase.UpdateSummary(); };
+            txtDiscount.TextChanged += (s1, e1) => { dgvFactorDetail.GetViewBase.UpdateSummary(); };
             // طرف حساب (مشتری) — همون الگوی cmbGroup توی FrmProduct
             var getPersons = (await _personService.GetAllPersonsAsync())
                 .Select(p => new { p.Id, p.FullName }).ToList();
             var cmbPerson = ClsCollect.ModelGridToDataLayoutBtn("طرف حساب", getPersons, "Id", "FullName", "");
             cmbPerson.ConvertGroupToGrid().HiddenColumn("Id");
 
-            var cmbType = ClsCollect.ModelRadioGroup("نوع فاکتور", new List<ClsCollect.modelRadioGroup>{
-                new() { Column = 1,Field = "فروش" },
-                new() { Column = 2,Field = "خرید" },
+            var cmbType = ClsCollect.ModelRadioGroup("نوع فاکتور", new List<ClsCollect.modelRadioGroup>
+            {
+                new() { Column = 1, Field = "فروش" },
+                new() { Column = 2, Field = "خرید" },
             });
 
             var dtFactor = ClsCollect.ModelDateTime("تاریخ", 10, "");
-            var txtDiscount = ClsCollect.ModelTextEditPrice("تخفیف", 10, "");
+
 
             layInput.SetFieldColumnDataLayout(true, 1, [
                 new() { Grp = 1, Ctrl = txtId, Visibility = LayoutVisibility.Never },
@@ -107,9 +111,10 @@ namespace Kavosh.UI.Forms
                 new() { Grp = 1, Ctrl = cmbType,AllowNull = false, SizeType = SizeConstraintsType.Custom, AutoHeight = 38  },
                 new() { Grp = 1, Ctrl = dtFactor,AllowNull = false},
                 new() { Grp = 1, Ctrl = cmbMarketer, AllowNull = true, SizeType = SizeConstraintsType.Custom, AutoHeight = 38 },
-                new() { Grp = 1, Ctrl = txtDiscount, },
+
                 new() { Grp = 1, Ctrl = txtMalyat1, },
                 new() { Grp = 1, Ctrl = txtMalyat2, },
+                new() { Grp = 1, Ctrl = txtDiscount, },
             ], 13);
 
             layInput.BtnCancelClick += LayInput_BtnCancelClick;
@@ -119,6 +124,7 @@ namespace Kavosh.UI.Forms
 
 
         // ============= خط‌های محصول (سمت چپ، قابل ویرایش) =============
+        private double _sumTotalForCalc;
         public async Task SetFieldDgvFactorDetail()
         {
             if (dgvFactorDetail.ColumnCount() == 0)
@@ -163,16 +169,20 @@ namespace Kavosh.UI.Forms
 
                 #region Event
 
-                double sumTotal = 0, getMalyat1;
+                double sumTotal = 0;
                 dgvFactorDetail.GetViewBase.CustomSummaryCalculate += (s1, e1) =>
                 {
                     var ConE = e1.ConvertItemSummary();
                     dgvFactorDetail.AutoSummaryCalculate(e1, "جمع", "جمع", ref sumTotal, "تومان");
+
                     var getMalyat1 = sumTotal * layInput.GetValue<long>("مالیات 1") / 100;
                     var getMalyat2 = sumTotal * layInput.GetValue<long>("مالیات 2") / 100;
+                    var getDiscount = layInput.GetValue<long>("تخفیف", true, 0);
+
                     if (ConE.FieldName == "جمع")
                     {
-                        e1.TotalValue = "جمع کل: " + (getMalyat1 + getMalyat2 + sumTotal).ToString("N0");
+                        _sumTotalForCalc = sumTotal + getMalyat1 + getMalyat2 - getDiscount;
+                        e1.TotalValue = "جمع کل: " + _sumTotalForCalc.ToString("N0");
                     }
 
                     // dgvFactorDetail.GetViewBase.UpdateSummary();
@@ -272,11 +282,12 @@ namespace Kavosh.UI.Forms
         {
             layInput._disableAfterSave = false;
             var marketerIdRaw = layInput.GetValue<Guid>("بازاریاب");
+            var getPersonId = layInput.GetValue<Guid>("طرف حساب");
             var dto = new FactorHeaderDto
             {
                 Id = _selectedFactorId,
                 Code = layInput.GetValue<long>("کد فاکتور"),
-                PersonId = layInput.GetValue<Guid>("طرف حساب"),
+                PersonId = getPersonId,
                 Type = layInput.GetValue<string>("نوع فاکتور") == "فروش",
                 DateFactor = layInput.GetValue<string>("تاریخ").ShamsiToMiladi().Value,
                 Discount = layInput.GetValue<long>("تخفیف"),
@@ -331,6 +342,17 @@ namespace Kavosh.UI.Forms
                 return;
             }
 
+            #region کنترل دو مبلغ
+
+            if (_sumTotalForCalc != _sumTotalHowToPay)
+            {
+
+                ClassMessageBox.ShowMSG("مبلغ کل فاکتور با مبلغ پرداختی باید برابر باشد", Class_Text.Msg_Name, ClassMessageBox.enumIcon.بلندگو);
+                return;
+            }
+
+            #endregion
+
             #region کنترل موجودی
 
             try   // 👈 جدید
@@ -373,6 +395,7 @@ namespace Kavosh.UI.Forms
         }
         private void FrmFactor_Load(object sender, EventArgs e) { }
         // ============= گرید نحوه‌ی پرداخت (پایین، کل عرض) =============
+        double _sumTotalHowToPay = 0;
         public async Task SetFieldDgvHowToPay()
         {
             if (dgvHowToPay.ColumnCount() == 0)
@@ -404,10 +427,10 @@ namespace Kavosh.UI.Forms
                 #endregion
 
                 #region Event
-                double sumTotal = 0;
+
                 dgvHowToPay.GetViewBase.CustomSummaryCalculate += (s1, e1) =>
                 {
-                    dgvHowToPay.AutoSummaryCalculate(e1, "مبلغ", "جمع", ref sumTotal, "تومان");
+                    dgvHowToPay.AutoSummaryCalculate(e1, "مبلغ", "جمع", ref _sumTotalHowToPay, "تومان");
                 };
 
 
