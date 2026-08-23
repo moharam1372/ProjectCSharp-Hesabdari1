@@ -19,6 +19,7 @@
         public string Address { get; set; }
         public long Malyat1 { get; set; } = 0;
         public long Malyat2 { get; set; } = 0;
+        public string Description { get; set; }   // 👈 جدید
         public List<FactorReportDetailDto> FactorDetails { get; set; } = new();
         // 👇 جدید — نحوه‌های پرداخت این فاکتور
         public List<HowToPayReportDto> HowToPays { get; set; } = new();

@@ -64,6 +64,7 @@ namespace Kavosh.UI.Forms
                     new() { Name = "نوع فاکتور", Type = typeof(string) },
                     new() { Name = "تاریخ", Type = typeof(DateTime) },
                     new() { Name = "مبلغ کل", Type = typeof(long), PriceActive = true },
+                    new() { Name = "توضیحات", Object = KavoshGrid.enumObject.TextMemo},   // 👈 جدید
                     new() { Name = "چاپ", Object = KavoshGrid.enumObject.Button, ImageValue = MyCom.Properties.Resources.Print2 },
                 ], false, true, true);
 
@@ -72,6 +73,7 @@ namespace Kavosh.UI.Forms
                 dgvFactor.MaxMinWidth("ویرایش", 40, 40);
                 dgvFactor.MaxMinWidth("حذف", 40, 40);
                 dgvFactor.MaxMinWidth("چاپ", 40, 40);
+                dgvFactor.MaxMinWidth("توضیحات", 150, 200);
                 //dgvFactor.FixColumn("چاپ", FixedStyle.MiddleLeft);
 
                 #region Event
@@ -202,7 +204,13 @@ namespace Kavosh.UI.Forms
             _dtFactor.Rows.Clear();
             foreach (var f in factors)
             {
-                _dtFactor.Rows.Add(f.Id, "ویرایش", "حذف", f.Code, f.PersonName, f.Type ? "فروش" : "خرید", f.DateFactor.DateTimePersian().Date, f.PriceTotal);
+                _dtFactor.Rows.Add(f.Id, "ویرایش", "حذف", f.Code,
+                    f.PersonName, 
+                    f.Type ? "فروش" : "خرید", 
+                    f.DateFactor.DateTimePersian().Date,
+                    f.PriceTotal,
+                   
+                    f.Description);
             }
             dgvFactor.SetFieldSizeColumn();
         }

@@ -85,6 +85,7 @@ namespace Kavosh.UI.Forms
             var txtMalyat1 = ClsCollect.ModelTextEditPrice("مالیات 1", 2, "", true, "درصد");
             var txtMalyat2 = ClsCollect.ModelTextEditPrice("مالیات 2", 2, "", true, "درصد");
             var txtDiscount = ClsCollect.ModelTextEditPrice("تخفیف", 10, "");
+            var txtDescrption = ClsCollect.ModelLayoutMemoEdit("توضیحات", 120, "");
 
             txtMalyat1.TextChanged += (s1, e1) => { dgvFactorDetail.GetViewBase.UpdateSummary(); };
             txtMalyat2.TextChanged += (s1, e1) => { dgvFactorDetail.GetViewBase.UpdateSummary(); };
@@ -104,22 +105,24 @@ namespace Kavosh.UI.Forms
             var dtFactor = ClsCollect.ModelDateTime("تاریخ", 10, "");
 
 
-            layInput.SetFieldColumnDataLayout(true, 1, [
+            layInput.SetFieldColumnDataLayout(true, 2, [
                 new() { Grp = 1, Ctrl = txtId, Visibility = LayoutVisibility.Never },
+
                 new() { Grp = 1, Ctrl = txtCode, },
                 new() { Grp = 1, Ctrl = cmbPerson,AllowNull = false, SizeType = SizeConstraintsType.Custom, AutoHeight = 38 },
                 new() { Grp = 1, Ctrl = cmbType,AllowNull = false, SizeType = SizeConstraintsType.Custom, AutoHeight = 38  },
                 new() { Grp = 1, Ctrl = dtFactor,AllowNull = false},
                 new() { Grp = 1, Ctrl = cmbMarketer, AllowNull = true, SizeType = SizeConstraintsType.Custom, AutoHeight = 38 },
 
-                new() { Grp = 1, Ctrl = txtMalyat1, },
-                new() { Grp = 1, Ctrl = txtMalyat2, },
-                new() { Grp = 1, Ctrl = txtDiscount, },
+                new() { Grp = 2, Ctrl = txtMalyat1, },
+                new() { Grp = 2, Ctrl = txtMalyat2, },
+                new() { Grp = 2, Ctrl = txtDiscount, },
+                new() { Grp = 2, Ctrl = txtDescrption,  },
             ], 13);
 
             layInput.BtnCancelClick += LayInput_BtnCancelClick;
             layInput.BtnSaveClick += LayInput_BtnSaveClick;
-            layInput.BtnNewClick += LayInput_BtnNewClick; ;
+            layInput.BtnNewClick += LayInput_BtnNewClick;
         }
 
 
@@ -254,6 +257,8 @@ namespace Kavosh.UI.Forms
             layInput.SetValueType("تخفیف", dto.Discount);
             layInput.SetValueType("مالیات 1", dto.Malyat1);
             layInput.SetValueType("مالیات 2", dto.Malyat2);
+            layInput.SetValueType("توضیحات", dto.Description);
+
             if (dto.MarketerId.HasValue)
                 layInput.SetValueType("بازاریاب", dto.MarketerId.Value);
 
@@ -283,6 +288,7 @@ namespace Kavosh.UI.Forms
             layInput._disableAfterSave = false;
             var marketerIdRaw = layInput.GetValue<Guid>("بازاریاب");
             var getPersonId = layInput.GetValue<Guid>("طرف حساب");
+            var getDescription = layInput.GetValue<string>("توضیحات");
             var dto = new FactorHeaderDto
             {
                 Id = _selectedFactorId,
@@ -293,6 +299,7 @@ namespace Kavosh.UI.Forms
                 Discount = layInput.GetValue<long>("تخفیف"),
                 Malyat1 = layInput.GetValue<long>("مالیات 1"),
                 Malyat2 = layInput.GetValue<long>("مالیات 2"),
+                Description = getDescription,
 
                 MarketerId = marketerIdRaw == Guid.Empty ? (Guid?)null : marketerIdRaw,
 
@@ -409,12 +416,15 @@ namespace Kavosh.UI.Forms
                     new() { Name = "تاریخ چک",Action = EventDatePanel, Object = KavoshGrid.enumObject.PnlDate, ImageValue = MyCom.Properties.Resources.adateoccuring },
                     new() { Name = "تسویه", Type = typeof(bool),Object = KavoshGrid.enumObject.Checked},
                     new() { Name = "توضیحات", Type = typeof(string) },
+                    new() { Name = "دریافت مبلغ",Object = KavoshGrid.enumObject.Button, ImageValue = MyCom.Properties.Resources.New2 },
+
                 ], true, false, true);
 
                 dgvHowToPay.ActiveScrollGrid();
                 dgvHowToPay.HiddenColumn("Id");
                 dgvHowToPay.MaxMinWidth("حذف", 45, 45);
                 dgvHowToPay.MaxMinWidth("مبلغ", 155, 155);
+                dgvHowToPay.MaxMinWidth("دریافت مبلغ", 45, 45);
                 dgvHowToPay.MaxMinWidth("تاریخ چک", 100, 100);
                 dgvHowToPay.AddAllowNewRowAndType(DefaultBoolean.True, NewItemRowPosition.Top);
                 dgvHowToPay.AddSummaryItem("مبلغ", "مبلغ", "", SummaryItemType.Custom);
@@ -427,6 +437,11 @@ namespace Kavosh.UI.Forms
                 #endregion
 
                 #region Event
+
+                dgvHowToPay.AddEventRowCellClick<Guid>(obj =>
+                {
+                    dgvHowToPay.SetValue("مبلغ", _sumTotalForCalc);
+                }, "Id", "دریافت مبلغ");
 
                 dgvHowToPay.GetViewBase.CustomSummaryCalculate += (s1, e1) =>
                 {

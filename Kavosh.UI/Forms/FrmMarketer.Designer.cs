@@ -18,11 +18,11 @@
             dgvMarketer = new MyCom.Object.KavoshGrid(components);
             viewMarketer = new DevExpress.XtraGrid.Views.BandedGrid.BandedGridView();
             gridBand1 = new DevExpress.XtraGrid.Views.BandedGrid.GridBand();
+            panel1 = new Panel();
+            srcGrid = new DevExpress.XtraEditors.SearchControl();
             layInput = new MyCom.Object.KavoshLayout(components);
             Root = new DevExpress.XtraLayout.LayoutControlGroup();
             pnlFunction = new Panel();
-            panel1 = new Panel();
-            srcGrid = new DevExpress.XtraEditors.SearchControl();
             ((System.ComponentModel.ISupportInitialize)splitContainerControl1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)splitContainerControl1.Panel1).BeginInit();
             splitContainerControl1.Panel1.SuspendLayout();
@@ -31,10 +31,10 @@
             splitContainerControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvMarketer).BeginInit();
             ((System.ComponentModel.ISupportInitialize)viewMarketer).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)layInput).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)Root).BeginInit();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)srcGrid.Properties).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)layInput).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)Root).BeginInit();
             SuspendLayout();
             // 
             // splitContainerControl1
@@ -44,24 +44,30 @@
             splitContainerControl1.IsSplitterFixed = true;
             splitContainerControl1.Location = new Point(0, 0);
             splitContainerControl1.Name = "splitContainerControl1";
-            splitContainerControl1.Panel1.Controls.Add(dgvMarketer);
-            splitContainerControl1.Panel1.Controls.Add(panel1);
+            // 
+            // splitContainerControl1.Panel1
+            // 
+            splitContainerControl1.Panel1.Controls.Add(layInput);
+            splitContainerControl1.Panel1.Controls.Add(pnlFunction);
             splitContainerControl1.Panel1.Text = "Panel1";
-            splitContainerControl1.Panel2.Controls.Add(layInput);
-            splitContainerControl1.Panel2.Controls.Add(pnlFunction);
+            // 
+            // splitContainerControl1.Panel2
+            // 
+            splitContainerControl1.Panel2.Controls.Add(panel1);
+            splitContainerControl1.Panel2.Controls.Add(dgvMarketer);
             splitContainerControl1.Panel2.Text = "Panel2";
-            splitContainerControl1.Size = new Size(900, 550);
-            splitContainerControl1.SplitterPosition = 384;
+            splitContainerControl1.Size = new Size(1198, 590);
+            splitContainerControl1.SplitterPosition = 744;
             splitContainerControl1.TabIndex = 0;
             // 
             // dgvMarketer
             // 
             dgvMarketer.Dock = DockStyle.Fill;
-            dgvMarketer.Location = new Point(0, 36);
+            dgvMarketer.Location = new Point(0, 0);
             dgvMarketer.MainView = viewMarketer;
             dgvMarketer.Name = "dgvMarketer";
             dgvMarketer.RightToLeft = RightToLeft.Yes;
-            dgvMarketer.Size = new Size(500, 514);
+            dgvMarketer.Size = new Size(744, 590);
             dgvMarketer.TabIndex = 0;
             dgvMarketer.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { viewMarketer });
             // 
@@ -84,7 +90,7 @@
             panel1.Dock = DockStyle.Top;
             panel1.Location = new Point(0, 0);
             panel1.Name = "panel1";
-            panel1.Size = new Size(500, 36);
+            panel1.Size = new Size(744, 36);
             panel1.TabIndex = 1;
             // 
             // srcGrid
@@ -92,13 +98,13 @@
             srcGrid.Anchor = AnchorStyles.None;
             srcGrid.Client = dgvMarketer;
             srcGrid.EditValue = "";
-            srcGrid.Location = new Point(150, 2);
+            srcGrid.Location = new Point(251, 3);
             srcGrid.Name = "srcGrid";
             srcGrid.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] { new DevExpress.XtraEditors.Repository.ClearButton(), new DevExpress.XtraEditors.Repository.SearchButton() });
             srcGrid.Properties.Client = dgvMarketer;
             srcGrid.Properties.FilterCondition = DevExpress.Data.Filtering.FilterCondition.Contains;
             srcGrid.RightToLeft = RightToLeft.Yes;
-            srcGrid.Size = new Size(245, 28);
+            srcGrid.Size = new Size(245, 20);
             srcGrid.TabIndex = 2;
             // 
             // layInput
@@ -106,8 +112,9 @@
             layInput.Dock = DockStyle.Fill;
             layInput.Location = new Point(0, 33);
             layInput.Name = "layInput";
+            layInput.OptionsView.RightToLeftMirroringApplied = true;
             layInput.Root = Root;
-            layInput.Size = new Size(384, 517);
+            layInput.Size = new Size(444, 557);
             layInput.TabIndex = 0;
             layInput.Text = "kavoshLayoutMarketer";
             // 
@@ -116,7 +123,7 @@
             Root.EnableIndentsWithoutBorders = DevExpress.Utils.DefaultBoolean.True;
             Root.GroupBordersVisible = false;
             Root.Name = "Root";
-            Root.Size = new Size(384, 517);
+            Root.Size = new Size(444, 557);
             Root.TextVisible = false;
             // 
             // pnlFunction
@@ -124,12 +131,12 @@
             pnlFunction.Dock = DockStyle.Top;
             pnlFunction.Location = new Point(0, 0);
             pnlFunction.Name = "pnlFunction";
-            pnlFunction.Size = new Size(384, 33);
+            pnlFunction.Size = new Size(444, 33);
             pnlFunction.TabIndex = 2;
             // 
             // FrmMarketer
             // 
-            ClientSize = new Size(900, 550);
+            ClientSize = new Size(1198, 590);
             Controls.Add(splitContainerControl1);
             Name = "FrmMarketer";
             RightToLeft = RightToLeft.Yes;
@@ -144,10 +151,10 @@
             splitContainerControl1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvMarketer).EndInit();
             ((System.ComponentModel.ISupportInitialize)viewMarketer).EndInit();
-            ((System.ComponentModel.ISupportInitialize)layInput).EndInit();
-            ((System.ComponentModel.ISupportInitialize)Root).EndInit();
             panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)srcGrid.Properties).EndInit();
+            ((System.ComponentModel.ISupportInitialize)layInput).EndInit();
+            ((System.ComponentModel.ISupportInitialize)Root).EndInit();
             ResumeLayout(false);
         }
 

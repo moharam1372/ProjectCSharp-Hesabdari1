@@ -45,6 +45,8 @@ namespace Kavosh.UI.Reports.Factor
             lblBuyerName.Text = data.Buyer;
             lblBuyerMobile.Text = data.Mobile;
             lblAddress.Text = data.Address;
+            txtDiscount.Text = data.Discount.ToString("N0");
+            txtDescription.Text = data.Description;
 
             long afterMalyat1 = (data.PriceTotal * data.Malyat1 / 100);
             txtTaxes.Text = afterMalyat1.ToString("N0");

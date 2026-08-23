@@ -99,9 +99,13 @@ namespace Kavosh.DataAccess.Repositories
             existing.Type = header.Type;
             existing.DateFactor = header.DateFactor;
             existing.Discount = header.Discount;
+            existing.Malyat1 = header.Malyat1;
+            existing.Malyat2 = header.Malyat2;
             existing.PriceTotal = header.PriceTotal;
             existing.UpdatedAt = DateTime.UtcNow;
             existing.MarketerId = header.MarketerId;  
+            existing.Description = header.Description;
+           
 
             // Sync خط‌های کالا (بدون تغییر نسبت به قبل)
             var incomingIds = details.Where(d => d.Id != Guid.Empty).Select(d => d.Id).ToHashSet();
