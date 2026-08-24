@@ -76,8 +76,11 @@ namespace Kavosh.UI.Forms
                 dgvFactor.MaxMinWidth("توضیحات", 150, 200);
                 //dgvFactor.FixColumn("چاپ", FixedStyle.MiddleLeft);
 
+
+                // Description ToDO Engine for width async reports Factor Item Click Event  
                 #region Event
                 Guid selId = Guid.Empty;
+
                 barBtnA5.ItemClick += async (a1,e1) => {
                     var rpt = new Kavosh.UI.Reports.Factor.RptFactorA5();
                     await FunPrint(selId, rpt);
@@ -130,6 +133,7 @@ namespace Kavosh.UI.Forms
             // فعال کردن دکمه‌های مورد نظر
             ps.SetCommandVisibility(PrintingSystemCommand.Print, CommandVisibility.All);
             ps.SetCommandVisibility(PrintingSystemCommand.ExportPdf, CommandVisibility.All);
+            ps.SetCommandVisibility(PrintingSystemCommand.ExportGraphic, CommandVisibility.All);
             ps.SetCommandVisibility(PrintingSystemCommand.ExportFile, CommandVisibility.All);
 
             // قفل کردن کامل نوار ابزار و جلوگیری از جابجایی

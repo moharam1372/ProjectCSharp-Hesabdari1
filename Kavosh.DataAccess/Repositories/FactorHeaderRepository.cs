@@ -6,12 +6,15 @@ namespace Kavosh.DataAccess.Repositories
 {
     public interface IFactorHeaderRepository : IRepository<FactorHeader>
     {
+
         Task<FactorHeader> GetByIdWithDetailsAsync(Guid id);
         Task<long> GetMaxCodeAsync();
         Task<Guid> SaveWithDetailsAsync(FactorHeader header, List<FactorDetail> details, List<HowToPay> howToPays);
         Task<List<FactorHeader>> GetAllWithPersonAsync();
         Task<Dictionary<Guid, bool>> GetHowToPaySettlementSnapshotAsync(Guid factorHeaderId);
         Task<List<FactorHeader>> GetAllWithPersonAndMarketerAsync();
+        Task<List<HowToPay>> GetHowToPaySnapshotAsync(Guid factorHeaderId);   
+
     }
 
     public class FactorHeaderRepository : Repository<FactorHeader>, IFactorHeaderRepository
@@ -182,5 +185,13 @@ namespace Kavosh.DataAccess.Repositories
                 .Where(p => p.FactorHeaderId == factorHeaderId)
                 .ToDictionaryAsync(p => p.Id, p => p.Settlement);
         }
+        public async Task<List<HowToPay>> GetHowToPaySnapshotAsync(Guid factorHeaderId)
+        {
+            return await _context.Set<HowToPay>()
+                .AsNoTracking()
+                .Where(p => p.FactorHeaderId == factorHeaderId)
+                .ToListAsync();
+        }
+   
     }
 }

@@ -265,5 +265,31 @@ namespace Kavosh.Services
             HowToPayId = d.HowToPayId,
             IsSettled = isSettled
         };
+        public async Task UpdateDebtPriceAsync(Guid howToPayId, long newPrice)
+        {
+            var debtEntry = await _repository.GetDebtByHowToPayIdAsync(howToPayId);
+            if (debtEntry is null) return;
+
+            var alreadySettled = await _repository.IsAlreadySettledAsync(debtEntry.Id);
+            if (alreadySettled)
+                throw new InvalidOperationException("این چک قبلاً وصول شده؛ مبلغش دیگر قابل ویرایش نیست.");
+
+            debtEntry.Price = newPrice;
+            await _repository.Update(debtEntry);
+            await _repository.SaveChangesAsync();
+        }
+
+        public async Task RemoveDebtByHowToPayIdAsync(Guid howToPayId)
+        {
+            var debtEntry = await _repository.GetDebtByHowToPayIdAsync(howToPayId);
+            if (debtEntry is null) return;
+
+            var alreadySettled = await _repository.IsAlreadySettledAsync(debtEntry.Id);
+            if (alreadySettled)
+                throw new InvalidOperationException("این چک قبلاً وصول شده؛ از فاکتور قابل حذف نیست.");
+
+            await _repository.Remove(debtEntry);   // Soft Delete، هماهنگ با بقیه‌ی جدول‌ها
+            await _repository.SaveChangesAsync();
+        }
     }
 }

@@ -46,6 +46,10 @@ namespace Kavosh.UI.Reports.Factor
             lblBuyerMobile.Text = data.Mobile;
             lblAddress.Text = data.Address;
             txtDiscount.Text = data.Discount.ToString("N0");
+            if (string.IsNullOrEmpty(data.Description))
+            {
+                txtDescription.Visible = lblDescription.Visible = false;
+            }
             txtDescription.Text = data.Description;
 
             long afterMalyat1 = (data.PriceTotal * data.Malyat1 / 100);

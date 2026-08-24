@@ -15,8 +15,9 @@ namespace Kavosh.Services
         private readonly ProductUnitService _productUnitService;
         private readonly ChequeService _chequeService;
 
-        private readonly IProductRepository _productRepository;   // 👈 جدید
-        private readonly AppSettingService _appSettingService;     // 👈 جدید
+        private readonly IProductRepository _productRepository;
+        private readonly AppSettingService _appSettingService;
+
         public FactorHeaderService(IFactorHeaderRepository repository, IRepository<PaymentType> paymentTypeRepository,
             DefinitiveAccountService definitiveAccountService, StoreInfoService storeInfoService,
             ProductUnitService productUnitService, ChequeService chequeService, IProductRepository productRepository, AppSettingService appSettingService)
@@ -39,6 +40,7 @@ namespace Kavosh.Services
 
             return last is null ? null : ToListDto(last);
         }
+
         public async Task<List<FactorHeaderDto>> GetAllFactorsAsync()
         {
             var factors = await _repository.GetAllWithPersonAsync();
@@ -77,11 +79,13 @@ namespace Kavosh.Services
         {
             Validate(dto);
             ValidateHowToPays(dto.HowToPays);
-            await ValidateStockAsync(dto);   // 👈 جدید   بررسی موجودی منفی
-            // 👇 Snapshot از وضعیت «قبل از ذخیره» برای تشخیص تغییرات (فقط اگه ویرایشه)
-            var oldSettlements = dto.Id != Guid.Empty
-                ? await _repository.GetHowToPaySettlementSnapshotAsync(dto.Id)
-                : new Dictionary<Guid, bool>();
+            await ValidateStockAsync(dto);   // بررسی موجودی منفی
+
+            // 👇 اصلاح‌شده: Snapshot کامل رکوردهای قبلی (نه فقط وضعیت Settlement)
+            // چون برای تشخیص «تغییر مبلغ» و «حذف کامل ردیف» به کل رکورد قبلی نیاز داریم
+            var oldHowToPays = dto.Id != Guid.Empty
+                ? await _repository.GetHowToPaySnapshotAsync(dto.Id)
+                : new List<HowToPay>();
 
             // 👇 جمع کل فاکتور بر مبنای «مبلغ فروش» محاسبه می‌شود (نه مبلغ خرید)
             var calculatedTotal = dto.Details.Sum(d => (long)(d.Count * d.SellPrice)) - dto.Discount;
@@ -91,16 +95,14 @@ namespace Kavosh.Services
                 Id = dto.Id,
                 Code = dto.Code,
                 PersonId = dto.PersonId,
-                MarketerId = dto.MarketerId,   
+                MarketerId = dto.MarketerId,
                 Type = dto.Type,
                 DateFactor = dto.DateFactor,
                 Discount = dto.Discount,
                 PriceTotal = calculatedTotal,
                 Malyat1 = dto.Malyat1,
                 Malyat2 = dto.Malyat2,
-                Description = dto.Description   // 👈 جدید
-
-
+                Description = dto.Description
             };
 
             var details = dto.Details.Select(d => new FactorDetail
@@ -109,7 +111,7 @@ namespace Kavosh.Services
                 ProductId = d.ProductId,
                 Count = d.Count,
                 PriceUnit = d.PriceUnit,
-                SellPrice = d.SellPrice,   // 👈 جدید
+                SellPrice = d.SellPrice,
             }).ToList();
 
             var howToPays = dto.HowToPays.Select(p => new HowToPay
@@ -127,22 +129,34 @@ namespace Kavosh.Services
             await _repository.SaveChangesAsync();
 
             // 👇 حالا که HowToPayها Id واقعی گرفتن، منطق DefinitiveAccount رو اجرا می‌کنیم
-            //await SyncDefinitiveAccountsAsync(dto.PersonId, dto.Code, howToPays, oldSettlements);
-            await SyncDefinitiveAccountsAsync(dto.PersonId, dto.Code, dto.Type, howToPays, oldSettlements);
+            await SyncDefinitiveAccountsAsync(dto.PersonId, dto.Code, dto.Type, howToPays, oldHowToPays);
+
             return savedId;
         }
+
+        // 👇 بازنویسی کامل — حالا هر ۴ حالت رو پوشش می‌ده: جدید / تغییرمبلغ / تسویه / حذف کامل ردیف
         private async Task SyncDefinitiveAccountsAsync(Guid personId, long factorCode, bool factorType,
-            List<HowToPay> howToPays, Dictionary<Guid, bool> oldSettlements)
+            List<HowToPay> howToPays, List<HowToPay> oldHowToPays)
         {
+            var oldById = oldHowToPays.ToDictionary(x => x.Id);
+            var currentIds = howToPays.Select(x => x.Id).ToHashSet();
+
+            // 1️⃣ ردیف‌هایی که کاملاً از فاکتور حذف شدن (موقع ویرایش)
+            foreach (var removed in oldHowToPays.Where(x => !currentIds.Contains(x.Id)))
+            {
+                bool wasDebtOrCheck = removed.PaymentTypeId == PaymentTypeIds.Debtor || removed.PaymentTypeId == PaymentTypeIds.Check;
+                if (wasDebtOrCheck)
+                    await _definitiveAccountService.RemoveDebtByHowToPayIdAsync(removed.Id);
+            }
+
+            // 2️⃣ ردیف‌های فعلی — جدید / تغییرمبلغ / تسویه
             foreach (var hp in howToPays)
             {
                 bool isDebtType = hp.PaymentTypeId == PaymentTypeIds.Debtor;
                 bool isCheckType = hp.PaymentTypeId == PaymentTypeIds.Check;
 
-                if (!isDebtType && !isCheckType)
-                    continue;
-
-                var isNewRow = !oldSettlements.ContainsKey(hp.Id);
+                var old = oldById.GetValueOrDefault(hp.Id);
+                var isNewRow = old is null;
 
                 if (isCheckType)
                 {
@@ -150,9 +164,20 @@ namespace Kavosh.Services
                     await _chequeService.CreateOrUpdateFromHowToPayAsync(hp.Id, personId, hp.CheckNumber, hp.CheckDate, hp.Price, isReceived: factorType);
                 }
 
+                if (!isDebtType && !isCheckType)
+                {
+                    // نوع پرداخت این ردیف به نقد/کارت تغییر کرده؟ پس بدهیِ قبلی‌ای که ثبت شده بود باید حذف بشه
+                    bool wasDebtOrCheck = old is not null &&
+                        (old.PaymentTypeId == PaymentTypeIds.Debtor || old.PaymentTypeId == PaymentTypeIds.Check);
+
+                    if (wasDebtOrCheck)
+                        await _definitiveAccountService.RemoveDebtByHowToPayIdAsync(hp.Id);
+
+                    continue;
+                }
+
                 if (isNewRow)
                 {
-                    // 👇 اصلاح شد — پارامتر factorType اضافه شد
                     // فروش (factorType=true) => شخص بدهکار است
                     // خرید (factorType=false) => ما بدهکاریم (شخص بستانکار است)
                     await _definitiveAccountService.CreateDebtFromHowToPayAsync(personId, hp.Id, hp.Price, factorCode, isCheckType, factorType);
@@ -160,14 +185,18 @@ namespace Kavosh.Services
                     if (isCheckType && hp.Settlement)
                         await _definitiveAccountService.SettleCheckByHowToPayIdAsync(hp.Id);
                 }
-                else if (isCheckType)
+                else
                 {
-                    var wasSettled = oldSettlements[hp.Id];
-                    if (!wasSettled && hp.Settlement)
+                    // 👇 جدید: اگه مبلغ ردیف موجود تغییر کرده، DefinitiveAccount مربوطه هم آپدیت بشه
+                    if (old.Price != hp.Price)
+                        await _definitiveAccountService.UpdateDebtPriceAsync(hp.Id, hp.Price);
+
+                    if (isCheckType && !old.Settlement && hp.Settlement)
                         await _definitiveAccountService.SettleCheckByHowToPayIdAsync(hp.Id);
                 }
             }
         }
+
         public async Task DeleteFactorAsync(Guid id)
         {
             var entity = await _repository.GetById(id);
@@ -195,7 +224,6 @@ namespace Kavosh.Services
             }
         }
 
-        // 👇 اصلاح‌شده: ساده‌تر، بدون کوئری اضافه به دیتابیس
         private static void ValidateHowToPays(List<HowToPayDto> howToPays)
         {
             if (howToPays is null || howToPays.Count == 0)
@@ -214,13 +242,13 @@ namespace Kavosh.Services
                     if (string.IsNullOrWhiteSpace(hp.CheckNumber))
                         throw new ArgumentException("برای پرداخت چکی، شماره چک الزامی است");
 
-                    if (hp.CheckDate is null || hp.CheckDate == default)   // 👈 چک Nullable
+                    if (hp.CheckDate is null || hp.CheckDate == default)
                         throw new ArgumentException("برای پرداخت چکی، تاریخ چک الزامی است");
                 }
             }
         }
 
-        // 👇 جدید — تبدیل به مدل مخصوص چاپ
+        // تبدیل به مدل مخصوص چاپ
         public async Task<FactorReportDto> GetFactorReportDataAsync(Guid factorId)
         {
             var units = await _productUnitService.GetAllAsync();
@@ -231,7 +259,7 @@ namespace Kavosh.Services
             var taxPercent = storeInfo?.TaxPercent ?? 0;
             var taxAmount = (long)(factor.PriceTotal * taxPercent / 100);
 
-            // 👇 محاسبه‌ی واقعی بدهی قبلی (بدون احتساب همین فاکتور)
+            // محاسبه‌ی واقعی بدهی قبلی (بدون احتساب همین فاکتور)
             var previousDebt = await _definitiveAccountService.GetPreviousDebtAsync(factor.PersonId, factor.Code);
 
             // مبلغ قابل پرداخت = جمع کل (این فاکتور + مالیاتش) + بدهی قبلی
@@ -252,11 +280,11 @@ namespace Kavosh.Services
                 {
                     ProductTitle = d.ProductTitle,
                     Count = d.Count,
-                    // 👇 در چاپ، «مبلغ واحد» همان مبلغ فروش است (نه مبلغ خرید)
+                    // در چاپ، «مبلغ واحد» همان مبلغ فروش است (نه مبلغ خرید)
                     PriceUnit = d.SellPrice,
                     UnitTitle = units.First(f => f.Id == d.UnitId).Title
                 }).ToList(),
-    
+
                 HowToPays = factor.HowToPays.Select(p => new HowToPayReportDto
                 {
                     PaymentTypeTitle = p.PaymentTypeTitle,
@@ -270,7 +298,7 @@ namespace Kavosh.Services
                 Discount = factor.Discount,
                 PriceTotal = factor.PriceTotal,
                 TaxAmount = taxAmount,
-                PreviousDebt = previousDebt,        // 👈 اصلاح شد
+                PreviousDebt = previousDebt,
                 PayableAmount = payable,
                 BankName = storeInfo?.BankName,
                 AddressSeller = storeInfo?.Address,
@@ -307,7 +335,7 @@ namespace Kavosh.Services
                 ProductTitle = d.Product?.Title,
                 Count = d.Count,
                 PriceUnit = d.PriceUnit,
-                SellPrice = d.SellPrice,   // 👈 جدید
+                SellPrice = d.SellPrice,
                 UnitId = d.Product.ProductUnitId
             }).ToList(),
 
@@ -323,6 +351,7 @@ namespace Kavosh.Services
                 Description = p.Description
             }).ToList()
         };
+
         // ============= بررسی موجودی =============
         private async Task ValidateStockAsync(FactorHeaderDto dto)
         {
@@ -364,5 +393,4 @@ namespace Kavosh.Services
             }
         }
     }
-
 }

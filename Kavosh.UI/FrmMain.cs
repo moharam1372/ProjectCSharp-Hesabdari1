@@ -21,6 +21,32 @@ namespace Kavosh.UI
 {
     public partial class FrmMain : DevExpress.XtraBars.Ribbon.RibbonForm
     {
+        protected override void WndProc(ref Message m)
+        {
+            if (m.Msg == NativeMethods.WM_SHOWME)
+            {
+                ShowMeAndMaximize();
+            }
+
+            base.WndProc(ref m);
+        }
+
+        private void ShowMeAndMaximize()
+        {
+            if (WindowState == FormWindowState.Minimized)
+                WindowState = FormWindowState.Normal;
+
+            WindowState = FormWindowState.Maximized;
+
+            // ترفند استاندارد برای آوردن پنجره به جلو حتی وقتی برنامه فوکوس ندارد
+            bool wasTopMost = TopMost;
+            TopMost = true;
+            TopMost = wasTopMost;
+
+            Activate();
+            BringToFront();
+        }
+
         private ClsFont _clsFont = new ClsFont(false);
         private ClsFont _clsFontBold = new ClsFont(true);
 

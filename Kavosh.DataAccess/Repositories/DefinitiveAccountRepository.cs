@@ -44,7 +44,8 @@ namespace Kavosh.DataAccess.Repositories
         public async Task<DefinitiveAccount> GetDebtByHowToPayIdAsync(Guid howToPayId)
         {
             return await _dbSet.FirstOrDefaultAsync(d =>
-                d.HowToPayId == howToPayId && d.IsCheck && d.Debtor);
+                d.HowToPayId == howToPayId && d.Debtor && d.SettledFromId == null);
+//d.HowToPayId == howToPayId && d.IsCheck && d.Debtor);
         }
 
         public async Task<bool> IsAlreadySettledAsync(Guid definitiveAccountId)

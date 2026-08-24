@@ -20,6 +20,26 @@ namespace Kavosh.UI
         [STAThread]
         static void Main()
         {
+            const string mutexName = "Kavosh_UI_SingleInstance_Mutex_{8F5B2A11-2C4E-4A9F-9C3A-1D2E3F4A5B6C}";
+
+            using var mutex = new Mutex(true, mutexName, out bool createdNew);
+
+            if (!createdNew)
+            {
+                // نمونه‌ی دیگری در حال اجراست:
+                // به آن نمونه پیام می‌فرستیم که خودش را نشان بدهد و بدون هیچ پیامی از این نمونه خارج می‌شویم
+                NativeMethods.PostMessage(
+                    (IntPtr)NativeMethods.HWND_BROADCAST,
+                    NativeMethods.WM_SHOWME,
+                    IntPtr.Zero,
+                    IntPtr.Zero);
+
+                return; // خروج بی‌صدا از نمونه‌ی دوم
+            }
+
+            // ================= از اینجا به بعد کد قبلی خودتان بدون تغییر =================
+
+
             //WindowsFormsSettings.SetDPIAware();
             //ApplicationConfiguration.Initialize();
 
