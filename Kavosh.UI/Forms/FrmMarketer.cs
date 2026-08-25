@@ -14,7 +14,6 @@ namespace Kavosh.UI.Forms
     {
         private readonly MarketerService _marketerService;
 
-        private ClsFont _clsFont = new(false);
         private ClsFont _clsFontBold = new(true);
 
         private DataTable _dtMarketer;
@@ -29,16 +28,30 @@ namespace Kavosh.UI.Forms
 
         private async void FrmMarketer_Shown(object sender, EventArgs e)
         {
+            tabPane1.SelectedPageChanged += async (s1, e1) =>
+            {
+                if (tabPane1.SelectedPage==tabNavigationPage2)
+                {
+                    await SetFieldDgvReport();
+                }
+            };
+
             await SetStyle();
             await SetFieldLayInput();
             await SetFieldDgvMarketer();
+    
         }
 
         public async Task SetStyle()
         {
+            _clsFontBold.ChangeFont(tabPane1, 13);
             _clsFontBold.ChangeFont(srcGrid, 15);
             _clsFontBold.ChangeFont(dgvMarketer);
             await dgvMarketer.SetStyle();
+
+            _clsFontBold.ChangeFont(dgvMarketerReport);
+            _clsFontBold.ChangeFont(searchControl2, 15);
+            await dgvMarketerReport.SetStyle();
         }
 
         public async Task SetFieldDgvMarketer()
@@ -172,5 +185,41 @@ namespace Kavosh.UI.Forms
         }
 
         private void FrmMarketer_Load(object sender, EventArgs e) { }
+
+
+        #region Report
+        private DataTable _dtReport;
+
+        private async Task SetFieldDgvReport()
+        {
+            dgvMarketerReport.WaitDownPage(async () =>
+            {
+                if (dgvMarketerReport.ColumnCount() == 0)
+                {
+                    _dtReport = dgvMarketerReport.GridStructure([
+                        new() { Name = "نام بازاریاب", Type = typeof(string) },
+                        new() { Name = "شماره تماس", Type = typeof(string) },
+                        new() { Name = "تعداد فاکتور", Type = typeof(int) },
+                        new() { Name = "تعداد مشتری جذب‌شده", Type = typeof(int) },
+                        new() { Name = "جمع فروش", Type = typeof(long), PriceActive = true },
+                    ], false, true, true);
+
+                    dgvMarketerReport.ActiveScrollGrid();
+                }
+
+                var items = await _marketerService.GetMarketerReportAsync();
+
+                _dtReport.Rows.Clear();
+                foreach (var m in items)
+                {
+                    _dtReport.Rows.Add(m.MarketerFullName, m.PhoneNumber, m.FactorCount, m.CustomerCount, m.TotalSales);
+                }
+
+                dgvMarketerReport.SetFieldSizeColumn();
+            });
+        }
+
+
+        #endregion
     }
 }
