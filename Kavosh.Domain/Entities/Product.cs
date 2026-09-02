@@ -12,6 +12,7 @@
         public Guid ProductUnitId { get; set; }
         public ProductUnit ProductUnit { get; set; }
 
+
         /// <summary>
         /// موجودی اولیه
         /// </summary>

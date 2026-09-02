@@ -14,8 +14,8 @@ public class FactorHeaderDto
     public long PriceTotal { get; set; }
     public long Malyat1 { get; set; } = 0;
     public long Malyat2 { get; set; } = 0;
-    public string Description { get; set; }   // 👈 جدید
-
+    public string Description { get; set; }
+    public long Freight { get; set; } = 0;   // 👈 جدید
     public Guid? MarketerId { get; set; }
     public string MarketerFullName { get; set; }
     /// <summary>

@@ -66,6 +66,7 @@ namespace Kavosh.UI.Forms
         {
             _clsFontBold.ChangeFont(dgvProduct);
             _clsFontBold.ChangeFont(srcGrid, 15);
+            _clsFontBold.ChangeFont(btnBarCode);
             await dgvProduct.SetStyle();
         }
 
@@ -267,7 +268,7 @@ namespace Kavosh.UI.Forms
                     };
                     await frmPortable.ShowDialogAsync();
 
-                 
+
                 });
                 cmbUnit.ConvertGroupToGrid().HiddenColumn("Id");
 
@@ -300,36 +301,45 @@ namespace Kavosh.UI.Forms
 
         private async void LayInput_BtnSaveClick(object sender, EventArgs e)
         {
-            layInput._disableAfterSave = true;
+            layInput._disableAfterSave = false;
+            //layInput.WaitDownPage(async () =>
+            //{
+
+
+
+            var dto = new ProductDto
+            {
+                Id = _selectedProductId,
+                ProductCode = layInput.GetValue<long>("کد محصول"),
+                Title = layInput.GetValue<string>("نام محصول"),
+                ProductGroupId = layInput.GetValue<Guid>("گروه محصول"),
+                ProductUnitId = layInput.GetValue<Guid>("سنجش"),
+                InitialInventory = layInput.GetValue<float>("موجودی اولیه"),
+                SellPrice = layInput.GetValue<long>("قیمت فروش"),
+                UnitPrice = layInput.GetValue<long>("قیمت واحد")
+            };
+
             try
             {
-                var dto = new ProductDto
-                {
-                    Id = _selectedProductId,
-                    ProductCode = layInput.GetValue<long>("کد محصول"),
-                    Title = layInput.GetValue<string>("نام محصول"),
-                    ProductGroupId = layInput.GetValue<Guid>("گروه محصول"),
-                    ProductUnitId = layInput.GetValue<Guid>("سنجش"),
-                    InitialInventory = layInput.GetValue<float>("موجودی اولیه"),
-                    SellPrice = layInput.GetValue<long>("قیمت فروش"),
-                    UnitPrice = layInput.GetValue<long>("قیمت واحد")
-                };
-
                 var savedId = await _productService.SaveProductAsync(dto);
-                _selectedProductId = Guid.Empty;   // 👈 مورد بعدی هم می‌بینی چرا لازمه
+                _selectedProductId = Guid.Empty; // 👈 مورد بعدی هم می‌بینی چرا لازمه
+                                                 //await Task.Delay(1200);
+                layInput.CallCancel();
 
                 await SetFieldDgvProduct();
+
                 ClassMessageBox.ShowMSG("اطلاعات ذخیره شد.", Class_Text.Msg_Name, ClassMessageBox.enumIcon.موفقیت);
+
             }
             catch (Exception ex)
             {
+                layInput._disableAfterSave = false;
                 var message = ex.InnerException?.Message ?? ex.Message;
                 ClassMessageBox.ShowMSG(message, Class_Text.Msg_Name, ClassMessageBox.enumIcon.هشدار); // آیکون درست
             }
-            finally
-            {
-                layInput._disableAfterSave = false;
-            }
+
+            //  });
+
         }
 
         private void FrmProduct_Load(object sender, EventArgs e)

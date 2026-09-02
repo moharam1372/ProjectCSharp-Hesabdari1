@@ -279,7 +279,8 @@ namespace MyCom.Object
             _btnSave.Click += (s, e) =>
             {
                 //bubble the event up to the parent
-                if (!CheckNullField())
+                var b = !CheckNullField();
+                if (b)
                     return;
 
                 BtnSaveClick?.Invoke(this, e);

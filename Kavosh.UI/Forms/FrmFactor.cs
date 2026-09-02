@@ -71,6 +71,13 @@ namespace Kavosh.UI.Forms
             pnlFunction.Controls.Add(layInput.ShowPanelOperation());
             layInput.AddButtonOperation();
 
+            #region کرایه
+
+            var txtFreight = ClsCollect.ModelTextEditPrice("کرایه", 10, "");
+            txtFreight.TextChanged += (s1, e1) => { dgvFactorDetail.GetViewBase.UpdateSummary(); };
+
+            #endregion
+
             #region بازاریاب
 
             var getMarketers = (await _marketerService.GetAllAsync())
@@ -112,6 +119,7 @@ namespace Kavosh.UI.Forms
                 new() { Grp = 1, Ctrl = cmbPerson,AllowNull = false, SizeType = SizeConstraintsType.Custom, AutoHeight = 38 },
                 new() { Grp = 1, Ctrl = cmbType,AllowNull = false, SizeType = SizeConstraintsType.Custom, AutoHeight = 38  },
                 new() { Grp = 1, Ctrl = dtFactor,AllowNull = false},
+                new() { Grp = 1, Ctrl = txtFreight, AllowNull = true,},
                 new() { Grp = 1, Ctrl = cmbMarketer, AllowNull = true, SizeType = SizeConstraintsType.Custom, AutoHeight = 38 },
 
                 new() { Grp = 2, Ctrl = txtMalyat1, },
@@ -132,18 +140,27 @@ namespace Kavosh.UI.Forms
         {
             if (dgvFactorDetail.ColumnCount() == 0)
             {
+                //_dtFactorDetail = dgvFactorDetail.GridStructure([
+                //    new() { Name = "Id", Type = typeof(Guid) },
+                //    new() { Name = "حذف", Object = KavoshGrid.enumObject.Button, ImageValue = MyCom.Properties.Resources.delete },
+                //    new() { Name = "محصول", Type = typeof(Guid) },
+                //    new() { Name = "تعداد", Type = typeof(float) },
+                //    new() { Name = "قیمت واحد", Type = typeof(long),PriceActive = true},   // مبلغ خرید - اطلاعاتی
+                //    new() { Name = "قیمت فروش", Type = typeof(long),PriceActive = true},   // 👈 جدید - قابل ویرایش، مبنای جمع و چاپ
+                //    new() { Name = "جمع", Type = typeof(long),PriceActive = true },
+                //], true, false, true);
                 _dtFactorDetail = dgvFactorDetail.GridStructure([
                     new() { Name = "Id", Type = typeof(Guid) },
                     new() { Name = "حذف", Object = KavoshGrid.enumObject.Button, ImageValue = MyCom.Properties.Resources.delete },
                     new() { Name = "محصول", Type = typeof(Guid) },
                     new() { Name = "تعداد", Type = typeof(float) },
-                    new() { Name = "قیمت واحد", Type = typeof(long),PriceActive = true},   // مبلغ خرید - اطلاعاتی
-                    new() { Name = "قیمت فروش", Type = typeof(long),PriceActive = true},   // 👈 جدید - قابل ویرایش، مبنای جمع و چاپ
+                    new() { Name = "قیمت واحد", Type = typeof(long),PriceActive = true},   // بهای تمام‌شده - مخفی، فقط اطلاعاتی
+                    new() { Name = "مبلغ", Type = typeof(long),PriceActive = true},        // 👈 قبلاً "قیمت فروش" بود - قابل ویرایش، مبنای محاسبه
                     new() { Name = "جمع", Type = typeof(long),PriceActive = true },
                 ], true, false, true);
-
                 dgvFactorDetail.ActiveScrollGrid();
                 dgvFactorDetail.HiddenColumn("Id");
+                dgvFactorDetail.HiddenColumn("قیمت واحد");   // 👈 جدید - مخفی شد
                 dgvFactorDetail.MaxMinWidth("حذف", 45, 45);
                 dgvFactorDetail.MaxMinWidth("جمع", 155, 155);
                 dgvFactorDetail.AddAllowNewRowAndType(DefaultBoolean.True, NewItemRowPosition.Top);
@@ -155,15 +172,34 @@ namespace Kavosh.UI.Forms
                 var getProducts = (await _productService.GetAllProductsAsync())
                     .Select(s => new { s.Id, s.Title, s.SellPrice, s.UnitPrice }).ToList();
 
+                //var cmbProduct = dgvFactorDetail.AddGridToGrid(getProducts, "محصول", "Id", "Title", select =>
+                //{
+                //    var getCount = dgvFactorDetail.GetValue<long>("تعداد");
+                //    var product = getProducts.First(f => f.Id == select.Id);
+
+                //    dgvFactorDetail.SetValue("قیمت واحد", product.UnitPrice);   // مبلغ خرید - فقط اطلاعاتی
+                //    dgvFactorDetail.SetValue("قیمت فروش", product.SellPrice);   // مبلغ فروش - پیش‌فرض، قابل تغییر توسط کاربر
+                //    dgvFactorDetail.SetValue("جمع", product.SellPrice * getCount);
+                //});
+
+                #region جدید 
+
                 var cmbProduct = dgvFactorDetail.AddGridToGrid(getProducts, "محصول", "Id", "Title", select =>
                 {
                     var getCount = dgvFactorDetail.GetValue<long>("تعداد");
                     var product = getProducts.First(f => f.Id == select.Id);
 
-                    dgvFactorDetail.SetValue("قیمت واحد", product.UnitPrice);   // مبلغ خرید - فقط اطلاعاتی
-                    dgvFactorDetail.SetValue("قیمت فروش", product.SellPrice);   // مبلغ فروش - پیش‌فرض، قابل تغییر توسط کاربر
-                    dgvFactorDetail.SetValue("جمع", product.SellPrice * getCount);
+                    // 👇 بسته به نوع فاکتور، پیش‌فرض «مبلغ» فرق می‌کند
+                    var isSale = layInput.GetValue<string>("نوع فاکتور") != "خرید";
+                    var defaultAmount = isSale ? product.SellPrice : product.UnitPrice;
+
+                    dgvFactorDetail.SetValue("قیمت واحد", product.UnitPrice);   // بهای تمام‌شده - مخفی
+                    dgvFactorDetail.SetValue("مبلغ", defaultAmount);
+                    dgvFactorDetail.SetValue("جمع", defaultAmount * getCount);
                 });
+
+                #endregion
+
                 cmbProduct.HiddenColumn("Id");
                 cmbProduct.HiddenColumn("SellPrice");
                 cmbProduct.HiddenColumn("UnitPrice");
@@ -181,32 +217,51 @@ namespace Kavosh.UI.Forms
                     var getMalyat1 = sumTotal * layInput.GetValue<long>("مالیات 1") / 100;
                     var getMalyat2 = sumTotal * layInput.GetValue<long>("مالیات 2") / 100;
                     var getDiscount = layInput.GetValue<long>("تخفیف", true, 0);
+                    var getFreight = layInput.GetValue<long>("کرایه", true, 0);   // 👈 جدید
 
+                    //if (ConE.FieldName == "جمع")
+                    //{
+                    //    _sumTotalForCalc = sumTotal + getMalyat1 + getMalyat2 - getDiscount;
+                    //    e1.TotalValue = "جمع کل: " + _sumTotalForCalc.ToString("N0");
+                    //}
                     if (ConE.FieldName == "جمع")
                     {
-                        _sumTotalForCalc = sumTotal + getMalyat1 + getMalyat2 - getDiscount;
+                        _sumTotalForCalc = sumTotal + getMalyat1 + getMalyat2 - getDiscount + getFreight;   // 👈 اصلاح شد
                         e1.TotalValue = "جمع کل: " + _sumTotalForCalc.ToString("N0");
                     }
-
                     // dgvFactorDetail.GetViewBase.UpdateSummary();
                 };
 
 
                 dgvFactorDetail.GetViewBase.CellValueChanged += (s1, e1) =>
                 {
-                    // 👇 جمع فقط بر اساس «تعداد» و «قیمت فروش» محاسبه می‌شود (نه قیمت واحد/خرید)
-                    if (e1.Column.FieldName != "قیمت فروش" && e1.Column.FieldName != "تعداد")
+                    //// 👇 جمع فقط بر اساس «تعداد» و «قیمت فروش» محاسبه می‌شود (نه قیمت واحد/خرید)
+                    //if (e1.Column.FieldName != "قیمت فروش" && e1.Column.FieldName != "تعداد")
+                    //    return;
+
+                    //long getSellPrice = e1.Column.FieldName == "قیمت فروش"
+                    //    ? e1.Value.GetNum<long>()
+                    //    : dgvFactorDetail.GetValue<long>("قیمت فروش");
+
+                    //long getCount = e1.Column.FieldName == "تعداد"
+                    //    ? e1.Value.GetNum<long>()
+                    //    : dgvFactorDetail.GetValue<long>("تعداد");
+
+                    //dgvFactorDetail.SetValue("جمع", getSellPrice * getCount);
+
+                    // 👇 جمع فقط بر اساس «تعداد» و «مبلغ» محاسبه می‌شود
+                    if (e1.Column.FieldName != "مبلغ" && e1.Column.FieldName != "تعداد")
                         return;
 
-                    long getSellPrice = e1.Column.FieldName == "قیمت فروش"
+                    long getAmount = e1.Column.FieldName == "مبلغ"
                         ? e1.Value.GetNum<long>()
-                        : dgvFactorDetail.GetValue<long>("قیمت فروش");
+                        : dgvFactorDetail.GetValue<long>("مبلغ");
 
                     long getCount = e1.Column.FieldName == "تعداد"
                         ? e1.Value.GetNum<long>()
                         : dgvFactorDetail.GetValue<long>("تعداد");
 
-                    dgvFactorDetail.SetValue("جمع", getSellPrice * getCount);
+                    dgvFactorDetail.SetValue("جمع", getAmount * getCount);
 
                 };
 
@@ -255,6 +310,7 @@ namespace Kavosh.UI.Forms
             layInput.SetValueType("نوع فاکتور", dto.Type ? "فروش" : "خرید");
             layInput.SetValueType("تاریخ", dto.DateFactor.DateTimePersian().Date);
             layInput.SetValueType("تخفیف", dto.Discount);
+            layInput.SetValueType("کرایه", dto.Freight);   // 👈 جدید
             layInput.SetValueType("مالیات 1", dto.Malyat1);
             layInput.SetValueType("مالیات 2", dto.Malyat2);
             layInput.SetValueType("توضیحات", dto.Description);
@@ -299,6 +355,7 @@ namespace Kavosh.UI.Forms
                 Discount = layInput.GetValue<long>("تخفیف"),
                 Malyat1 = layInput.GetValue<long>("مالیات 1"),
                 Malyat2 = layInput.GetValue<long>("مالیات 2"),
+                Freight = layInput.GetValue<long>("کرایه"),   // 👈 جدید
                 Description = getDescription,
 
                 MarketerId = marketerIdRaw == Guid.Empty ? (Guid?)null : marketerIdRaw,
@@ -313,7 +370,8 @@ namespace Kavosh.UI.Forms
                         ProductId = (Guid)r["محصول"],
                         Count = Convert.ToSingle(r["تعداد"]),
                         PriceUnit = Convert.ToInt64(r["قیمت واحد"]),
-                        SellPrice = Convert.ToInt64(r["قیمت فروش"])
+                        //SellPrice = Convert.ToInt64(r["قیمت فروش"]),
+                        SellPrice = Convert.ToInt64(r["مبلغ"])   // 👈 اصلاح شد - قبلاً "قیمت فروش"
                     }).ToList(),
 
 
@@ -334,7 +392,8 @@ namespace Kavosh.UI.Forms
                             CheckNumber = r["شماره چک"] as string,
                             CheckDate = checkDate, // 👈 اصلاح شد
                             Settlement = r["تسویه"] != DBNull.Value && Convert.ToBoolean(r["تسویه"]),
-                            Description = r["توضیحات"] as string
+                            Description = r["توضیحات"] as string,
+
                         };
                     }).ToList()
             };

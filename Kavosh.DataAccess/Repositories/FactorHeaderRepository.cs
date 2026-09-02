@@ -108,6 +108,7 @@ namespace Kavosh.DataAccess.Repositories
             existing.UpdatedAt = DateTime.UtcNow;
             existing.MarketerId = header.MarketerId;  
             existing.Description = header.Description;
+            existing.Freight = header.Freight;
            
 
             // Sync خط‌های کالا (بدون تغییر نسبت به قبل)

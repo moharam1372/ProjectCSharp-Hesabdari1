@@ -38,6 +38,7 @@
             layInput = new MyCom.Object.KavoshLayout(components);
             Root = new DevExpress.XtraLayout.LayoutControlGroup();
             pnlFunction = new Panel();
+            btnBarCode = new DevExpress.XtraEditors.SimpleButton();
             ((System.ComponentModel.ISupportInitialize)splitContainerControl1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)splitContainerControl1.Panel1).BeginInit();
             splitContainerControl1.Panel1.SuspendLayout();
@@ -71,7 +72,7 @@
             splitContainerControl1.Panel2.Controls.Add(layInput);
             splitContainerControl1.Panel2.Controls.Add(pnlFunction);
             splitContainerControl1.Panel2.Text = "Panel2";
-            splitContainerControl1.Size = new Size(1113, 608);
+            splitContainerControl1.Size = new Size(1113, 606);
             splitContainerControl1.SplitterPosition = 384;
             splitContainerControl1.TabIndex = 0;
             // 
@@ -82,7 +83,7 @@
             dgvProduct.MainView = viewProduct;
             dgvProduct.Name = "dgvProduct";
             dgvProduct.RightToLeft = RightToLeft.Yes;
-            dgvProduct.Size = new Size(713, 572);
+            dgvProduct.Size = new Size(713, 570);
             dgvProduct.TabIndex = 0;
             dgvProduct.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { viewProduct });
             // 
@@ -101,6 +102,7 @@
             // panel1
             // 
             panel1.BackColor = Color.FromArgb(255, 255, 192);
+            panel1.Controls.Add(btnBarCode);
             panel1.Controls.Add(srcGrid);
             panel1.Dock = DockStyle.Top;
             panel1.Location = new Point(0, 0);
@@ -136,7 +138,7 @@
             layInput.Location = new Point(0, 33);
             layInput.Name = "layInput";
             layInput.Root = Root;
-            layInput.Size = new Size(384, 575);
+            layInput.Size = new Size(384, 573);
             layInput.TabIndex = 0;
             layInput.Text = "kavoshLayout1";
             // 
@@ -145,7 +147,7 @@
             Root.EnableIndentsWithoutBorders = DevExpress.Utils.DefaultBoolean.True;
             Root.GroupBordersVisible = false;
             Root.Name = "Root";
-            Root.Size = new Size(384, 575);
+            Root.Size = new Size(384, 573);
             Root.TextVisible = false;
             // 
             // pnlFunction
@@ -156,9 +158,18 @@
             pnlFunction.Size = new Size(384, 33);
             pnlFunction.TabIndex = 2;
             // 
+            // btnBarCode
+            // 
+            btnBarCode.ImageOptions.SvgImage = Properties.Resources.shopping_barcode;
+            btnBarCode.Location = new Point(584, 1);
+            btnBarCode.Name = "btnBarCode";
+            btnBarCode.Size = new Size(127, 34);
+            btnBarCode.TabIndex = 9;
+            btnBarCode.Text = "بارکد";
+            // 
             // FrmProduct
             // 
-            ClientSize = new Size(1113, 608);
+            ClientSize = new Size(1113, 606);
             Controls.Add(splitContainerControl1);
             Name = "FrmProduct";
             StartPosition = FormStartPosition.CenterScreen;
@@ -190,5 +201,6 @@
         private DevExpress.XtraGrid.Views.BandedGrid.GridBand gridBand1;
         private Panel panel1;
         private DevExpress.XtraEditors.SearchControl srcGrid;
+        private DevExpress.XtraEditors.SimpleButton btnBarCode;
     }
 }

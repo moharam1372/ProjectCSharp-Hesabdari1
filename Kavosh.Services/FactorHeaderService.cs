@@ -1,4 +1,5 @@
-﻿using Kavosh.DataAccess.Repositories;
+﻿using System.ComponentModel;
+using Kavosh.DataAccess.Repositories;
 using Kavosh.Domain.Constants;
 using Kavosh.Domain.Entities;
 using Kavosh.Domain.Interfaces;
@@ -48,20 +49,27 @@ namespace Kavosh.Services
         }
 
         // نسخه‌ی سبک برای گرید — بدون Details/HowToPays (که فقط موقع باز کردن تک فاکتور لازمه)
-        private static FactorHeaderDto ToListDto(FactorHeader f) => new()
+        private static FactorHeaderDto ToListDto(FactorHeader f)
         {
-            Id = f.Id,
-            Code = f.Code,
-            PersonId = f.PersonId,
-            PersonName = f.Person?.FullName,
-            Type = f.Type,
-            DateFactor = f.DateFactor,
-            Discount = f.Discount,
-            PriceTotal = f.PriceTotal,
-            Malyat1 = f.Malyat1,
-            Malyat2 = f.Malyat2,
-            Description = f.Description
-        };
+            double mal = (f.Malyat1 + (double)f.Malyat2) / 100;
+            long fPriceTotal = (long)((f.PriceTotal + (f.PriceTotal * mal)) - f.Discount + f.Freight);
+            return new()
+            {
+                Id = f.Id,
+                Code = f.Code,
+                PersonId = f.PersonId,
+                PersonName = f.Person?.FullName,
+                Type = f.Type,
+                DateFactor = f.DateFactor,
+                Discount = f.Discount,
+                //PriceTotal = f.PriceTotal,
+                PriceTotal = fPriceTotal,
+                Malyat1 = f.Malyat1,
+                Malyat2 = f.Malyat2,
+                Description = f.Description,
+                Freight = f.Freight
+            };
+        }
 
         public async Task<long> GetNextCodeAsync()
         {
@@ -102,7 +110,8 @@ namespace Kavosh.Services
                 PriceTotal = calculatedTotal,
                 Malyat1 = dto.Malyat1,
                 Malyat2 = dto.Malyat2,
-                Description = dto.Description
+                Description = dto.Description,
+                Freight = dto.Freight
             };
 
             var details = dto.Details.Select(d => new FactorDetail
@@ -186,11 +195,14 @@ namespace Kavosh.Services
                         await _definitiveAccountService.SettleCheckByHowToPayIdAsync(hp.Id);
                 }
                 else
+                //PaymentTypeId
                 {
                     // 👇 جدید: اگه مبلغ ردیف موجود تغییر کرده، DefinitiveAccount مربوطه هم آپدیت بشه
                     if (old.Price != hp.Price)
                         await _definitiveAccountService.UpdateDebtPriceAsync(hp.Id, hp.Price);
+                    // بررسی ویرایش برای ثبت بدهی
 
+                    
                     if (isCheckType && !old.Settlement && hp.Settlement)
                         await _definitiveAccountService.SettleCheckByHowToPayIdAsync(hp.Id);
                 }
@@ -276,6 +288,7 @@ namespace Kavosh.Services
                 Malyat1 = factor.Malyat1,
                 Malyat2 = factor.Malyat2,
                 Description = factor.Description,
+                Freight = factor.Freight,
                 FactorDetails = factor.Details.Select(d => new FactorReportDetailDto
                 {
                     ProductTitle = d.ProductTitle,
@@ -328,6 +341,7 @@ namespace Kavosh.Services
             MarketerId = f.MarketerId,
             MarketerFullName = f.Marketer?.FullName,
             Description = f.Description,
+            Freight = f.Freight,
             Details = f.FactorDetails.Select(d => new FactorDetailDto
             {
                 Id = d.Id,
