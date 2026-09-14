@@ -133,6 +133,15 @@ namespace Kavosh.Services
             await _repository.Update(cheque);
             await _repository.SaveChangesAsync();
         }
+        // 👇 جدید — وقتی نوع پرداخت از چک به چیز دیگه تغییر می‌کنه، چک مرتبط باید حذف بشه
+        public async Task RemoveByHowToPayIdAsync(Guid howToPayId)
+        {
+            var cheque = await _repository.GetByHowToPayIdAsync(howToPayId);
+            if (cheque is null) return;
+
+            await _repository.Remove(cheque);
+            await _repository.SaveChangesAsync();
+        }
         private static ChequeDto ToDto(Cheque c) => new()
         {
             Id = c.Id,

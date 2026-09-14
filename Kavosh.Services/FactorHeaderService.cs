@@ -86,17 +86,27 @@ namespace Kavosh.Services
         public async Task<Guid> SaveFactorAsync(FactorHeaderDto dto)
         {
             Validate(dto);
-            ValidateHowToPays(dto.HowToPays);
-            await ValidateStockAsync(dto);   // بررسی موجودی منفی
 
-            // 👇 اصلاح‌شده: Snapshot کامل رکوردهای قبلی (نه فقط وضعیت Settlement)
-            // چون برای تشخیص «تغییر مبلغ» و «حذف کامل ردیف» به کل رکورد قبلی نیاز داریم
+            if (dto.Id != Guid.Empty)
+            {
+                var documentedIds = await _repository.GetDocumentedFactorIdsAsync();   // 👈 اصلاح شد
+                if (documentedIds.Contains(dto.Id))
+                    throw new InvalidOperationException("این فاکتور در سند صندوق ثبت شده است و قابل ویرایش نیست. برای ویرایش، ابتدا سند مربوطه را از صندوق حذف کنید.");
+            }
+
+            ValidateHowToPays(dto.HowToPays);
+            await ValidateStockAsync(dto);
+
             var oldHowToPays = dto.Id != Guid.Empty
                 ? await _repository.GetHowToPaySnapshotAsync(dto.Id)
                 : new List<HowToPay>();
 
-            // 👇 جمع کل فاکتور بر مبنای «مبلغ فروش» محاسبه می‌شود (نه مبلغ خرید)
-            var calculatedTotal = dto.Details.Sum(d => (long)(d.Count * d.SellPrice)) - dto.Discount;
+            // 👇 فاز ۱ — پاکسازی: باید حتماً قبل از حذف/تغییر فیزیکی ردیف‌های HowToPay در دیتابیس انجام بشه
+            // وگرنه به خاطر FK Restrict روی DefinitiveAccount.HowToPayId، حذف HowToPay با خطا مواجه می‌شه
+            // و همینطور چک‌ها قبل از این‌که HowToPayId شون NULL بشه، باید پیدا و حذف بشن
+            await CleanupObsoleteDefinitiveAccountsAsync(dto.HowToPays, oldHowToPays);
+
+            var calculatedTotal = dto.Details.Sum(d => (long)(d.Count * d.SellPrice)) - dto.Discount + dto.Freight;
 
             var header = new FactorHeader
             {
@@ -107,11 +117,11 @@ namespace Kavosh.Services
                 Type = dto.Type,
                 DateFactor = dto.DateFactor,
                 Discount = dto.Discount,
+                Freight = dto.Freight,
                 PriceTotal = calculatedTotal,
                 Malyat1 = dto.Malyat1,
                 Malyat2 = dto.Malyat2,
-                Description = dto.Description,
-                Freight = dto.Freight
+                Description = dto.Description
             };
 
             var details = dto.Details.Select(d => new FactorDetail
@@ -137,80 +147,103 @@ namespace Kavosh.Services
             var savedId = await _repository.SaveWithDetailsAsync(header, details, howToPays);
             await _repository.SaveChangesAsync();
 
-            // 👇 حالا که HowToPayها Id واقعی گرفتن، منطق DefinitiveAccount رو اجرا می‌کنیم
-            await SyncDefinitiveAccountsAsync(dto.PersonId, dto.Code, dto.Type, howToPays, oldHowToPays);
+            // 👇 فاز ۲ — حالا که HowToPayها ذخیره شدن و پاکسازی قدیمی‌ها انجام شده، بدهی/چک‌های جدید یا آپدیت‌شده ثبت می‌شن
+            await CreateOrUpdateDefinitiveAccountsAsync(dto.PersonId, dto.Code, dto.Type, howToPays, oldHowToPays);
 
             return savedId;
         }
 
-        // 👇 بازنویسی کامل — حالا هر ۴ حالت رو پوشش می‌ده: جدید / تغییرمبلغ / تسویه / حذف کامل ردیف
-        private async Task SyncDefinitiveAccountsAsync(Guid personId, long factorCode, bool factorType,
+        // ============= فاز ۱: پاکسازی قبل از تغییرات ساختاری =============
+        // برای هر ردیف قدیمی که «بدهی یا چک» بوده: اگه حذف شده یا نوعش از این دو دسته خارج شده
+        // (یا بین بدهی↔چک عوض شده)، رکورد DefinitiveAccount و در صورت لزوم رکورد Cheque مرتبط پاک می‌شن
+        private async Task CleanupObsoleteDefinitiveAccountsAsync(List<HowToPayDto> currentHowToPays, List<HowToPay> oldHowToPays)
+        {
+            var currentById = currentHowToPays
+                .Where(x => x.Id != Guid.Empty)
+                .ToDictionary(x => x.Id);
+
+            foreach (var old in oldHowToPays)
+            {
+                bool oldWasDebtOrCheck = old.PaymentTypeId == PaymentTypeIds.Debtor || old.PaymentTypeId == PaymentTypeIds.Check;
+                if (!oldWasDebtOrCheck)
+                    continue;   // نوع قبلی نقد/کارت بوده، چیزی برای پاکسازی نیست
+
+                var stillExists = currentById.TryGetValue(old.Id, out var current);
+
+                if (!stillExists)
+                {
+                    // ردیف کاملاً از فاکتور حذف شده
+                    await _definitiveAccountService.RemoveDebtByHowToPayIdAsync(old.Id);
+                    continue;
+                }
+
+                bool sameCategory =
+                    (old.PaymentTypeId == PaymentTypeIds.Debtor && current.PaymentTypeId == PaymentTypeIds.Debtor) ||
+                    (old.PaymentTypeId == PaymentTypeIds.Check && current.PaymentTypeId == PaymentTypeIds.Check);
+
+                if (!sameCategory)
+                {
+                    // نوع تغییر کرده (بدهی↔چک، یا به نقد/کارت) — رکورد قدیمی پاک می‌شه تا فاز ۲ از نو بسازدش
+                    await _definitiveAccountService.RemoveDebtByHowToPayIdAsync(old.Id);
+                }
+            }
+        }
+
+        // ============= فاز ۲: ایجاد/آپدیت پس از ذخیره‌ی ساختاری =============
+        private async Task CreateOrUpdateDefinitiveAccountsAsync(Guid personId, long factorCode, bool factorType,
             List<HowToPay> howToPays, List<HowToPay> oldHowToPays)
         {
             var oldById = oldHowToPays.ToDictionary(x => x.Id);
-            var currentIds = howToPays.Select(x => x.Id).ToHashSet();
 
-            // 1️⃣ ردیف‌هایی که کاملاً از فاکتور حذف شدن (موقع ویرایش)
-            foreach (var removed in oldHowToPays.Where(x => !currentIds.Contains(x.Id)))
-            {
-                bool wasDebtOrCheck = removed.PaymentTypeId == PaymentTypeIds.Debtor || removed.PaymentTypeId == PaymentTypeIds.Check;
-                if (wasDebtOrCheck)
-                    await _definitiveAccountService.RemoveDebtByHowToPayIdAsync(removed.Id);
-            }
-
-            // 2️⃣ ردیف‌های فعلی — جدید / تغییرمبلغ / تسویه
             foreach (var hp in howToPays)
             {
                 bool isDebtType = hp.PaymentTypeId == PaymentTypeIds.Debtor;
                 bool isCheckType = hp.PaymentTypeId == PaymentTypeIds.Check;
 
-                var old = oldById.GetValueOrDefault(hp.Id);
-                var isNewRow = old is null;
-
                 if (isCheckType)
                 {
-                    // فروش (factorType=true) => چک دریافتی از مشتری / خرید (factorType=false) => چک صادرشده به تامین‌کننده
+                    // چه ردیف کاملاً جدید باشه چه چکی که نوعش عوض نشده - اطلاعات چک ثبت/آپدیت می‌شه
                     await _chequeService.CreateOrUpdateFromHowToPayAsync(hp.Id, personId, hp.CheckNumber, hp.CheckDate, hp.Price, isReceived: factorType);
                 }
 
                 if (!isDebtType && !isCheckType)
+                    continue;   // نقد/کارت - پاکسازی احتمالیِ لازم قبلاً در فاز ۱ انجام شده
+
+                var old = oldById.GetValueOrDefault(hp.Id);
+                bool sameCategoryAsBefore = old is not null &&
+                    ((isDebtType && old.PaymentTypeId == PaymentTypeIds.Debtor) ||
+                     (isCheckType && old.PaymentTypeId == PaymentTypeIds.Check));
+
+                if (!sameCategoryAsBefore)
                 {
-                    // نوع پرداخت این ردیف به نقد/کارت تغییر کرده؟ پس بدهیِ قبلی‌ای که ثبت شده بود باید حذف بشه
-                    bool wasDebtOrCheck = old is not null &&
-                        (old.PaymentTypeId == PaymentTypeIds.Debtor || old.PaymentTypeId == PaymentTypeIds.Check);
-
-                    if (wasDebtOrCheck)
-                        await _definitiveAccountService.RemoveDebtByHowToPayIdAsync(hp.Id);
-
-                    continue;
-                }
-
-                if (isNewRow)
-                {
-                    // فروش (factorType=true) => شخص بدهکار است
-                    // خرید (factorType=false) => ما بدهکاریم (شخص بستانکار است)
+                    // ردیف جدید است، یا نوعش تغییر کرده (که در فاز ۱ پاک شد) - باید از نو بدهی ساخته بشه
                     await _definitiveAccountService.CreateDebtFromHowToPayAsync(personId, hp.Id, hp.Price, factorCode, isCheckType, factorType);
 
                     if (isCheckType && hp.Settlement)
                         await _definitiveAccountService.SettleCheckByHowToPayIdAsync(hp.Id);
                 }
                 else
-                //PaymentTypeId
                 {
-                    // 👇 جدید: اگه مبلغ ردیف موجود تغییر کرده، DefinitiveAccount مربوطه هم آپدیت بشه
+                    // همون دسته‌ی قبلی (بدهی یا چک، بدون تغییر نوع) - فقط آپدیت مبلغ/تسویه
                     if (old.Price != hp.Price)
                         await _definitiveAccountService.UpdateDebtPriceAsync(hp.Id, hp.Price);
-                    // بررسی ویرایش برای ثبت بدهی
 
-                    
                     if (isCheckType && !old.Settlement && hp.Settlement)
                         await _definitiveAccountService.SettleCheckByHowToPayIdAsync(hp.Id);
                 }
             }
         }
 
+
+
+
+
         public async Task DeleteFactorAsync(Guid id)
         {
+            var documentedIds = await _repository.GetDocumentedFactorIdsAsync();   // 👈 اصلاح شد
+            if (documentedIds.Contains(id))
+                throw new InvalidOperationException("این فاکتور در سند صندوق ثبت شده است و قابل حذف نیست. برای حذف، ابتدا سند مربوطه را از صندوق حذف کنید.");
+
             var entity = await _repository.GetById(id);
             if (entity is null) return;
 

@@ -45,6 +45,47 @@ namespace Kavosh.DataAccess.Migrations
                     b.ToTable("AppSettings");
                 });
 
+            modelBuilder.Entity("Kavosh.Domain.Entities.CashDocument", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("Code")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateDocument")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FactorHeaderIds")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSettled")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("TotalAmount")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("Type")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CashDocuments");
+                });
+
             modelBuilder.Entity("Kavosh.Domain.Entities.Cheque", b =>
                 {
                     b.Property<Guid>("Id")
@@ -201,6 +242,29 @@ namespace Kavosh.DataAccess.Migrations
                     b.HasIndex("SettledFromId");
 
                     b.ToTable("DefinitiveAccounts");
+                });
+
+            modelBuilder.Entity("Kavosh.Domain.Entities.ExpenseType", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ExpenseTypes");
                 });
 
             modelBuilder.Entity("Kavosh.Domain.Entities.FactorDetail", b =>
@@ -399,6 +463,74 @@ namespace Kavosh.DataAccess.Migrations
                     b.ToTable("Marketers");
                 });
 
+            modelBuilder.Entity("Kavosh.Domain.Entities.Partner", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Partners");
+                });
+
+            modelBuilder.Entity("Kavosh.Domain.Entities.PartnerExpense", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("Amount")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateCustom")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("ExpenseTypeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsPayment")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("PartnerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExpenseTypeId");
+
+                    b.HasIndex("PartnerId");
+
+                    b.ToTable("PartnerExpenses");
+                });
+
             modelBuilder.Entity("Kavosh.Domain.Entities.PaymentType", b =>
                 {
                     b.Property<Guid>("Id")
@@ -560,6 +692,50 @@ namespace Kavosh.DataAccess.Migrations
                     b.ToTable("ProductUnits", (string)null);
                 });
 
+            modelBuilder.Entity("Kavosh.Domain.Entities.SettlementRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CashDocumentIds")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("Code")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateSettlement")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DocumentCount")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("Profit")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("TotalPurchases")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("TotalSales")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SettlementRecords");
+                });
+
             modelBuilder.Entity("Kavosh.Domain.Entities.StoreInfo", b =>
                 {
                     b.Property<Guid>("Id")
@@ -716,6 +892,24 @@ namespace Kavosh.DataAccess.Migrations
                     b.Navigation("PaymentType");
                 });
 
+            modelBuilder.Entity("Kavosh.Domain.Entities.PartnerExpense", b =>
+                {
+                    b.HasOne("Kavosh.Domain.Entities.ExpenseType", "ExpenseType")
+                        .WithMany("PartnerExpenses")
+                        .HasForeignKey("ExpenseTypeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Kavosh.Domain.Entities.Partner", "Partner")
+                        .WithMany("PartnerExpenses")
+                        .HasForeignKey("PartnerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ExpenseType");
+
+                    b.Navigation("Partner");
+                });
+
             modelBuilder.Entity("Kavosh.Domain.Entities.Product", b =>
                 {
                     b.HasOne("Kavosh.Domain.Entities.ProductGroup", "ProductGroup")
@@ -735,6 +929,11 @@ namespace Kavosh.DataAccess.Migrations
                     b.Navigation("ProductUnit");
                 });
 
+            modelBuilder.Entity("Kavosh.Domain.Entities.ExpenseType", b =>
+                {
+                    b.Navigation("PartnerExpenses");
+                });
+
             modelBuilder.Entity("Kavosh.Domain.Entities.FactorHeader", b =>
                 {
                     b.Navigation("FactorDetails");
@@ -750,6 +949,11 @@ namespace Kavosh.DataAccess.Migrations
             modelBuilder.Entity("Kavosh.Domain.Entities.Marketer", b =>
                 {
                     b.Navigation("FactorHeaders");
+                });
+
+            modelBuilder.Entity("Kavosh.Domain.Entities.Partner", b =>
+                {
+                    b.Navigation("PartnerExpenses");
                 });
 
             modelBuilder.Entity("Kavosh.Domain.Entities.PaymentType", b =>

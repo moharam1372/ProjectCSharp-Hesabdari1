@@ -1,0 +1,93 @@
+﻿using Kavosh.Services.DTOs;
+using MyCom.Class;
+using System.Globalization;
+using DevExpress.XtraPrinting;
+using DevExpress.XtraReports.UI;
+using RightToLeft = DevExpress.XtraReports.UI.RightToLeft;
+
+namespace Kavosh.UI.Reports.Factor
+{
+    public partial class RptFactorA4 : DevExpress.XtraReports.UI.XtraReport
+    {
+        public RptFactorA4()
+        {
+            InitializeComponent();
+            // Format String Number Float =>            {0:#,#}
+        }
+
+        protected override void BeforeReportPrint()
+        {
+            CultureInfo customCulture = new CultureInfo("en-US");
+            customCulture.NumberFormat.NumberDecimalSeparator = "/";
+
+            if (Tag is not FactorReportDto data)
+            {
+                base.BeforeReportPrint();
+                return;
+            }
+
+
+            #region HowToPay
+
+            var subReport = new RptHowToPayList();
+            subReport.Tag = data.HowToPays;
+            subReport.RightToLeft = RightToLeft.Yes;
+
+            xrSubreport1.ReportSource = subReport;
+
+            #endregion
+
+            DataSource = data.FactorDetails;
+
+            lblHeader2.Text = data.Header;
+            lblNum.Text = data.Num;
+            lblDate.Text = data.Date.DateTimePersian().Date;
+            lblBuyerName.Text = data.Buyer;
+            lblBuyerMobile.Text = data.Mobile;
+            lblAddress.Text = data.Address;
+            txtDiscount.Text = data.Discount.ToString("N0");
+            txtDescription.Text = data.Description;
+
+            long afterMalyat1 = (data.PriceTotal * data.Malyat1 / 100);
+            txtTaxes.Text = afterMalyat1.ToString("N0");
+            var dataPreviousDebt = data.PreviousDebt; // جهت بررسی
+            txtPreviousDebt.Text = Math.Abs(dataPreviousDebt).ToString(ClsCollect.FormatStringNegativeNumber(0));
+            //txtPreviousDebt.Text = data.PreviousDebt.ToString("N0");
+            if (dataPreviousDebt < 0)
+            {
+                xrLabel23.Text = "مانده حساب (بستانکار)";
+            }
+            else if (dataPreviousDebt > 0)
+            {
+                xrLabel23.Text = "مانده حساب (بدهکار)";
+            }
+            else
+            {
+                xrLabel23.Text = "مانده حساب (تسویه)";
+            }
+
+            // 👇 اصلاح شد: جمع کل = مبلغ فاکتور + مالیات (بدون بدهی قبلی)
+            //txtSumTotal.Text = (data.PriceTotal + data.TaxAmount).ToString("N0");
+            txtSumTotal.Text = (afterMalyat1 + data.PayableAmount).ToString("N0");
+
+            //xrLabel25.Text = @"مبلغ قابل پرداخت: " + data.PayableAmount.ToString("N0");
+            txt.Text = $"شماره کارت: {data.CardNumber}";
+            xrLabel8.Text = $"شماره شبا: {data.ShabaNumber}";
+            xrLabel9.Text = $"{data.BankName} - {data.AccountHolderName}";
+            lblAddressSeller.Text = data.AddressSeller + " -  " + data.PhoneSeller;
+            if (data.Logo is { Length: > 0 })
+                picLogo.Image = System.Drawing.Image.FromStream(new System.IO.MemoryStream(data.Logo));
+            if (data.Mohr is { Length: > 0 })
+                picMohr.Image = System.Drawing.Image.FromStream(new System.IO.MemoryStream(data.Mohr));
+
+            base.BeforeReportPrint();
+        }
+
+        private void lblPage_PrintOnPage(object sender, PrintOnPageEventArgs e)
+        {
+            var ePageIndex = e.PageIndex;
+            lblPage.Text = @"صفحه: " + (ePageIndex + 1) + @" از " + this.Pages.Count;
+        }
+
+    }
+}

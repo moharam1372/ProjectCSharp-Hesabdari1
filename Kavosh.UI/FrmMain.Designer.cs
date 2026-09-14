@@ -43,15 +43,16 @@
             ribbonPage1 = new DevExpress.XtraBars.Ribbon.RibbonPage();
             ribbonPageGroup1 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             ribbonStatusBar = new DevExpress.XtraBars.Ribbon.RibbonStatusBar();
+            barBtnCashRegister = new DevExpress.XtraBars.BarButtonItem();
             ((System.ComponentModel.ISupportInitialize)ribbon).BeginInit();
             SuspendLayout();
             // 
             // ribbon
             // 
             ribbon.ExpandCollapseItem.Id = 0;
-            ribbon.Items.AddRange(new DevExpress.XtraBars.BarItem[] { ribbon.ExpandCollapseItem, barBtnProduct, barPerson, barFactor, barBtnAccounting, barBtnSetting, barBtnPardakhtDaryaft, barBtnDebtorsList, barButtonItem1, barBtnCheque, btnBarLock, barBtnMarketer });
+            ribbon.Items.AddRange(new DevExpress.XtraBars.BarItem[] { ribbon.ExpandCollapseItem, barBtnProduct, barPerson, barFactor, barBtnAccounting, barBtnSetting, barBtnPardakhtDaryaft, barBtnDebtorsList, barButtonItem1, barBtnCheque, btnBarLock, barBtnMarketer, barBtnCashRegister });
             ribbon.Location = new Point(0, 0);
-            ribbon.MaxItemId = 13;
+            ribbon.MaxItemId = 14;
             ribbon.Name = "ribbon";
             ribbon.PageHeaderItemLinks.Add(btnBarLock);
             ribbon.PageHeaderItemLinks.Add(barButtonItem1);
@@ -173,12 +174,13 @@
             // 
             ribbonPageGroup1.ItemLinks.Add(barBtnProduct);
             ribbonPageGroup1.ItemLinks.Add(barPerson);
+            ribbonPageGroup1.ItemLinks.Add(barBtnMarketer);
             ribbonPageGroup1.ItemLinks.Add(barFactor);
             ribbonPageGroup1.ItemLinks.Add(barBtnPardakhtDaryaft);
             ribbonPageGroup1.ItemLinks.Add(barBtnAccounting);
             ribbonPageGroup1.ItemLinks.Add(barBtnDebtorsList);
             ribbonPageGroup1.ItemLinks.Add(barBtnCheque);
-            ribbonPageGroup1.ItemLinks.Add(barBtnMarketer);
+            ribbonPageGroup1.ItemLinks.Add(barBtnCashRegister);
             ribbonPageGroup1.ItemLinks.Add(barBtnSetting);
             ribbonPageGroup1.Name = "ribbonPageGroup1";
             // 
@@ -188,6 +190,16 @@
             ribbonStatusBar.Name = "ribbonStatusBar";
             ribbonStatusBar.Ribbon = ribbon;
             ribbonStatusBar.Size = new Size(1218, 37);
+            // 
+            // barBtnCashRegister
+            // 
+            barBtnCashRegister.AllowHtmlText = DevExpress.Utils.DefaultBoolean.True;
+            barBtnCashRegister.Caption = "صندوق";
+            barBtnCashRegister.Id = 13;
+            barBtnCashRegister.ImageOptions.SvgImage = Properties.Resources.currency;
+            barBtnCashRegister.LargeWidth = 60;
+            barBtnCashRegister.Name = "barBtnCashRegister";
+            barBtnCashRegister.ItemClick += barBtnCashRegister_ItemClick;
             // 
             // FrmMain
             // 
@@ -228,5 +240,6 @@
         private DevExpress.XtraBars.BarButtonItem barBtnCheque;
         private DevExpress.XtraBars.BarButtonItem btnBarLock;
         private DevExpress.XtraBars.BarButtonItem barBtnMarketer;
+        private DevExpress.XtraBars.BarButtonItem barBtnCashRegister;
     }
 }

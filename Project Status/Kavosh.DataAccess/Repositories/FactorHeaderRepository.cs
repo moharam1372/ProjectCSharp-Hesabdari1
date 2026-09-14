@@ -1,0 +1,197 @@
+using Kavosh.Domain.Entities;
+using Kavosh.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
+
+namespace Kavosh.DataAccess.Repositories
+{
+    public interface IFactorHeaderRepository : IRepository<FactorHeader>
+    {
+
+        Task<FactorHeader> GetByIdWithDetailsAsync(Guid id);
+        Task<long> GetMaxCodeAsync();
+        Task<Guid> SaveWithDetailsAsync(FactorHeader header, List<FactorDetail> details, List<HowToPay> howToPays);
+        Task<List<FactorHeader>> GetAllWithPersonAsync();
+        Task<Dictionary<Guid, bool>> GetHowToPaySettlementSnapshotAsync(Guid factorHeaderId);
+        Task<List<FactorHeader>> GetAllWithPersonAndMarketerAsync();
+        Task<List<HowToPay>> GetHowToPaySnapshotAsync(Guid factorHeaderId);   
+
+    }
+
+    public class FactorHeaderRepository : Repository<FactorHeader>, IFactorHeaderRepository
+    {
+
+        public FactorHeaderRepository(AppDbContext context) : base(context) { }
+        public async Task<List<FactorHeader>> GetAllWithPersonAsync()
+        {
+            return await _dbSet
+                .AsNoTracking()   // 👈 جدید
+                .Include(f => f.Person)
+                .Include(f => f.Marketer)   // 👈 جدید
+                .Where(f => !f.IsDeleted)
+                .OrderByDescending(f => f.Code)
+                .ToListAsync();
+        }
+        public async Task<List<FactorHeader>> GetAllWithPersonAndMarketerAsync()
+        {
+            return await _dbSet
+                .AsNoTracking()
+                .Include(f => f.Person)
+                .Include(f => f.Marketer)
+                .Where(f => !f.IsDeleted && f.MarketerId != null)
+                .ToListAsync();
+        }
+        public async Task<FactorHeader> GetByIdWithDetailsAsync(Guid id)
+        {
+            return await _dbSet
+                .AsNoTracking()   // 👈 جدید
+                .Include(f => f.Person)
+                .Include(f => f.FactorDetails)
+                .ThenInclude(d => d.Product)
+                .Include(f => f.HowToPays)
+                .ThenInclude(p => p.PaymentType)
+                .FirstOrDefaultAsync(f => f.Id == id);
+        }
+
+        public async Task<long> GetMaxCodeAsync()
+        {
+            // اگه جدول خالی باشه 999 برمی‌گرده تا اولین کد بشه 1000
+            return await _dbSet.MaxAsync(f => (long?)f.Code) ?? 999;
+        }
+
+        public async Task<Guid> SaveWithDetailsAsync(FactorHeader header, List<FactorDetail> details, List<HowToPay> howToPays)
+        {
+            var existing = header.Id != Guid.Empty
+                ? await _dbSet
+                    .Include(f => f.FactorDetails)
+                    .Include(f => f.HowToPays)
+                    .FirstOrDefaultAsync(f => f.Id == header.Id)
+                : null;
+
+            // ============= فاکتور جدید =============
+            if (existing is null)
+            {
+                header.Id = header.Id != Guid.Empty ? header.Id : Guid.NewGuid();
+                header.CreatedAt = DateTime.UtcNow;
+                header.IsDeleted = false;
+
+                foreach (var d in details)
+                {
+                    d.Id = Guid.NewGuid();
+                    d.FactorHeaderId = header.Id;
+                    d.CreatedAt = DateTime.UtcNow;
+                    d.IsDeleted = false;
+                }
+                header.FactorDetails = details;
+
+                foreach (var p in howToPays)
+                {
+                    p.Id = Guid.NewGuid();
+                    p.FactorHeaderId = header.Id;
+                    p.CreatedAt = DateTime.UtcNow;
+                    p.IsDeleted = false;
+                }
+                header.HowToPays = howToPays;
+
+                await _dbSet.AddAsync(header);
+                return header.Id;
+            }
+
+            // ============= ویرایش فاکتور موجود =============
+            existing.Code = header.Code;
+            existing.PersonId = header.PersonId;
+            existing.Type = header.Type;
+            existing.DateFactor = header.DateFactor;
+            existing.Discount = header.Discount;
+            existing.Malyat1 = header.Malyat1;
+            existing.Malyat2 = header.Malyat2;
+            existing.PriceTotal = header.PriceTotal;
+            existing.UpdatedAt = DateTime.UtcNow;
+            existing.MarketerId = header.MarketerId;  
+            existing.Description = header.Description;
+           
+
+            // Sync خط‌های کالا (بدون تغییر نسبت به قبل)
+            var incomingIds = details.Where(d => d.Id != Guid.Empty).Select(d => d.Id).ToHashSet();
+            var toRemove = existing.FactorDetails.Where(d => !incomingIds.Contains(d.Id)).ToList();
+            foreach (var d in toRemove)
+            {
+                existing.FactorDetails.Remove(d);
+                _context.Set<FactorDetail>().Remove(d);
+            }
+            foreach (var incoming in details)
+            {
+                var match = incoming.Id != Guid.Empty
+                    ? existing.FactorDetails.FirstOrDefault(d => d.Id == incoming.Id)
+                    : null;
+
+                if (match is not null)
+                {
+                    match.ProductId = incoming.ProductId;
+                    match.Count = incoming.Count;
+                    match.PriceUnit = incoming.PriceUnit;
+                    match.SellPrice = incoming.SellPrice;   
+                    match.UpdatedAt = DateTime.UtcNow;
+                }
+                else
+                {
+                    incoming.Id = Guid.NewGuid();
+                    incoming.FactorHeaderId = existing.Id;
+                    incoming.CreatedAt = DateTime.UtcNow;
+                    incoming.IsDeleted = false;
+                    _context.Set<FactorDetail>().Add(incoming);
+                }
+            }
+
+            var incomingPayIds = howToPays.Where(p => p.Id != Guid.Empty).Select(p => p.Id).ToHashSet();
+            var payToRemove = existing.HowToPays.Where(p => !incomingPayIds.Contains(p.Id)).ToList();
+            foreach (var p in payToRemove)
+            {
+                existing.HowToPays.Remove(p);
+                _context.Set<HowToPay>().Remove(p);
+            }
+            foreach (var incoming in howToPays)
+            {
+                var match = incoming.Id != Guid.Empty
+                    ? existing.HowToPays.FirstOrDefault(p => p.Id == incoming.Id)
+                    : null;
+
+                if (match is not null)
+                {
+                    match.PaymentTypeId = incoming.PaymentTypeId;
+                    match.Price = incoming.Price;
+                    match.CheckNumber = incoming.CheckNumber;
+                    match.CheckDate = incoming.CheckDate;
+                    match.Settlement = incoming.Settlement;
+                    match.Description = incoming.Description;
+                    match.UpdatedAt = DateTime.UtcNow;
+                }
+                else
+                {
+                    incoming.Id = Guid.NewGuid();
+                    incoming.FactorHeaderId = existing.Id;
+                    incoming.CreatedAt = DateTime.UtcNow;
+                    incoming.IsDeleted = false;
+                    _context.Set<HowToPay>().Add(incoming);
+                }
+            }
+
+            return existing.Id;
+        }
+
+        public async Task<Dictionary<Guid, bool>> GetHowToPaySettlementSnapshotAsync(Guid factorHeaderId)
+        {
+            return await _context.Set<HowToPay>()
+                .AsNoTracking()
+                .Where(p => p.FactorHeaderId == factorHeaderId)
+                .ToDictionaryAsync(p => p.Id, p => p.Settlement);
+        }
+        public async Task<List<HowToPay>> GetHowToPaySnapshotAsync(Guid factorHeaderId)
+        {
+            return await _context.Set<HowToPay>()
+                .AsNoTracking()
+                .Where(p => p.FactorHeaderId == factorHeaderId)
+                .ToListAsync();
+        }
+   
+    }
+}

@@ -113,6 +113,11 @@ namespace Kavosh.UI
             services.AddScoped<IChequeRepository, ChequeRepository>();
             services.AddScoped<ILoginUserRepository, LoginUserRepository>();
             services.AddScoped<IMarketerRepository, MarketerRepository>();
+            services.AddScoped<ICashDocumentRepository, CashDocumentRepository>();
+            services.AddScoped<IPartnerRepository, PartnerRepository>();
+            services.AddScoped<IExpenseTypeRepository, ExpenseTypeRepository>();
+            services.AddScoped<IPartnerExpenseRepository, PartnerExpenseRepository>();
+            services.AddScoped<ISettlementRecordRepository, SettlementRecordRepository>();
 
             // =========================================================
             // Services
@@ -131,6 +136,10 @@ namespace Kavosh.UI
             services.AddScoped<LoginUserService>();
             services.AddScoped<MarketerService>();
             services.AddScoped<AppSettingService>();
+            services.AddScoped<CashRegisterService>();
+            services.AddScoped<PartnerService>();
+            services.AddScoped<ExpenseTypeService>();
+            services.AddScoped<PartnerExpenseService>();
 
             // =========================================================
             // Forms
@@ -151,6 +160,7 @@ namespace Kavosh.UI
             services.AddTransient<FrmLogin>();
             services.AddTransient<FrmMarketer>();
             services.AddTransient<FrmMarketerReport>();
+            services.AddTransient<FrmCashRegister>();
         }
 
         private static void InitializeDatabase()

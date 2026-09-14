@@ -472,5 +472,11 @@ namespace Kavosh.UI
             var frm = Program.CreateScopedForm<FrmMarketer>();
             frm.OverShowWait<FrmMarketer>(this);
         }
+
+        private void barBtnCashRegister_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var frm = Program.CreateScopedForm<FrmCashRegister>();
+            frm.OverShowWait<FrmCashRegister>(this);
+        }
     }
 }

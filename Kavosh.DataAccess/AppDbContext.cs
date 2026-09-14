@@ -31,9 +31,12 @@ namespace Kavosh.DataAccess
         public DbSet<Marketer> Marketers { get; set; }
 
         public DbSet<AppSetting> AppSettings { get; set; }
-        // TODO: به ازای هر یک از ۱۵ جدول، یک DbSet مشابه اینجا اضافه کنید
-        // public DbSet<Order> Orders { get; set; }
-        // public DbSet<Product> Products { get; set; }
+
+        public DbSet<CashDocument> CashDocuments { get; set; }
+        public DbSet<Partner> Partners { get; set; }
+        public DbSet<ExpenseType> ExpenseTypes { get; set; }
+        public DbSet<PartnerExpense> PartnerExpenses { get; set; }
+        public DbSet<SettlementRecord> SettlementRecords { get; set; }
 
 
         public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
@@ -51,6 +54,19 @@ namespace Kavosh.DataAccess
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<PartnerExpense>(entity =>
+            {
+                entity.HasOne(p => p.Partner)
+                    .WithMany(pt => pt.PartnerExpenses)
+                    .HasForeignKey(p => p.PartnerId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(p => p.ExpenseType)
+                    .WithMany(et => et.PartnerExpenses)
+                    .HasForeignKey(p => p.ExpenseTypeId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
             modelBuilder.Entity<FactorHeader>(entity =>
             {
                 entity.HasOne(f => f.Marketer)

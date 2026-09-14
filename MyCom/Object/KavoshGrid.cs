@@ -576,17 +576,18 @@ namespace MyCom.Object
                                     frmCalender frmCalender = new frmCalender();
                                     frmCalender.ShowDialog();
 
-                                    var selRowdate = frmCalender.SelDate;
-                                    column[i1].Action?.Invoke(selRowdate);
+                                    var selRowDate = frmCalender.SelDate;
+                                    column[i1].Action?.Invoke(selRowDate);
                                 }
                             };
+
                             addButton.Buttons[0].Click += (s1, e1) =>
                             {
                                 frmCalender frmCalender = new frmCalender();
                                 frmCalender.ShowDialog();
 
-                                var selRowdate = frmCalender.SelDate;
-                                column[i1].Action?.Invoke(selRowdate);
+                                var selRowDate = frmCalender.SelDate;
+                                column[i1].Action?.Invoke(selRowDate);
                             };
                         }
 

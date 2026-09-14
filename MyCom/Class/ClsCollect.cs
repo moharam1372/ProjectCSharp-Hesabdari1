@@ -2572,7 +2572,9 @@ namespace MyCom.Class
         }
 
         //public static GroupControl ModelGridToDataLayoutBtn<EF>(string name, List<EF> dtData, string valueMember, string displayMember, string nullText, Action action = null, TextEditStyles styles = TextEditStyles.Standard, float sizeFont = 13f)
-        public static Panel ModelGridToDataLayoutBtn<EF>(string name, List<EF> dtData, string valueMember, string displayMember, string nullText, Action action = null, TextEditStyles styles = TextEditStyles.Standard, float sizeFont = 13f)
+        public static Panel ModelGridToDataLayoutBtn<EF>(string name, List<EF> dtData, string valueMember,
+            string displayMember, string nullText, Action actionBTN = null, Action actionChangeValue = null,
+            TextEditStyles styles = TextEditStyles.Standard, float sizeFont = 13f)
         {
             GridLookUpEdit gridComboEdit = new GridLookUpEdit
             {
@@ -2586,13 +2588,13 @@ namespace MyCom.Class
                     DisplayMember = displayMember,
                     DataSource = dtData,
                     //LookAndFeel = {UseDefaultLookAndFeel = false, SkinName = "Office 2013 Dark Gray"},
-                    LookAndFeel = {UseDefaultLookAndFeel = false, SkinName = "WXI"},
+                    LookAndFeel = { UseDefaultLookAndFeel = false, SkinName = "WXI" },
                     Appearance =
                     {
                         BackColor = Color.White,
-                        TextOptions = {HAlignment = HorzAlignment.Center, VAlignment = VertAlignment.Center}
+                        TextOptions = { HAlignment = HorzAlignment.Center, VAlignment = VertAlignment.Center }
                     },
-                    AppearanceFocused = {BackColor = Color.FromArgb(255, 241, 242, 154),},
+                    AppearanceFocused = { BackColor = Color.FromArgb(255, 241, 242, 154), },
                     //AppearanceFocused = {BackColor = Color.FromArgb(255, 242, 242, 217)},
                 },
             };
@@ -2639,10 +2641,7 @@ namespace MyCom.Class
                     gridComboEdit.Properties.Appearance.ForeColor = Color.FromArgb(16, 1, 1);
             };
 
-            gridComboEdit.Properties.DoubleClick += (s, e) =>
-            {
-                gridComboEdit.SelectAll();
-            };
+            gridComboEdit.Properties.DoubleClick += (s, e) => { gridComboEdit.SelectAll(); };
 
 
             //GroupControl groupControl = new GroupControl
@@ -2656,10 +2655,37 @@ namespace MyCom.Class
             };
             // {Name = "GridPnl_" + gridComboEdit.Name, Dock = DockStyle.Fill,ShowCaption = false,BorderStyle = BorderStyles.NoBorder};
 
+            #region Action Object
+
+
+            //if (actionChangeValue != null)
+            //{
+            //    gridComboEdit.ch += (s1, e1) =>
+            //    {
+            //        if (e1.Column.FieldName == column[i1].Name)
+            //        {
+            //            frmCalender frmCalender = new frmCalender();
+            //            frmCalender.ShowDialog();
+
+            //            var selRowDate = frmCalender.SelDate;
+            //            column[i1].Action?.Invoke(selRowDate);
+            //        }
+            //    };
+            //}
+            //if (e1.Column.FieldName == column[i1].Name)
+            //{
+            //    frmCalender frmCalender = new frmCalender();
+            //    frmCalender.ShowDialog();
+
+            //    var selRowDate = frmCalender.SelDate;
+            //    column[i1].Action?.Invoke(selRowDate);
+            //}
+
+            #endregion
 
             #region Button
 
-            if (action != null)
+            if (actionBTN != null)
             {
                 var font = _fontBold.ChangeFont();
 
@@ -2674,11 +2700,12 @@ namespace MyCom.Class
                 };
                 btnFastToday.LookAndFeel.UseDefaultLookAndFeel = false;
                 btnFastToday.LookAndFeel.SkinName = "Glass Oceans";
-                btnFastToday.Click += (s1, e1) => { action(); };
+                btnFastToday.Click += (s1, e1) => { actionBTN(); };
                 //groupControl.Controls.Add(gridComboEdit);
                 groupControl.Controls.Add(btnFastToday);
                 //gridComboEdit.BringToFront();
             }
+
             groupControl.Controls.Add(gridComboEdit);
             gridComboEdit.BringToFront();
             //gridComboEdit.Click -= dateCalen_Click;
@@ -2690,6 +2717,7 @@ namespace MyCom.Class
             //  groupControl.BringToFront();
             return groupControl;
         }
+
         public static GroupControl ModelGridToDataLayout2(string name, DataTable dtData, string valueMember, string displayMember, string nullText, TextEditStyles styles = TextEditStyles.Standard, float sizeFont = 13f)
         {
             GridLookUpEdit gridComboEdit = new GridLookUpEdit
@@ -3416,7 +3444,8 @@ namespace MyCom.Class
                     Appearance = {Font = _fontBold.ChangeFont(fontSize)},
                     AppearanceReadOnly = {Font = _fontBold.ChangeFont(fontSize)},
                     AppearanceFocused = {Font = _fontBold.ChangeFont(fontSize)},
-                    AppearanceDisabled = {Font = _fontBold.ChangeFont(fontSize)}
+                    AppearanceDisabled = {Font = _fontBold.ChangeFont(fontSize)},
+                    
                 },
                 BackColor = Color.Transparent,
                 BorderStyle = borderStyle,

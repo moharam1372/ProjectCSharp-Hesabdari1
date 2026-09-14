@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFramework>net10.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <RootNamespace>Kavosh.Services</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Kavosh.DataAccess\Kavosh.DataAccess.csproj" />
+    <ProjectReference Include="..\Kavosh.Domain\Kavosh.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -12,6 +12,7 @@ using System.Data;
 using System.Linq;
 using System.Windows.Forms;
 using DevExpress.Data;
+using MyCom.Form_Portable;
 
 namespace Kavosh.UI.Forms
 {
@@ -80,8 +81,7 @@ namespace Kavosh.UI.Forms
 
             #region بازاریاب
 
-            var getMarketers = (await _marketerService.GetAllAsync())
-                .Select(m => new { m.Id, m.FullName }).ToList();
+            var getMarketers = (await _marketerService.GetAllAsync()).Select(m => new { m.Id, m.FullName }).ToList();
             var cmbMarketer = ClsCollect.ModelGridToDataLayoutFull("بازاریاب", getMarketers, "Id", "FullName", "", async id => { });
             cmbMarketer.ConvertGroupToGrid().HiddenColumn("Id");
 
@@ -97,11 +97,44 @@ namespace Kavosh.UI.Forms
             txtMalyat1.TextChanged += (s1, e1) => { dgvFactorDetail.GetViewBase.UpdateSummary(); };
             txtMalyat2.TextChanged += (s1, e1) => { dgvFactorDetail.GetViewBase.UpdateSummary(); };
             txtDiscount.TextChanged += (s1, e1) => { dgvFactorDetail.GetViewBase.UpdateSummary(); };
+
+            #region طرف حساب
+
             // طرف حساب (مشتری) — همون الگوی cmbGroup توی FrmProduct
-            var getPersons = (await _personService.GetAllPersonsAsync())
-                .Select(p => new { p.Id, p.FullName }).ToList();
-            var cmbPerson = ClsCollect.ModelGridToDataLayoutBtn("طرف حساب", getPersons, "Id", "FullName", "");
+            var getPersons = (await _personService.GetAllPersonsAsync()).Select(p => new { p.Id, p.FullName }).ToList();
+            Panel cmbPerson = null;
+            cmbPerson = ClsCollect.ModelGridToDataLayoutFull("طرف حساب", getPersons, "Id", "FullName", "", null, async () =>
+            {
+                var getData = (await _personService.GetAllPersonsAsync())
+                    .Select(s => new FrmPortable.ModelPortableData { Id = s.Id, Title = s.FullName }).ToList();
+
+                var frmPortable = new FrmPortable("طرف حساب", getData, new FrmPortable.ModelAction
+                {
+                    SaveData = async void (data) =>
+                    {
+                        await _personService.SavePersonAsync(new PersonDto { Id = data.Id, FullName = data.Title });
+                        var cmb = cmbPerson.Controls.OfType<GridLookUpEdit>().First();
+                        getPersons = (await _personService.GetAllPersonsAsync()).Select(p => new { p.Id, p.FullName }).ToList();
+                        cmb.UpdateGridLookUpEdit(getPersons);
+                        //await RefreshTransactionsAsync();
+                    },
+                    DeleteData = async void (id) =>
+                    {
+                        try { await _personService.DeletePersonAsync(id); }
+                        catch (Exception ex) { ClassMessageBox.ShowMSG(ex.Message, Class_Text.Msg_Name, ClassMessageBox.enumIcon.هشدار); }
+                        var cmb = cmbPerson.Controls.OfType<GridLookUpEdit>().First();
+                        getPersons = (await _personService.GetAllPersonsAsync()).Select(p => new { p.Id, p.FullName }).ToList();
+                        cmb.UpdateGridLookUpEdit(getPersons);
+                        //await RefreshTransactionsAsync();
+                    },
+                });
+                frmPortable.FormClosing += (s1, e1) => SendKeys.SendWait("{Enter}");
+                await frmPortable.ShowDialogAsync();
+            });
             cmbPerson.ConvertGroupToGrid().HiddenColumn("Id");
+
+            #endregion
+
 
             var cmbType = ClsCollect.ModelRadioGroup("نوع فاکتور", new List<ClsCollect.modelRadioGroup>
             {

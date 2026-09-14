@@ -279,17 +279,22 @@ namespace Kavosh.Services
             await _repository.SaveChangesAsync();
         }
 
+
         public async Task RemoveDebtByHowToPayIdAsync(Guid howToPayId)
         {
             var debtEntry = await _repository.GetDebtByHowToPayIdAsync(howToPayId);
             if (debtEntry is null) return;
 
-            var alreadySettled = await _repository.IsAlreadySettledAsync(debtEntry.Id);
-            if (alreadySettled)
-                throw new InvalidOperationException("این چک قبلاً وصول شده؛ از فاکتور قابل حذف نیست.");
+            // اگه این بدهی/چک قبلاً وصول یا تسویه شده، رکورد خنثی‌کننده (وصول) هم باید حذف بشه
+            var offsettingEntries = await _repository.Find(d => d.SettledFromId == debtEntry.Id);
+            foreach (var offsetting in offsettingEntries)
+                await _repository.Remove(offsetting);
 
-            await _repository.Remove(debtEntry);   // Soft Delete، هماهنگ با بقیه‌ی جدول‌ها
+            await _repository.Remove(debtEntry);
             await _repository.SaveChangesAsync();
+
+            if (debtEntry.IsCheck)
+                await _chequeService.RemoveByHowToPayIdAsync(howToPayId);
         }
     }
 }

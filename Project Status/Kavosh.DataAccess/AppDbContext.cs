@@ -1,0 +1,144 @@
+using Kavosh.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
+
+
+namespace Kavosh.DataAccess
+{
+    public class AppDbContext : DbContext
+    {
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        {
+           
+        }
+        //[Table(name: "DefinitiveAccount", Schema = "Account")]
+        public DbSet<LoginUser> LoginUsers { get; set; }
+        public DbSet<Customer> Customers { get; set; }
+        public DbSet<DefinitiveAccount> DefinitiveAccounts { get; set; }
+        public DbSet<Person> Persons { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<ProductUnit> ProductUnits { get; set; }
+        public DbSet<ProductGroup> ProductGroups { get; set; }
+        public DbSet<FactorHeader> FactorHeaders { get; set; }
+        public DbSet<FactorDetail> FactorDetails { get; set; }
+        /// <summary>
+        /// نحوه پرداخت
+        /// </summary>
+        public DbSet<HowToPay> HowToPays { get; set; }
+        public DbSet<PaymentType> PaymentTypes { get; set; }
+        public DbSet<StoreInfo> StoreInfos { get; set; }
+        public DbSet<Cheque> Cheques { get; set; }
+        public DbSet<Marketer> Marketers { get; set; }
+
+        public DbSet<AppSetting> AppSettings { get; set; }
+        // TODO: به ازای هر یک از ۱۵ جدول، یک DbSet مشابه اینجا اضافه کنید
+        // public DbSet<Order> Orders { get; set; }
+        // public DbSet<Product> Products { get; set; }
+
+
+        public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
+        {
+            public AppDbContext CreateDbContext(string[] args)
+            {
+                var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+
+                // فقط برای Migration - مستقیم Connection String رو اینجا بنویس
+                //optionsBuilder.UseSqlServer("Data Source=.\\Kavosh;Initial Catalog=Account1;Integrated Security=false;MultipleActiveResultSets=true;TrustServerCertificate=True;User ID=sa;Password=Moaz1370110;");
+                optionsBuilder.UseSqlServer("Data Source=MOJTABAPC\\MOJTABA;Initial Catalog=Account1;Integrated Security=false;MultipleActiveResultSets=true;TrustServerCertificate=True;User ID=sa;Password=Moaz1370110;");
+
+                return new AppDbContext(optionsBuilder.Options);
+            }
+        }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<FactorHeader>(entity =>
+            {
+                entity.HasOne(f => f.Marketer)
+                    .WithMany(m => m.FactorHeaders)
+                    .HasForeignKey(f => f.MarketerId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<Cheque>(entity =>
+            {
+                entity.HasOne(c => c.Person)
+                    .WithMany(p => p.Cheques)
+                    .HasForeignKey(c => c.PersonId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(c => c.HowToPay)
+                    .WithMany()
+                    .HasForeignKey(c => c.HowToPayId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(c => c.DefinitiveAccount)
+                    .WithMany()
+                    .HasForeignKey(c => c.DefinitiveAccountId)
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            modelBuilder.Entity<Product>(entity =>
+            {
+                entity.ToTable("Products");
+                entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
+
+                entity.HasOne(p => p.ProductGroup)
+                    .WithMany(g => g.Products)
+                    .HasForeignKey(p => p.ProductGroupId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(p => p.ProductUnit)
+                    .WithMany(u => u.Products)
+                    .HasForeignKey(p => p.ProductUnitId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<ProductGroup>(entity =>
+            {
+                entity.ToTable("ProductGroups");
+                entity.Property(e => e.Title).IsRequired().HasMaxLength(150);
+            });
+
+            modelBuilder.Entity<ProductUnit>(entity =>
+            {
+                entity.ToTable("ProductUnits");
+                entity.Property(e => e.Title).IsRequired().HasMaxLength(50);
+            });
+
+            // ============= HowToPay =============
+            modelBuilder.Entity<HowToPay>(entity =>
+            {
+                entity.HasOne(h => h.FactorHeader)
+                    .WithMany(f => f.HowToPays)
+                    .HasForeignKey(h => h.FactorHeaderId)
+                    .OnDelete(DeleteBehavior.Cascade);   // حذف فاکتور => حذف روش‌های پرداختش
+
+                entity.HasOne(h => h.PaymentType)
+                    .WithMany(p => p.HowToPays)
+                    .HasForeignKey(h => h.PaymentTypeId)
+                    .OnDelete(DeleteBehavior.Restrict);  // حذف نوع پرداخت نباید تاریخچه رو پاک کنه
+            });
+
+            // ============= DefinitiveAccount =============
+            modelBuilder.Entity<DefinitiveAccount>(entity =>
+            {
+                entity.HasOne(d => d.Person)
+                    .WithMany(p => p.DefinitiveAccounts)
+                    .HasForeignKey(d => d.PersonId)
+                    .OnDelete(DeleteBehavior.Restrict);   // این مسیر Cascade باقی می‌مونه
+
+                entity.HasOne(d => d.HowToPay)
+                    .WithMany(h => h.DefinitiveAccounts)
+                    .HasForeignKey(d => d.HowToPayId)
+                    .OnDelete(DeleteBehavior.Restrict);  // 👈 کلید حل مشکل multiple cascade paths
+                // 👇 جدید — SQL Server اجازه‌ی Cascade روی خودارجاع نمی‌ده، حتماً Restrict
+                entity.HasOne(d => d.SettledFrom)
+                    .WithMany()
+                    .HasForeignKey(d => d.SettledFromId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+      
+            base.OnModelCreating(modelBuilder);
+        }
+    }
+}

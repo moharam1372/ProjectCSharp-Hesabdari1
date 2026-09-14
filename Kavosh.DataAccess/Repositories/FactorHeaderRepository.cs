@@ -13,7 +13,12 @@ namespace Kavosh.DataAccess.Repositories
         Task<List<FactorHeader>> GetAllWithPersonAsync();
         Task<Dictionary<Guid, bool>> GetHowToPaySettlementSnapshotAsync(Guid factorHeaderId);
         Task<List<FactorHeader>> GetAllWithPersonAndMarketerAsync();
-        Task<List<HowToPay>> GetHowToPaySnapshotAsync(Guid factorHeaderId);   
+        Task<List<HowToPay>> GetHowToPaySnapshotAsync(Guid factorHeaderId);
+
+        Task<List<FactorHeader>> GetByTypeAsync(bool type);
+        Task<List<FactorHeader>> GetByIdsAsync(List<Guid> ids);
+        Task<bool> IsFactorDocumentedAsync(Guid factorId);
+        Task<HashSet<Guid>> GetDocumentedFactorIdsAsync();
 
     }
 
@@ -193,6 +198,79 @@ namespace Kavosh.DataAccess.Repositories
                 .Where(p => p.FactorHeaderId == factorHeaderId)
                 .ToListAsync();
         }
-   
+        public async Task<List<FactorHeader>> GetByTypeAsync(bool type)
+        {
+            return await _dbSet
+                .AsNoTracking()
+                .Include(f => f.Person)
+                .Where(f => !f.IsDeleted && f.Type == type)
+                .OrderByDescending(f => f.Code)
+                .ToListAsync();
+        }
+
+        public async Task<List<FactorHeader>> GetByIdsAsync(List<Guid> ids)
+        {
+            return await _dbSet
+                .Where(f => ids.Contains(f.Id) && !f.IsDeleted)
+                .ToListAsync();
+        }
+
+        // بررسی می‌کند آیا این فاکتور در یکی از سندهای صندوق (سندخورده) حضور دارد یا نه
+        public async Task<bool> IsFactorDocumentedAsync(Guid factorId)
+        {
+            try
+            {
+                var allIds = await _context.Set<CashDocument>()
+                    .AsNoTracking()
+                    .Where(d => !d.IsDeleted)
+                    .Select(d => d.FactorHeaderIds)
+                    .ToListAsync();
+
+                var idStr = factorId.ToString();
+                return allIds.Any(ids => !string.IsNullOrWhiteSpace(ids) &&
+                                         ids.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                             .Any(p => p.Trim() == idStr));
+            }
+            catch (Exception e)
+            {
+                
+            }
+
+            return false;
+        }
+        // 👇 جدید — همه‌ی آیدی‌های فاکتورهایی که در یک سند صندوق (غیرحذف‌شده) حضور دارند، در یک کوئری
+        public async Task<HashSet<Guid>> GetDocumentedFactorIdsAsync()
+        {
+        ReBack:
+            try
+            {
+                var allFactorIdStrings = await _context.Set<CashDocument>()
+                    .AsNoTracking()
+                    .Where(d => !d.IsDeleted)
+                    .Select(d => d.FactorHeaderIds)
+                    .ToListAsync();
+
+                var result = new HashSet<Guid>();
+                foreach (var ids in allFactorIdStrings)
+                {
+                    if (string.IsNullOrWhiteSpace(ids)) continue;
+
+                    foreach (var part in ids.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        if (Guid.TryParse(part.Trim(), out var id))
+                            result.Add(id);
+                    }
+                }
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                await Task.Delay(500);
+                goto ReBack;
+            }
+
+           
+        }
     }
 }
